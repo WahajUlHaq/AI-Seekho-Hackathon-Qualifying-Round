@@ -1,0 +1,168 @@
+# ============================================================
+# Autonomous Content-to-Action Agent — .gitignore
+# Stack: TypeScript · Node.js · React · (monorepo)
+# ============================================================
+
+# ------------------------------------------------------------
+# Dependencies
+# ------------------------------------------------------------
+node_modules/
+**/node_modules/
+.pnp
+.pnp.js
+.yarn/install-state.gz
+
+# ------------------------------------------------------------
+# Build outputs
+# ------------------------------------------------------------
+dist/
+**/dist/
+build/
+**/build/
+out/
+**/out/
+.next/
+.nuxt/
+.output/
+.cache/
+**/coverage/
+*.tsbuildinfo
+
+# ------------------------------------------------------------
+# Environment & secrets  <- NEVER commit these
+# ------------------------------------------------------------
+.env
+.env.*
+!.env.example
+!.env.template
+!.env.*.example
+*.pem
+*.key
+*.cert
+secrets/
+credentials.json
+service-account*.json
+*-service-account.json
+
+# ------------------------------------------------------------
+# Logs & runtime artifacts
+# ------------------------------------------------------------
+logs/
+**/logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+*.pid
+*.seed
+
+# ------------------------------------------------------------
+# OS generated files
+# ------------------------------------------------------------
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+._*
+.Spotlight-V100
+.Trashes
+
+# Windows
+Thumbs.db
+Thumbs.db:encryptable
+ehthumbs.db
+ehthumbs_vista.db
+Desktop.ini
+$RECYCLE.BIN/
+*.lnk
+
+# Linux
+*~
+
+# ------------------------------------------------------------
+# IDE & editor files
+# ------------------------------------------------------------
+# VS Code
+.vscode/*
+!.vscode/extensions.json
+!.vscode/launch.json
+!.vscode/settings.json
+
+# JetBrains (WebStorm, IntelliJ, etc.)
+.idea/
+*.iml
+*.iws
+*.ipr
+
+# Vim / Neovim
+*.swp
+*.swo
+[._]*.s[a-v][a-z]
+[._]*.sw[a-p]
+Session.vim
+.netrwhist
+
+# Emacs
+\#*\#
+.\#*
+
+# Sublime Text
+*.sublime-workspace
+
+# ------------------------------------------------------------
+# TypeScript
+# ------------------------------------------------------------
+*.js.map
+*.d.ts.map
+
+# ------------------------------------------------------------
+# Testing & QA
+# ------------------------------------------------------------
+coverage/
+*.lcov
+.nyc_output/
+junit.xml
+test-results/
+playwright-report/
+.playwright/
+
+# ------------------------------------------------------------
+# Package manager lock files
+# Uncomment the lock files you do NOT use
+# ------------------------------------------------------------
+# package-lock.json   # keep if using npm
+# yarn.lock           # keep if using yarn
+# pnpm-lock.yaml      # keep if using pnpm
+
+# ------------------------------------------------------------
+# Docker & infrastructure
+# ------------------------------------------------------------
+.docker/
+docker-compose.override.yml
+
+# ------------------------------------------------------------
+# AI / LLM tooling
+# ------------------------------------------------------------
+# Claude Code session state (keep settings.json, ignore runtime state)
+.claude/todos/
+.claude/sessions/
+
+# Vector store / embeddings caches
+*.faiss
+*.index
+chroma_db/
+vector_store/
+embeddings_cache/
+
+# ------------------------------------------------------------
+# Miscellaneous
+# ------------------------------------------------------------
+*.tmp
+*.temp
+*.bak
+*.orig
+.turbo/
+.vercel/
+.netlify/

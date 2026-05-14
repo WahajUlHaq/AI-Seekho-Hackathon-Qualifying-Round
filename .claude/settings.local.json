@@ -1,0 +1,9 @@
+{
+  "permissions": {
+    "allow": [
+      "PowerShell(Get-ChildItem -Path \"D:\\\\Google Ai Seekho 2026\\\\Autonomous Content-to-Action Agent\" -Recurse -Depth 3 -File | Where-Object { $_.Extension -match '\\\\.\\(json|ts|js|py|env|toml|yaml|yml|txt|lock|config\\)$' } | Select-Object -ExpandProperty FullName)",
+      "PowerShell(Get-ChildItem -Path \"D:\\\\Google Ai Seekho 2026\\\\Autonomous Content-to-Action Agent\" -Recurse -Depth 2 -File | Where-Object { $_.Name -match '^\\(package\\\\.json|tsconfig\\\\.json|\\\\.env|requirements\\\\.txt|Dockerfile|docker-compose\\\\.yml|\\\\.eslintrc|\\\\.prettierrc|vite\\\\.config|next\\\\.config|tailwind\\\\.config\\)' } | Select-Object -ExpandProperty FullName)",
+      "PowerShell(Get-ChildItem -Path \"D:\\\\Google Ai Seekho 2026\\\\Autonomous Content-to-Action Agent\" -Recurse -Depth 3 -File | Where-Object { $_.Name -match '^package\\\\.json$' -and $_.FullName -notmatch 'node_modules' } | Select-Object -ExpandProperty FullName)"
+    ]
+  }
+}
