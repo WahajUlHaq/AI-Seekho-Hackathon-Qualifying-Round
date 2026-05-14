@@ -2,6 +2,10 @@ import { Router, Request, Response } from "express";
 import { v4 as uuidv4 } from "uuid";
 import { traceCollector } from "../tracing/collector";
 import { contractRegistry } from "../contracts/registry";
+import { pipelineOrchestrator } from "../agents/orchestrator";
+import { exportTrace } from "../tracing/exporter";
+import { RawSourceInput } from "../agents/multi-source-ingestion.agent";
+import { Constraints } from "../types/simulation.types";
 
 export const pipelineRoutes = Router();
 
@@ -10,8 +14,8 @@ pipelineRoutes.post("/run", async (req: Request, res: Response) => {
     const pipelineId = `PIPE-${uuidv4().replace(/-/g, "").slice(0, 8).toUpperCase()}`;
     try {
         const { sources, constraints } = req.body as {
-            sources?: unknown[];
-            constraints?: Record<string, unknown>;
+            sources?: RawSourceInput[];
+            constraints?: Partial<Constraints>;
         };
 
         if (!sources || !Array.isArray(sources) || sources.length === 0) {
@@ -21,24 +25,20 @@ pipelineRoutes.post("/run", async (req: Request, res: Response) => {
             return;
         }
 
-        // Orchestrator wired in Phase 4 — stub response for now
-        res.json({
-            pipeline_id: pipelineId,
-            status: "received",
-            message: "Orchestrator not yet implemented — Phase 4",
-            sources_received: sources.length,
-            constraints_received: constraints ?? {},
-        });
+        const result = await pipelineOrchestrator.run({ sources, constraints }, pipelineId);
+        res.json(result);
     } catch (err: unknown) {
         const message = err instanceof Error ? err.message : String(err);
         console.error(`[Pipeline] Run failed for ${pipelineId}:`, message);
-        res.status(500).json({ error: message, pipeline_id: pipelineId });
+        const trace = traceCollector.getTrace(pipelineId);
+        res.status(500).json({ error: message, pipeline_id: pipelineId, trace: trace ?? null });
     }
 });
 
 // GET /api/pipeline/:id
 pipelineRoutes.get("/:id", (req: Request, res: Response) => {
-    const trace = traceCollector.getTrace(req.params.id);
+    const id = Array.isArray(req.params.id) ? req.params.id[0] : req.params.id;
+    const trace = traceCollector.getTrace(id);
     if (!trace) {
         res.status(404).json({ error: "Pipeline not found" });
         return;
@@ -48,12 +48,13 @@ pipelineRoutes.get("/:id", (req: Request, res: Response) => {
 
 // GET /api/pipeline/:id/trace  (Antigravity trace export for judges)
 pipelineRoutes.get("/:id/trace", (req: Request, res: Response) => {
-    const trace = traceCollector.getTrace(req.params.id);
+    const id = Array.isArray(req.params.id) ? req.params.id[0] : req.params.id;
+    const trace = traceCollector.getTrace(id);
     if (!trace) {
         res.status(404).json({ error: "Pipeline trace not found" });
         return;
     }
-    res.json(trace);
+    res.json(exportTrace(trace));
 });
 
 // GET /api/pipeline/contracts/list

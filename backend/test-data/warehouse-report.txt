@@ -1,0 +1,22 @@
+WAREHOUSE INVENTORY REPORT
+Date: 2026-05-07T09:00:00Z
+Facility: Warehouse A, Karachi
+Prepared by: Inventory Management System
+
+Product: SKU-1234 (Premium Widget)
+Current Stock Count: 500 units
+Last Physical Count Date: 2026-05-07T09:00:00Z
+Reorder Point: 100 units
+Maximum Capacity: 1000 units
+Status: ADEQUATE
+
+Supplier: XYZ Logistics
+Lead Time: 7 days
+Last Delivery: 2026-04-30
+Next Scheduled Delivery: 2026-05-17
+
+Notes:
+- Annual supplier contract renewed for 2026.
+- Stock levels reviewed weekly.
+- No anomalies detected as of report date.
+- Reference: Internal Inventory Report #INV-2026-0507

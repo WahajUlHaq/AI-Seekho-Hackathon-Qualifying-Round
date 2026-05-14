@@ -1,0 +1,60 @@
+{
+  "sources": [
+    {
+      "source_id": "SRC-001",
+      "source_type": "pdf",
+      "content": "WAREHOUSE INVENTORY REPORT\nDate: 2026-05-07T09:00:00Z\nFacility: Warehouse A, Karachi\nProduct: SKU-1234 (Premium Widget)\nCurrent Stock Count: 500 units\nStatus: ADEQUATE\nNext Delivery: 2026-05-17\nReference: INV-2026-0507",
+      "metadata": {
+        "filename": "warehouse-report.txt",
+        "timestamp": "2026-05-07T09:00:00Z",
+        "authority_type": "official"
+      }
+    },
+    {
+      "source_id": "SRC-002",
+      "source_type": "csv",
+      "content": "date,product_sku,orders,demand_change_pct,revenue_pkr\n2026-05-14,SKU-1234,130,30,650000\n2026-05-13,SKU-1234,100,0,500000\n2026-05-12,SKU-1234,98,-2,490000\n2026-05-11,SKU-1234,102,2,510000\n2026-05-10,SKU-1234,95,-5,475000",
+      "metadata": {
+        "filename": "sales-dashboard.csv",
+        "timestamp": "2026-05-14T12:00:00Z",
+        "authority_type": "official"
+      }
+    },
+    {
+      "source_id": "SRC-003",
+      "source_type": "json",
+      "content": "{\"from\":\"supplier@xyzlogistics.com\",\"date\":\"2026-05-14T08:30:00Z\",\"subject\":\"Delivery Delay Notice\",\"body\":\"Due to transport strike, delivery of SKU-1234 (500 units) delayed by 3 days. New delivery date: 2026-05-17. Reference: SA-2026-0514\"}",
+      "metadata": {
+        "filename": "supplier-email.json",
+        "timestamp": "2026-05-14T08:30:00Z",
+        "authority_type": "official"
+      }
+    },
+    {
+      "source_id": "SRC-004",
+      "source_type": "url",
+      "content": "Transport strike continues to affect Karachi routes. Major logistics disruption reported across supply chains. Multiple warehouses report delivery delays of 2-5 days. Businesses urged to review inventory levels.",
+      "metadata": {
+        "url": "https://example.com/news/transport-delays-karachi",
+        "timestamp": "2026-05-14T06:00:00Z",
+        "authority_type": "news"
+      }
+    },
+    {
+      "source_id": "SRC-005",
+      "source_type": "realtime_feed",
+      "content": "[{\"timestamp\":\"2026-05-14T10:15:00Z\",\"customer_id\":\"C001\",\"message\":\"SKU-1234 shows out of stock. Cannot place order. Stock level appears to be 0 units.\",\"severity\":\"high\"},{\"timestamp\":\"2026-05-14T10:30:00Z\",\"customer_id\":\"C002\",\"message\":\"Tried purchasing SKU-1234 for 2 hours. Out of stock. Zero units available.\",\"severity\":\"high\"},{\"timestamp\":\"2026-05-14T10:45:00Z\",\"customer_id\":\"C003\",\"message\":\"SKU-1234 completely unavailable — 0 units in stock.\",\"severity\":\"critical\"},{\"timestamp\":\"2026-05-14T11:00:00Z\",\"customer_id\":\"C004\",\"message\":\"SKU-1234 out of stock with 0 units remaining.\",\"severity\":\"medium\"},{\"timestamp\":\"2026-05-14T11:10:00Z\",\"customer_id\":\"C005\",\"message\":\"Out of stock notice for SKU-1234. Stock shows 0 units.\",\"severity\":\"high\"}]",
+      "metadata": {
+        "feed_name": "customer-complaints",
+        "timestamp": "2026-05-14T11:10:00Z",
+        "authority_type": "user_generated"
+      }
+    }
+  ],
+  "constraints": {
+    "budget_limit": 500000,
+    "currency": "PKR",
+    "time_limit_hours": 24,
+    "urgency": "critical"
+  }
+}

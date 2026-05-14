@@ -1,0 +1,23 @@
+From: supplier@xyzlogistics.com
+To: procurement@company.com
+Date: 2026-05-14T08:30:00Z
+Subject: Delivery Delay Notice — Order #ORD-4521 (SKU-1234)
+
+Dear Valued Customer,
+
+Due to the ongoing transport strike affecting major Karachi routes since May 13, 2026,
+your scheduled delivery for Order #ORD-4521 has been delayed.
+
+Affected Items:
+- SKU-1234 (Premium Widget): 500 units
+- Original delivery date: 2026-05-14
+- New estimated delivery date: 2026-05-17
+
+We are monitoring the situation closely and will provide further updates.
+Reference: Supplier Advisory SA-2026-0514
+
+We sincerely apologize for the inconvenience.
+
+Best regards,
+Operations Team
+XYZ Logistics

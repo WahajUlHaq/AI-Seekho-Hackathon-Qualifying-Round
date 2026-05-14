@@ -10,7 +10,10 @@
       "Bash(grep -E \"/\\(express|ts-node|nodemon|zod|js-yaml|yaml|uuid|cors|@types\\)$\")",
       "Bash(xargs grep -l '\"name\": \"express\"')",
       "Bash(xargs -I{} sh -c 'echo \"=== {} ===\"; head -3 \"{}\"')",
-      "Bash(xargs head -5)"
+      "Bash(xargs head -5)",
+      "Bash(npx tsc *)",
+      "Bash(npm run *)",
+      "Bash(APP_ENV=development npx ts-node test/stress-tests.ts)"
     ]
   }
 }
