@@ -1,0 +1,51 @@
+{
+  "name": "content-action-agent-backend",
+  "version": "0.1.0",
+  "description": "Autonomous Content-to-Action Agent — Backend",
+  "main": "dist/index.js",
+  "scripts": {
+    "dev": "cross-env APP_ENV=development nodemon --watch src --ext ts --exec \"npx ts-node src/index.ts\"",
+    "build": "tsc",
+    "start": "node dist/index.js",
+    "test:llm": "cross-env APP_ENV=development npx ts-node src/utils/test-llm-client.ts",
+    "test:contracts": "cross-env APP_ENV=development npx ts-node src/contracts/test-validator.ts",
+    "test:stress": "cross-env APP_ENV=development npx ts-node test/stress-tests.ts",
+    "test:contradiction": "cross-env APP_ENV=development npx ts-node src/agents/test-contradiction-detector.ts"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "dependencies": {
+    "@extractus/article-extractor": "^8.1.0",
+    "@google-cloud/aiplatform": "^6.8.0",
+    "@google/generative-ai": "^0.24.1",
+    "axios": "^1.16.1",
+    "better-sqlite3": "^12.10.0",
+    "cheerio": "^1.2.0",
+    "cors": "^2.8.6",
+    "cross-env": "^10.1.0",
+    "csv-parser": "^3.2.1",
+    "dotenv": "^17.4.2",
+    "express": "^5.2.1",
+    "groq-sdk": "^1.2.0",
+    "js-yaml": "^4.1.1",
+    "multer": "^2.1.1",
+    "papaparse": "^5.5.3",
+    "pdf-parse": "^2.4.5",
+    "uuid": "^14.0.0",
+    "zod": "^4.4.3"
+  },
+  "devDependencies": {
+    "@types/better-sqlite3": "^7.6.13",
+    "@types/cors": "^2.8.19",
+    "@types/express": "^5.0.6",
+    "@types/js-yaml": "^4.0.9",
+    "@types/multer": "^2.1.0",
+    "@types/node": "^25.7.0",
+    "@types/pdf-parse": "^1.1.5",
+    "@types/uuid": "^10.0.0",
+    "nodemon": "^3.1.14",
+    "ts-node": "^10.9.2",
+    "typescript": "^6.0.3"
+  }
+}

@@ -1,0 +1,51 @@
+name: contradiction_detection
+version: "1.0"
+module: ContradictionDetectorAgent
+description: "Output contract for the contradiction detector agent"
+fields:
+  detection_id:
+    type: string
+    required: true
+    regex: "^DET-[A-Z0-9]{8}$"
+  contradictions_found:
+    type: number
+    required: true
+    min: 0
+  contradictions:
+    type: array
+    required: true
+    items:
+      type: object
+      properties:
+        contradiction_id:
+          type: string
+          required: true
+        topic:
+          type: string
+          required: true
+        severity:
+          type: string
+          required: true
+          enum: [CRITICAL, HIGH, MEDIUM, LOW]
+        type:
+          type: string
+          required: true
+          enum: [numeric, boolean, categorical, temporal]
+        sources_involved:
+          type: array
+          required: true
+        claim_a:
+          type: string
+          required: true
+        claim_b:
+          type: string
+          required: true
+        confidence:
+          type: number
+          required: true
+          min: 0
+          max: 1
+semantic_checks:
+  - "contradictions_found must equal the length of the contradictions array"
+  - "Each contradiction must involve at least 2 sources in sources_involved"
+  - "CRITICAL severity requires confidence >= 0.8"

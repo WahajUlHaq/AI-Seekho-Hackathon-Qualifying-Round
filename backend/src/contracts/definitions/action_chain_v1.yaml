@@ -1,0 +1,50 @@
+name: action_chain
+version: "1.0"
+module: ActionChainGeneratorAgent
+description: "Output contract for the action chain generator"
+fields:
+  chain_id:
+    type: string
+    required: true
+    regex: "^CHAIN-[A-Z0-9]{8}$"
+  action_count:
+    type: number
+    required: true
+    min: 3
+    max: 5
+  actions:
+    type: array
+    required: true
+    items:
+      type: object
+      properties:
+        action_id:
+          type: string
+          required: true
+        action_type:
+          type: string
+          required: true
+          enum: [diagnose, notify, update_system, mitigate, monitor, verify, escalate]
+        description:
+          type: string
+          required: true
+        depends_on:
+          type: array
+          required: true
+        simulatable:
+          type: boolean
+          required: true
+        constraints:
+          type: object
+          required: true
+        failure_recovery:
+          type: object
+          required: true
+  execution_order:
+    type: array
+    required: true
+semantic_checks:
+  - "action_count must equal the length of the actions array"
+  - "execution_order must only reference action_ids that exist in the actions array"
+  - "No circular dependencies in the depends_on chains"
+  - "Each action must have at least one constraint defined in its constraints object"
