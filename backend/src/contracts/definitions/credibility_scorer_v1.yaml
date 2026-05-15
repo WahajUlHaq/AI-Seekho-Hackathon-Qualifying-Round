@@ -1,20 +1,19 @@
-name: multi_source_ingestion
+name: credibility_scorer
 version: "1.0"
-module: MultiSourceIngestionAgent
-description: "Output contract for the multi-source ingestion agent"
+module: CredibilityScorerAgent
+description: "Output contract for the credibility scoring agent"
 fields:
-  ingestion_id:
+  scorer_id:
     type: string
     required: true
-    regex: "^ING-[A-Z0-9]{8}$"
-  timestamp:
+    regex: "^SCR-[A-Z0-9]{8}$"
+  scored_at:
     type: string
     required: true
-  sources_processed:
+  sources_scored:
     type: number
     required: true
     min: 1
-    max: 20
   sources:
     type: array
     required: true
@@ -31,13 +30,17 @@ fields:
         content:
           type: string
           required: true
-        credibility_tier:
-          type: string
-          enum: [HIGH, MEDIUM, LOW, UNVERIFIED]
         ingested_at:
           type: string
           required: true
+        credibility_tier:
+          type: string
+          required: true
+          enum: [HIGH, MEDIUM, LOW, UNVERIFIED]
+        credibility_score:
+          type: object
+          required: true
 semantic_checks:
-  - "Each source must have non-empty content"
-  - "ingestion_id must follow ING-XXXXXXXX pattern with 8 uppercase alphanumeric chars"
-  - "sources_processed must equal the length of the sources array"
+  - "sources_scored must equal the length of the sources array"
+  - "Each source must have a credibility_score with recency, authority, quality, and total fields"
+  - "total credibility score must equal recency + authority + quality for each source"

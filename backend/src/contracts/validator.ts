@@ -132,7 +132,15 @@ RULE_1: PASS|FAIL - reason
 RULE_2: PASS|FAIL - reason
 OVERALL: PASS|FAIL`;
 
-        const response = await llmClient.complete(prompt, true);
+        let response: string;
+        try {
+            response = await llmClient.complete(prompt, true);
+        } catch (err: unknown) {
+            // LLM unavailable (quota/network) — fall back to structural result only
+            console.warn(`[ContractValidator] Semantic validation skipped (LLM unavailable): ${(err as Error).message?.slice(0, 120)}`);
+            return { ...structural, semantic_issues: [] };
+        }
+
         const semantic_issues: string[] = [];
         let overallFail = false;
 

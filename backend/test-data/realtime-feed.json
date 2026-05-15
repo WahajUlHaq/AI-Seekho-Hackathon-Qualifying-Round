@@ -1,0 +1,86 @@
+[
+  {
+    "id": "EVT-001",
+    "timestamp": "2026-05-14T06:00:00Z",
+    "source": "FEED-REALTIME-01",
+    "event_type": "inventory_update",
+    "payload": { "item_id": "ITM-A1", "quantity": 450, "location": "WH-NORTH", "status": "in_stock", "confidence": "high" }
+  },
+  {
+    "id": "EVT-002",
+    "timestamp": "2026-05-14T06:05:00Z",
+    "source": "FEED-REALTIME-01",
+    "event_type": "shipment_alert",
+    "payload": { "carrier": "NorthRoute Carrier", "route": "WH-NORTH-TO-WH-SOUTH", "status": "suspended", "estimated_resume": "2026-05-17T09:00:00Z" }
+  },
+  {
+    "id": "EVT-003",
+    "timestamp": "2026-05-14T06:10:00Z",
+    "source": "FEED-REALTIME-01",
+    "event_type": "supplier_status",
+    "payload": { "supplier_id": "SUPP-X1", "certified": true, "capacity_units_per_day": 200, "routing_available": "WH-EAST" }
+  },
+  {
+    "id": "EVT-004",
+    "timestamp": "2026-05-14T06:15:00Z",
+    "source": "FEED-REALTIME-01",
+    "event_type": "inventory_update",
+    "payload": { "item_id": "ITM-A2", "quantity": 0, "location": "WH-SOUTH", "status": "out_of_stock", "confidence": "high" }
+  },
+  {
+    "id": "EVT-005",
+    "timestamp": "2026-05-14T06:20:00Z",
+    "source": "FEED-REALTIME-01",
+    "event_type": "demand_signal",
+    "payload": { "item_id": "ITM-A1", "demand_units": 520, "period": "Q2-2026", "priority": "critical" }
+  },
+  {
+    "id": "EVT-006",
+    "timestamp": "2026-05-14T06:30:00Z",
+    "source": "FEED-REALTIME-01",
+    "event_type": "inventory_update",
+    "payload": { "item_id": "ITM-B1", "quantity": 2100, "location": "WH-WEST", "status": "in_stock", "confidence": "medium" }
+  },
+  {
+    "id": "EVT-007",
+    "timestamp": "2026-05-14T06:45:00Z",
+    "source": "FEED-REALTIME-01",
+    "event_type": "shipment_alert",
+    "payload": { "carrier": "EastPath Logistics", "route": "WH-EAST-TO-WH-SOUTH", "status": "active", "capacity_remaining_units": 180 }
+  },
+  {
+    "id": "EVT-008",
+    "timestamp": "2026-05-14T07:00:00Z",
+    "source": "FEED-REALTIME-01",
+    "event_type": "inventory_update",
+    "payload": { "item_id": "ITM-C1", "quantity": 760, "location": "WH-NORTH", "status": "in_stock", "confidence": "high" }
+  },
+  {
+    "id": "EVT-009",
+    "timestamp": "2026-05-14T07:15:00Z",
+    "source": "FEED-REALTIME-01",
+    "event_type": "supplier_status",
+    "payload": { "supplier_id": "SUPP-Y2", "certified": false, "reason": "audit_pending", "expected_clearance": "2026-05-20T00:00:00Z" }
+  },
+  {
+    "id": "EVT-010",
+    "timestamp": "2026-05-14T07:30:00Z",
+    "source": "FEED-REALTIME-01",
+    "event_type": "demand_signal",
+    "payload": { "item_id": "ITM-B2", "demand_units": 400, "period": "Q2-2026", "priority": "medium" }
+  },
+  {
+    "id": "EVT-011",
+    "timestamp": "2026-05-14T08:00:00Z",
+    "source": "FEED-REALTIME-01",
+    "event_type": "inventory_update",
+    "payload": { "item_id": "ITM-A3", "quantity": 920, "location": "WH-EAST", "status": "in_stock", "confidence": "high" }
+  },
+  {
+    "id": "EVT-012",
+    "timestamp": "2026-05-14T08:30:00Z",
+    "source": "FEED-REALTIME-01",
+    "event_type": "shipment_alert",
+    "payload": { "carrier": "NorthRoute Carrier", "route": "WH-NORTH-TO-WH-SOUTH", "status": "suspended", "update": "suspension confirmed for 72 hours", "item_id": "ITM-A1", "quantity_held": 450 }
+  }
+]

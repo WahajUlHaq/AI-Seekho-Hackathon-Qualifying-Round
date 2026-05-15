@@ -1,0 +1,14 @@
+{
+  "patterns": [
+    { "pattern": "gov\\.example",          "score": 28 },
+    { "pattern": "intl-logistics\\.org",   "score": 25 },
+    { "pattern": "globalshipping\\.net",   "score": 22 },
+    { "pattern": "freightwatch\\.io",      "score": 20 },
+    { "pattern": "supplierportal\\.co",    "score": 18 },
+    { "pattern": "tradeinfo\\.com",        "score": 16 },
+    { "pattern": "blogspot\\.com",         "score": 5  },
+    { "pattern": "reddit\\.com",           "score": 4  }
+  ],
+  "defaultFallback": "llm",
+  "nonUrlDefaultScore": 15
+}

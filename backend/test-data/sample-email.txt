@@ -1,0 +1,41 @@
+From: logistics@globalfreight.co
+To: operations-team@globalfreight.co
+Subject: URGENT - NorthRoute Carrier Route Suspension & WH-NORTH Impact
+Date: Thu, 14 May 2026 09:15:00 +0000
+
+Team,
+
+I'm writing to confirm the route suspension affecting NorthRoute Carrier on the WH-NORTH to WH-SOUTH corridor, effective as of this morning.
+
+Key details:
+- Carrier: NorthRoute Carrier (Contract NRC-2026-08)
+- Affected route: WH-NORTH -> WH-SOUTH (primary lane)
+- Estimated suspension duration: 72 hours (until approximately 2026-05-17 09:00 UTC)
+- Reason: Infrastructure maintenance on the freight bridge at KM-47
+
+Impact assessment:
+- Item ITM-A1 has 380 units sitting at WH-NORTH that cannot be dispatched during the suspension.
+- Demand forecast shows a requirement of 520 units of ITM-A1 by end of quarter.
+- Supplier SUPP-X1 confirmed their certification is ACTIVE and can fulfil alternative routing.
+- Recommend activating secondary carrier (EastPath Logistics) for overflow capacity.
+
+---
+
+From: procurement@globalfreight.co
+To: logistics@globalfreight.co
+Subject: RE: URGENT - NorthRoute Carrier Route Suspension & WH-NORTH Impact
+Date: Thu, 14 May 2026 10:42:00 +0000
+
+Logistics,
+
+Confirmed. We have spoken with EastPath Logistics and they can absorb approximately 200 units per day from WH-EAST. This partially covers the shortfall but we still face a gap of roughly 120 units if the suspension extends beyond 72 hours.
+
+Please also note: our real-time feed shows ITM-A1 inventory at 450 units as of 06:00 UTC - this contradicts the 380 figure in the CSV export from last night. We need to reconcile these numbers before committing to any procurement orders.
+
+Action items:
+1. Confirm actual ITM-A1 count at WH-NORTH with physical audit.
+2. Contact NorthRoute Carrier for written confirmation of suspension timeline.
+3. Evaluate SUPP-X1 alternative routing via WH-EAST.
+
+Regards,
+Procurement Team

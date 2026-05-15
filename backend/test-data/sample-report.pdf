@@ -1,0 +1,70 @@
+%PDF-1.4
+1 0 obj
+<< /Type /Catalog /Pages 2 0 R >>
+endobj
+2 0 obj
+<< /Type /Pages /Kids [3 0 R] /Count 1 >>
+endobj
+3 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Contents 4 0 R /Resources << /Font << /F1 5 0 R >> >> >>
+endobj
+4 0 obj
+<< /Length 1173 >>
+stream
+BT
+/F1 12 Tf
+50 750 Td
+(SUPPLY CHAIN OPERATIONS REPORT - Q2 2026) Tj
+0 -25 Td
+(================================================) Tj
+0 -20 Td
+(SECTION 1: INVENTORY STATUS) Tj
+0 -18 Td
+(Item ITM-A1: 400 units available at WH-NORTH facility) Tj
+0 -18 Td
+(Item ITM-A2: Out of stock at WH-SOUTH - urgent restock required) Tj
+0 -18 Td
+(Item ITM-A3: 920 units at WH-EAST - sufficient buffer) Tj
+0 -18 Td
+(Item ITM-B1: 2100 units at WH-WEST - overstocked) Tj
+0 -25 Td
+(SECTION 2: SUPPLIER PERFORMANCE) Tj
+0 -18 Td
+(Supplier SUPP-X1: Certification status VERIFIED - active contract) Tj
+0 -18 Td
+(Supplier SUPP-Y2: Certification PENDING - audit scheduled 2026-05-20) Tj
+0 -25 Td
+(SECTION 3: LOGISTICS DISRUPTION) Tj
+0 -18 Td
+(NorthRoute Carrier: Route WH-NORTH to WH-SOUTH suspended) Tj
+0 -18 Td
+(Estimated suspension: 72 hours from 2026-05-14 09:00 UTC) Tj
+0 -18 Td
+(EastPath Logistics: Available as backup - capacity 200 units/day) Tj
+0 -25 Td
+(SECTION 4: DEMAND FORECAST) Tj
+0 -18 Td
+(ITM-A1 demand Q2-2026: 520 units - CRITICAL priority) Tj
+0 -18 Td
+(ITM-B2 demand Q2-2026: 400 units - MEDIUM priority) Tj
+0 -18 Td
+(Shortfall risk: 120 units if suspension exceeds 72 hours) Tj
+ET
+endstream
+endobj
+5 0 obj
+<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica >>
+endobj
+xref
+0 6
+0000000000 65535 f 
+0000000009 00000 n 
+0000000058 00000 n 
+0000000115 00000 n 
+0000000241 00000 n 
+0000001466 00000 n 
+trailer
+<< /Size 6 /Root 1 0 R >>
+startxref
+1536
+%%EOF

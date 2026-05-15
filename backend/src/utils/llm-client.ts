@@ -14,15 +14,15 @@ const APP_ENV = (process.env.APP_ENV || "development") as AppEnv;
 // Provider configuration per environment
 const PROVIDER_CONFIG = {
     development: {
-        primary: "gemini-free",
-        fallback: "groq",
+        primary: process.env.PRIMARY_PROVIDER || "gemini-free",
+        fallback: process.env.FALLBACK_PROVIDER || "groq",
         emergency: null,
         model: process.env.PRIMARY_MODEL || "gemini-2.0-flash",
         baseModel: process.env.BASE_MODEL || "gemini-1.5-pro",
     },
     staging: {
-        primary: "gemini-free",
-        fallback: "groq",
+        primary: process.env.PRIMARY_PROVIDER || "gemini-free",
+        fallback: process.env.FALLBACK_PROVIDER || "groq",
         emergency: null,
         model: process.env.PRIMARY_MODEL || "gemini-1.5-pro",
         baseModel: process.env.BASE_MODEL || "gemini-1.5-pro",

@@ -1,20 +1,27 @@
-name: multi_source_ingestion
+name: noise_filter
 version: "1.0"
-module: MultiSourceIngestionAgent
-description: "Output contract for the multi-source ingestion agent"
+module: NoiseFilterAgent
+description: "Output contract for the noise filter and deduplication agent"
 fields:
-  ingestion_id:
+  filter_id:
     type: string
     required: true
-    regex: "^ING-[A-Z0-9]{8}$"
-  timestamp:
+    regex: "^FLT-[A-Z0-9]{8}$"
+  filtered_at:
     type: string
     required: true
-  sources_processed:
+  input_count:
     type: number
     required: true
-    min: 1
-    max: 20
+    min: 0
+  output_count:
+    type: number
+    required: true
+    min: 0
+  removed_count:
+    type: number
+    required: true
+    min: 0
   sources:
     type: array
     required: true
@@ -33,11 +40,12 @@ fields:
           required: true
         credibility_tier:
           type: string
+          required: true
           enum: [HIGH, MEDIUM, LOW, UNVERIFIED]
         ingested_at:
           type: string
           required: true
 semantic_checks:
-  - "Each source must have non-empty content"
-  - "ingestion_id must follow ING-XXXXXXXX pattern with 8 uppercase alphanumeric chars"
-  - "sources_processed must equal the length of the sources array"
+  - "output_count must equal the length of the sources array"
+  - "removed_count must equal input_count minus output_count"
+  - "output_count must be less than or equal to input_count"
