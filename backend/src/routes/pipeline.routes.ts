@@ -1,7 +1,6 @@
 import { Router, Request, Response } from "express";
 import { v4 as uuidv4 } from "uuid";
 import { traceCollector } from "../tracing/collector";
-import { contractRegistry } from "../contracts/registry";
 
 export const pipelineRoutes = Router();
 
@@ -38,7 +37,7 @@ pipelineRoutes.post("/run", async (req: Request, res: Response) => {
 
 // GET /api/pipeline/:id
 pipelineRoutes.get("/:id", (req: Request, res: Response) => {
-    const trace = traceCollector.getTrace(req.params.id);
+    const trace = traceCollector.getTrace(req.params.id as string);
     if (!trace) {
         res.status(404).json({ error: "Pipeline not found" });
         return;
@@ -48,15 +47,10 @@ pipelineRoutes.get("/:id", (req: Request, res: Response) => {
 
 // GET /api/pipeline/:id/trace  (Antigravity trace export for judges)
 pipelineRoutes.get("/:id/trace", (req: Request, res: Response) => {
-    const trace = traceCollector.getTrace(req.params.id);
+    const trace = traceCollector.getTrace(req.params.id as string);
     if (!trace) {
         res.status(404).json({ error: "Pipeline trace not found" });
         return;
     }
     res.json(trace);
-});
-
-// GET /api/pipeline/contracts/list
-pipelineRoutes.get("/contracts/list", (_req: Request, res: Response) => {
-    res.json({ contracts: contractRegistry.list() });
 });

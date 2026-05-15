@@ -1,6 +1,6 @@
 import { llmClient } from "../utils/llm-client";
 import { contractRegistry } from "../contracts/registry";
-import { contractValidator, ValidationResult } from "../contracts/validator";
+import { decisionGate } from "../contracts/decision-gate";
 import { traceCollector } from "../tracing/collector";
 
 export interface AgentInput {
@@ -13,6 +13,11 @@ export interface AgentOutput {
     agent_name: string;
     completed_at: string;
     [key: string]: unknown;
+}
+
+export interface RetryContext {
+    attempt: number;
+    previousErrors: string[];
 }
 
 export abstract class BaseAgent<
@@ -30,6 +35,7 @@ export abstract class BaseAgent<
 
     async run(input: TInput): Promise<TOutput> {
         const { pipeline_id } = input;
+        const runStart = Date.now();
 
         traceCollector.log(pipeline_id, {
             pipeline_id,
@@ -39,29 +45,30 @@ export abstract class BaseAgent<
         });
 
         let output: TOutput | null = null;
-        let lastValidation: ValidationResult | null = null;
+        let lastAction: "PASS" | "WARN" | "REJECT" | "NO_CONTRACT" = "NO_CONTRACT";
+        let lastErrors: string[] = [];
 
         for (let attempt = 1; attempt <= this.maxRetries; attempt++) {
-            output = await this.execute(input);
+            const retryContext: RetryContext | undefined =
+                attempt > 1 ? { attempt, previousErrors: lastErrors } : undefined;
+
+            output = await this.execute(input, retryContext);
 
             const contract = contractRegistry.get(this.contractName);
             if (contract) {
-                lastValidation = contractValidator.validate(output, contract);
+                const gateResult = await decisionGate.evaluate(output, contract);
+                lastAction = gateResult.action;
 
                 traceCollector.log(pipeline_id, {
+                    ...gateResult.traceEvent,
                     pipeline_id,
-                    event_type: "contract_gate",
                     agent: this.agentName,
-                    message: `Contract gate: ${lastValidation.level} (attempt ${attempt}/${this.maxRetries})`,
-                    decision: lastValidation.level,
-                    confidence: lastValidation.passed ? 1.0 : 0.0,
-                    data: {
-                        errors: lastValidation.errors,
-                        warnings: lastValidation.warnings,
-                    },
+                    message: `Contract gate: ${gateResult.action} (attempt ${attempt}/${this.maxRetries})`,
                 });
 
-                if (lastValidation.level !== "REJECT") break;
+                if (gateResult.action !== "REJECT") break;
+
+                lastErrors = gateResult.errors;
 
                 if (attempt < this.maxRetries) {
                     console.warn(
@@ -79,18 +86,26 @@ export abstract class BaseAgent<
             }
         }
 
+        const execution_duration_ms = Date.now() - runStart;
+
         traceCollector.log(pipeline_id, {
             pipeline_id,
             event_type: "agent_complete",
             agent: this.agentName,
             message: `${this.agentName} completed`,
-            data: { validation_level: lastValidation?.level ?? "NO_CONTRACT" },
+            data: {
+                validation_level: lastAction,
+                execution_duration_ms,
+            },
         });
 
         return output!;
     }
 
-    protected abstract execute(input: TInput): Promise<TOutput>;
+    protected abstract execute(
+        input: TInput,
+        retryContext?: RetryContext
+    ): Promise<TOutput>;
 
     protected async llmComplete(
         pipelineId: string,

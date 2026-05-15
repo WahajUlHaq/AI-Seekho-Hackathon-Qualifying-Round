@@ -10,7 +10,10 @@
       "Bash(grep -E \"/\\(express|ts-node|nodemon|zod|js-yaml|yaml|uuid|cors|@types\\)$\")",
       "Bash(xargs grep -l '\"name\": \"express\"')",
       "Bash(xargs -I{} sh -c 'echo \"=== {} ===\"; head -3 \"{}\"')",
-      "Bash(xargs head -5)"
+      "Bash(xargs head -5)",
+      "Bash(curl -s -X POST http://localhost:8000/api/pipeline/run -H 'Content-Type: application/json' -d '{\"sources\":[{\"type\":\"test\"}]}')",
+      "Bash(python3 -m json.tool)",
+      "Bash(curl -s http://localhost:8000/api/validations)"
     ]
   }
 }

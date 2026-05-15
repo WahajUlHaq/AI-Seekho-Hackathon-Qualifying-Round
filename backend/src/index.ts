@@ -10,6 +10,8 @@ import express, { Request, Response, NextFunction } from "express";
 import cors from "cors";
 import { contractRegistry } from "./contracts/registry";
 import { pipelineRoutes } from "./routes/pipeline.routes";
+import { contractsRoutes } from "./routes/contracts.routes";
+import { validationsRoutes } from "./routes/validations.routes";
 
 const app = express();
 const PORT = process.env.PORT || 8000;
@@ -45,6 +47,8 @@ app.get("/health", (_req: Request, res: Response) => {
 });
 
 app.use("/api/pipeline", pipelineRoutes);
+app.use("/api/contracts", contractsRoutes);
+app.use("/api/validations", validationsRoutes);
 
 // Global error handler
 app.use((err: Error, _req: Request, res: Response, _next: NextFunction) => {

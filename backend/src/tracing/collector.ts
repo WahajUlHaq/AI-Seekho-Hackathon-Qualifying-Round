@@ -119,6 +119,10 @@ export class TraceCollector {
         return this.traces.get(pipelineId);
     }
 
+    getAll(): PipelineTrace[] {
+        return Array.from(this.traces.values());
+    }
+
     finalizePipeline(pipelineId: string): PipelineTrace {
         const trace = this.traces.get(pipelineId);
         if (!trace) throw new Error(`Pipeline trace not found: ${pipelineId}`);
