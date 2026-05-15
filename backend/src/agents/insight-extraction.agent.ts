@@ -52,7 +52,7 @@ export interface InsightExtractionOutput extends AgentOutput {
     trends: TrendItem[];
     risks: RiskItem[];
     opportunities: OpportunityItem[];
-    persistent_conflicts: ConflictSummary[];
+    persistentConflicts: ConflictSummary[];
 }
 
 function makeId(prefix: string, len = 8): string {
@@ -67,7 +67,7 @@ export class InsightExtractionAgent extends BaseAgent<
     private readonly vectorStore: VectorStore;
 
     constructor(vectorStore?: VectorStore) {
-        super("InsightExtractionAgent", "insight_extraction");
+        super("InsightExtractionAgent", "insight_extraction_v1");
 
         const thresholdsPath = path.resolve(__dirname, "../../config/agentThresholds.config.json");
         const thresholds = JSON.parse(fs.readFileSync(thresholdsPath, "utf-8"));
@@ -94,18 +94,20 @@ export class InsightExtractionAgent extends BaseAgent<
             allChunks.push(...chunks);
         }
 
-        // Step B: embed and index in batches
+        // Step B: embed and index in batches — fail-safe via Promise.allSettled so a single failure doesn't drop the batch
         const { embeddingBatchSize } = this.cfg;
         for (let i = 0; i < allChunks.length; i += embeddingBatchSize) {
             const batch = allChunks.slice(i, i + embeddingBatchSize);
-            const embeddings = await Promise.all(
-                batch.map(chunk => this.llmEmbed(pipeline_id, chunk.text).catch(() => [] as number[]))
+            const settled = await Promise.allSettled(
+                batch.map(chunk => this.llmEmbed(pipeline_id, chunk.text))
             );
             for (let j = 0; j < batch.length; j++) {
-                if (embeddings[j].length > 0) {
-                    batch[j].embedding = embeddings[j];
+                const result = settled[j];
+                if (result.status === "fulfilled" && result.value.length > 0) {
+                    batch[j].embedding = result.value;
                     await this.vectorStore.upsert(batch[j]);
                 }
+                // rejected embeddings silently dropped — already traced by llmEmbed's error path
             }
         }
 
@@ -190,7 +192,7 @@ export class InsightExtractionAgent extends BaseAgent<
         trends: TrendItem[];
         risks: RiskItem[];
         opportunities: OpportunityItem[];
-        persistent_conflicts: ConflictSummary[];
+        persistentConflicts: ConflictSummary[];
     }> {
         const unresolvedTopics = investigationPaths.map(p => p.topic).join(", ") || "none";
 
@@ -206,7 +208,7 @@ Reply with ONLY valid JSON matching this exact shape:
   "trends": [{"title": "string", "description": "string", "confidence": 0.0}],
   "risks": [{"title": "string", "description": "string", "severity": "LOW|MEDIUM|HIGH|CRITICAL"}],
   "opportunities": [{"title": "string", "description": "string"}],
-  "persistent_conflicts": [{"topic": "string", "summary": "string"}]
+  "persistentConflicts": [{"topic": "string", "summary": "string"}]
 }
 
 Requirements:
@@ -223,7 +225,7 @@ Requirements:
                     trends:              Array.isArray(parsed.trends)              ? parsed.trends              : [{ title: "Analysis complete", description: "See context", confidence: 0.5 }],
                     risks:               Array.isArray(parsed.risks)               ? parsed.risks               : [{ title: "Unknown risk", description: "Manual review recommended", severity: "MEDIUM" }],
                     opportunities:       Array.isArray(parsed.opportunities)       ? parsed.opportunities       : [{ title: "Review opportunities", description: "Further analysis required" }],
-                    persistent_conflicts: Array.isArray(parsed.persistent_conflicts) ? parsed.persistent_conflicts : [],
+                    persistentConflicts: Array.isArray(parsed.persistentConflicts) ? parsed.persistentConflicts : [],
                 };
             }
         } catch {
@@ -234,7 +236,7 @@ Requirements:
             trends:              [{ title: "Synthesis error", description: "LLM synthesis failed — manual review required", confidence: 0 }],
             risks:               [{ title: "Synthesis unavailable", description: "Could not extract risks automatically", severity: "MEDIUM" }],
             opportunities:       [{ title: "Synthesis unavailable", description: "Could not extract opportunities automatically" }],
-            persistent_conflicts: investigationPaths.map(p => ({ topic: p.topic, summary: p.recommended_steps.join("; ") })),
+            persistentConflicts: investigationPaths.map(p => ({ topic: p.topic, summary: p.recommended_steps.join("; ") })),
         };
     }
 }

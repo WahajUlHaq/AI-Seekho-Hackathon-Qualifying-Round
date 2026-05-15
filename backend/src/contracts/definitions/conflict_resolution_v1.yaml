@@ -1,4 +1,4 @@
-name: conflict_resolution
+name: conflict_resolution_v1
 version: "1.0"
 module: ConflictResolutionAgent
 description: "Output contract for the conflict resolution agent"
@@ -19,7 +19,7 @@ fields:
         contradiction_id:
           type: string
           required: true
-        strategy:
+        resolutionMethod:
           type: string
           required: true
           enum: [credibility_weighted, recency_weighted, weighted_average, investigation_required]
@@ -35,5 +35,5 @@ fields:
     type: array
     required: true
 semantic_checks:
-  - "investigation_required strategy must produce a corresponding entry in investigation_paths"
+  - "investigation_required resolutionMethod must produce a corresponding entry in investigation_paths"
   - "Each resolution must reference a contradiction_id from the input contradictions"

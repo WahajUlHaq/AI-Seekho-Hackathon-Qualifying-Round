@@ -18,8 +18,8 @@ async function runTests() {
         }
     }
 
-    const ingestionContract = contractRegistry.getRequired("multi_source_ingestion");
-    const contradictionContract = contractRegistry.getRequired("contradiction_detection");
+    const ingestionContract = contractRegistry.getRequired("multi_source_ingestion_v1");
+    const contradictionContract = contractRegistry.getRequired("contradiction_detection_v1");
     const actionChainContract = contractRegistry.getRequired("action_chain");
 
     // Test 1: Valid multi_source_ingestion → PASS

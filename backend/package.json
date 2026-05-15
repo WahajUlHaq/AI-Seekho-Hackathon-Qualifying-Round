@@ -11,7 +11,8 @@
     "test:smoke": "cross-env APP_ENV=development npx ts-node src/utils/smoke-test-singleton.ts",
     "test:contracts": "cross-env APP_ENV=development npx ts-node src/contracts/test-validator.ts",
     "test:stress": "cross-env APP_ENV=development npx ts-node test/stress-tests.ts",
-    "test:contradiction": "cross-env APP_ENV=development npx ts-node src/agents/test-contradiction-detector.ts"
+    "test:contradiction": "cross-env APP_ENV=development npx ts-node src/agents/test-contradiction-detector.ts",
+    "pipeline:run": "cross-env APP_ENV=development npx ts-node src/pipeline-runner.ts"
   },
   "engines": {
     "node": ">=18.0.0"

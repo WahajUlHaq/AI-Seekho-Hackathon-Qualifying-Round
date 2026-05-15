@@ -1,4 +1,4 @@
-name: multi_source_ingestion
+name: multi_source_ingestion_v1
 version: "1.0"
 module: MultiSourceIngestionAgent
 description: "Output contract for the multi-source ingestion agent"

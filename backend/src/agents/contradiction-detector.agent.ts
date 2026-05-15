@@ -62,7 +62,7 @@ export class ContradictionDetectorAgent extends BaseAgent<
     private readonly cfg: ContradictionDetectorConfig;
 
     constructor() {
-        super("ContradictionDetectorAgent", "contradiction_detection");
+        super("ContradictionDetectorAgent", "contradiction_detection_v1");
 
         const thresholdsPath = path.resolve(__dirname, "../../config/agentThresholds.config.json");
         const thresholds = JSON.parse(fs.readFileSync(thresholdsPath, "utf-8"));

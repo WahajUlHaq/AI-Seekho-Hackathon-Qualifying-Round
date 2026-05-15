@@ -7,6 +7,7 @@ export type TraceEventType =
     | "contract_gate"
     | "action_execute"
     | "failure"
+    | "ingestion_error"
     | "recovery"
     | "decision";
 

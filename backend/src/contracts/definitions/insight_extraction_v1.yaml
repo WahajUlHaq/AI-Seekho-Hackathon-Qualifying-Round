@@ -1,4 +1,4 @@
-name: insight_extraction
+name: insight_extraction_v1
 version: "1.0"
 module: InsightExtractionAgent
 description: "Output contract for the RAG-powered insight extraction agent"
@@ -27,7 +27,7 @@ fields:
   opportunities:
     type: array
     required: true
-  persistent_conflicts:
+  persistentConflicts:
     type: array
     required: true
 semantic_checks:

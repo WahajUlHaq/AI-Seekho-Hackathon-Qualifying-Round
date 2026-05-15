@@ -1,4 +1,4 @@
-name: noise_filter
+name: noise_filter_v1
 version: "1.0"
 module: NoiseFilterAgent
 description: "Output contract for the noise filter and deduplication agent"

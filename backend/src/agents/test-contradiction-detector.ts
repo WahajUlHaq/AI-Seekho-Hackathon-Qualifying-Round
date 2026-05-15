@@ -136,7 +136,7 @@ async function runTests() {
     );
 
     // --- Test 5: Contract validation on result1 ---
-    const contract = contractRegistry.get("contradiction_detection");
+    const contract = contractRegistry.get("contradiction_detection_v1");
     if (contract) {
         const validationResult = contractValidator.validate(result1, contract);
         console.log("\n[Test 5] Contract gate on result1:");
@@ -148,7 +148,7 @@ async function runTests() {
             validationResult.level !== "REJECT"
         );
     } else {
-        console.log("⚠️  contradiction_detection contract not loaded — skipping test 5");
+        console.log("⚠️  contradiction_detection_v1 contract not loaded — skipping test 5");
         total++;
         passed++;
     }

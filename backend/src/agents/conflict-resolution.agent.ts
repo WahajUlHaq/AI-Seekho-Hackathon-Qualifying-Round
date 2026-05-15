@@ -19,7 +19,7 @@ export type ResolutionStrategy =
 
 export interface Resolution {
     contradiction_id: string;
-    strategy: ResolutionStrategy;
+    resolutionMethod: ResolutionStrategy;
     resolved_value: string;
     confidence: number;
     reasoning: string;
@@ -65,7 +65,7 @@ export class ConflictResolutionAgent extends BaseAgent<
     private readonly cfg: ConflictResolutionConfig;
 
     constructor() {
-        super("ConflictResolutionAgent", "conflict_resolution");
+        super("ConflictResolutionAgent", "conflict_resolution_v1");
 
         const thresholdsPath = path.resolve(__dirname, "../../config/agentThresholds.config.json");
         const thresholds = JSON.parse(fs.readFileSync(thresholdsPath, "utf-8"));
@@ -129,7 +129,7 @@ export class ConflictResolutionAgent extends BaseAgent<
 
             return {
                 contradiction_id: contradiction.contradiction_id,
-                strategy: "credibility_weighted",
+                resolutionMethod: "credibility_weighted",
                 resolved_value: winValue,
                 confidence: 0.88,
                 reasoning: `Source ${winner?.source_id} had credibility ${Math.max(credA, credB).toFixed(1)} vs ${Math.min(credA, credB).toFixed(1)}`,
@@ -154,7 +154,7 @@ export class ConflictResolutionAgent extends BaseAgent<
 
                 return {
                     contradiction_id: contradiction.contradiction_id,
-                    strategy: "recency_weighted",
+                    resolutionMethod: "recency_weighted",
                     resolved_value: newerValue,
                     confidence: 0.80,
                     reasoning: `Source ${newerSrc.source_id} is ${timeDiff.toFixed(1)}h newer`,
@@ -162,12 +162,12 @@ export class ConflictResolutionAgent extends BaseAgent<
             }
         }
 
-        // Rule 3: minor numeric → weighted average
+        // Rule 3: minor numeric → weighted average (only if values within configured proximity)
         if (contradiction.type === "numeric" && contradiction.severity !== "CRITICAL") {
             const valA = parseFloat(contradiction.claim_a);
             const valB = parseFloat(contradiction.claim_b);
 
-            if (!isNaN(valA) && !isNaN(valB)) {
+            if (!isNaN(valA) && !isNaN(valB) && Math.abs(valA - valB) <= this.cfg.weightedAverageMaxDiff) {
                 const avg = weightedAverage(valA, credA, valB, credB);
 
                 this.logDecision(
@@ -179,7 +179,7 @@ export class ConflictResolutionAgent extends BaseAgent<
 
                 return {
                     contradiction_id: contradiction.contradiction_id,
-                    strategy: "weighted_average",
+                    resolutionMethod: "weighted_average",
                     resolved_value: avg.toFixed(2),
                     confidence: 0.72,
                     reasoning: `Credibility-weighted average of ${valA} (cred=${credA}) and ${valB} (cred=${credB})`,
@@ -203,7 +203,7 @@ export class ConflictResolutionAgent extends BaseAgent<
 
         return {
             contradiction_id: contradiction.contradiction_id,
-            strategy: "investigation_required",
+            resolutionMethod: "investigation_required",
             resolved_value: "see investigation_paths",
             confidence: 0.5,
             reasoning: `Unresolved ${contradiction.severity} contradiction between ${contradiction.claim_a} and ${contradiction.claim_b}`,

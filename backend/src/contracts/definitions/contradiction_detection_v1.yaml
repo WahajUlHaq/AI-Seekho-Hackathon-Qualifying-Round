@@ -1,4 +1,4 @@
-name: contradiction_detection
+name: contradiction_detection_v1
 version: "1.0"
 module: ContradictionDetectorAgent
 description: "Output contract for the contradiction detector agent"

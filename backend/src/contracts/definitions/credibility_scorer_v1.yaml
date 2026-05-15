@@ -1,4 +1,4 @@
-name: credibility_scorer
+name: credibility_scorer_v1
 version: "1.0"
 module: CredibilityScorerAgent
 description: "Output contract for the credibility scoring agent"

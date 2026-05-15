@@ -42,9 +42,10 @@ export class MultiSourceIngestionAgent extends BaseAgent<
     MultiSourceIngestionOutput
 > {
     private readonly defaultConfig: IngestionConfig;
+    private readonly defaultFeedAdapter: FeedAdapter | null;
 
-    constructor(config?: Partial<IngestionConfig>) {
-        super("MultiSourceIngestionAgent", "multi_source_ingestion");
+    constructor(config?: Partial<IngestionConfig>, feedAdapter?: FeedAdapter) {
+        super("MultiSourceIngestionAgent", "multi_source_ingestion_v1");
 
         const thresholdsPath = path.resolve(__dirname, "../../config/agentThresholds.config.json");
         const thresholds = JSON.parse(fs.readFileSync(thresholdsPath, "utf-8"));
@@ -55,6 +56,8 @@ export class MultiSourceIngestionAgent extends BaseAgent<
             maxContentLengthBytes: config?.maxContentLengthBytes ?? thresholds.ingestion.maxContentLengthBytes,
             ...config,
         };
+
+        this.defaultFeedAdapter = feedAdapter ?? null;
     }
 
     protected async execute(input: MultiSourceIngestionInput): Promise<MultiSourceIngestionOutput> {
@@ -62,9 +65,11 @@ export class MultiSourceIngestionAgent extends BaseAgent<
         const cfg = { ...this.defaultConfig, ...input.config };
         const now = new Date().toISOString();
 
-        const feedAdapter = input.feedAdapter ?? new MockRealtimeFeedAdapter(
-            path.join(cfg.testDataDir, "realtime-feed.json")
-        );
+        // Resolution order: per-call input override → constructor-injected default → local fallback
+        const feedAdapter =
+            input.feedAdapter
+            ?? this.defaultFeedAdapter
+            ?? new MockRealtimeFeedAdapter(path.join(cfg.testDataDir, "realtime-feed.json"));
 
         const feedCfg: FeedAdapterConfig = { delayMs: cfg.feedDelayMs, maxEvents: 15 };
 
@@ -85,7 +90,7 @@ export class MultiSourceIngestionAgent extends BaseAgent<
             } else {
                 traceCollector.log(pipeline_id, {
                     pipeline_id,
-                    event_type: "failure",
+                    event_type: "ingestion_error",
                     agent: this.agentName,
                     message: `Ingestion error: ${result.reason?.message ?? String(result.reason)}`,
                 });
@@ -213,7 +218,7 @@ export class MultiSourceIngestionAgent extends BaseAgent<
                 const msg = err instanceof Error ? err.message : String(err);
                 traceCollector.log(pipelineId, {
                     pipeline_id: pipelineId,
-                    event_type: "failure",
+                    event_type: "ingestion_error",
                     agent: this.agentName,
                     message: `URL parse error for ${def.url}: ${msg}`,
                 });

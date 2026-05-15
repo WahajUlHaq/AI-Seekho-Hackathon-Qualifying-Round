@@ -34,7 +34,7 @@ export class NoiseFilterAgent extends BaseAgent<NoiseFilterInput, NoiseFilterOut
     private readonly vectorStore: VectorStore;
 
     constructor(vectorStore?: VectorStore) {
-        super("NoiseFilterAgent", "noise_filter");
+        super("NoiseFilterAgent", "noise_filter_v1");
 
         const thresholdsPath = path.resolve(__dirname, "../../config/agentThresholds.config.json");
         const thresholds = JSON.parse(fs.readFileSync(thresholdsPath, "utf-8"));

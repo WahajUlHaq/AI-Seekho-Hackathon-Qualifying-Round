@@ -53,7 +53,7 @@ export class CredibilityScorerAgent extends BaseAgent<
     private readonly authorityCache: Map<string, number> = new Map();
 
     constructor() {
-        super("CredibilityScorerAgent", "credibility_scorer");
+        super("CredibilityScorerAgent", "credibility_scorer_v1");
 
         const thresholdsPath = path.resolve(__dirname, "../../config/agentThresholds.config.json");
         const thresholds = JSON.parse(fs.readFileSync(thresholdsPath, "utf-8"));
@@ -103,7 +103,10 @@ export class CredibilityScorerAgent extends BaseAgent<
 
     private scoreRecency(ingestedAt: string): number {
         const hoursSince = (Date.now() - new Date(ingestedAt).getTime()) / 3_600_000;
-        return Math.max(0, this.cfg.recencyMaxScore - (hoursSince / this.cfg.maxAgeHours) * this.cfg.recencyMaxScore);
+        if (hoursSince < 1)   return 40;
+        if (hoursSince < 24)  return 30;
+        if (hoursSince < 168) return 15;
+        return 0;
     }
 
     private async scoreAuthority(pipelineId: string, doc: SourceDocument): Promise<number> {
