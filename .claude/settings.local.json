@@ -13,7 +13,11 @@
       "Bash(xargs head -5)",
       "Bash(npx tsc *)",
       "Bash(npm run *)",
-      "Bash(APP_ENV=development npx ts-node test/stress-tests.ts)"
+      "Bash(APP_ENV=development npx ts-node test/stress-tests.ts)",
+      "PowerShell(Get-ChildItem -Path \"C:\\\\Users\\\\USER\\\\Downloads\\\\AISeekho2026_Challenge1\\\\AI-Seekho-Hackathon-Qualifying-Round\\\\backend\\\\test\" -Recurse | Select-Object FullName | ForEach-Object { $_.FullName -replace [regex]::Escape\\(\"C:\\\\Users\\\\USER\\\\Downloads\\\\AISeekho2026_Challenge1\\\\AI-Seekho-Hackathon-Qualifying-Round\\\\backend\\\\\"\\), \"\" } | Sort-Object)",
+      "PowerShell(Get-ChildItem -Path \"C:\\\\Users\\\\USER\\\\Downloads\\\\AISeekho2026_Challenge1\\\\AI-Seekho-Hackathon-Qualifying-Round\\\\backend\\\\test-data\" -Recurse | Select-Object FullName | ForEach-Object { $_.FullName -replace [regex]::Escape\\(\"C:\\\\Users\\\\USER\\\\Downloads\\\\AISeekho2026_Challenge1\\\\AI-Seekho-Hackathon-Qualifying-Round\\\\backend\\\\\"\\), \"\" } | Sort-Object)",
+      "Bash(npx ts-node *)",
+      "Bash(node -e ' *)"
     ]
   }
 }

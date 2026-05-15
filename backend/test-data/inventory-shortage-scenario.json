@@ -1,0 +1,60 @@
+{
+  "sources": [
+    {
+      "source_id": "SRC-001",
+      "source_type": "pdf",
+      "content": "WAREHOUSE INVENTORY REPORT\nDate: 2026-05-15T09:00:00Z\nFacility: Warehouse A, Karachi\nProduct: SKU-1234 (Premium Widget)\nCurrent Stock Count: 45 units\nStatus: CRITICAL - SHORTAGE\nReorder Point: 200 units\nDays Until Stockout: 2 days at current demand\nNext Delivery: 2026-05-20 (delayed due to transport strike)\nReference: INV-2026-0515-CRITICAL",
+      "metadata": {
+        "filename": "warehouse-report.txt",
+        "timestamp": "2026-05-15T09:00:00Z",
+        "authority_type": "official"
+      }
+    },
+    {
+      "source_id": "SRC-002",
+      "source_type": "csv",
+      "content": "date,product_sku,orders,demand_change_pct,revenue_pkr\n2026-05-15,SKU-1234,180,38,900000\n2026-05-14,SKU-1234,130,30,650000\n2026-05-13,SKU-1234,100,0,500000\n2026-05-12,SKU-1234,98,-2,490000\n2026-05-11,SKU-1234,102,2,510000",
+      "metadata": {
+        "filename": "sales-dashboard.csv",
+        "timestamp": "2026-05-15T12:00:00Z",
+        "authority_type": "official"
+      }
+    },
+    {
+      "source_id": "SRC-003",
+      "source_type": "json",
+      "content": "{\"from\":\"supplier@xyzlogistics.com\",\"date\":\"2026-05-15T08:30:00Z\",\"subject\":\"Critical Delivery Delay Notice\",\"body\":\"Due to ongoing transport strike in Karachi, delivery of SKU-1234 (500 units) is delayed by 5 days. Original delivery date was 2026-05-15, new estimated delivery: 2026-05-20. This affects your reorder schedule. Reference: SA-2026-0515-DELAY\"}",
+      "metadata": {
+        "filename": "supplier-email.json",
+        "timestamp": "2026-05-15T08:30:00Z",
+        "authority_type": "official"
+      }
+    },
+    {
+      "source_id": "SRC-004",
+      "source_type": "url",
+      "content": "Transport strike in Karachi enters day 3, severely disrupting supply chains across the region. Logistics firms report 100% route blockage on main arterial roads. Multiple warehouses declare emergency shortage protocols. Industry analysts predict 5-7 day disruption minimum. Emergency procurement from alternative suppliers may be required.",
+      "metadata": {
+        "url": "https://example.com/news/karachi-transport-strike-day3",
+        "timestamp": "2026-05-15T06:00:00Z",
+        "authority_type": "news"
+      }
+    },
+    {
+      "source_id": "SRC-005",
+      "source_type": "realtime_feed",
+      "content": "[{\"timestamp\":\"2026-05-15T10:15:00Z\",\"customer_id\":\"C001\",\"message\":\"SKU-1234 shows only 45 units remaining. Cannot fulfill bulk order of 200 units.\",\"severity\":\"critical\"},{\"timestamp\":\"2026-05-15T10:30:00Z\",\"customer_id\":\"C002\",\"message\":\"Urgent: SKU-1234 stock critically low — 45 units. We need 150 units by end of day.\",\"severity\":\"critical\"},{\"timestamp\":\"2026-05-15T10:45:00Z\",\"customer_id\":\"C003\",\"message\":\"SKU-1234 shortage confirmed. Only 45 units available. Emergency order required.\",\"severity\":\"critical\"},{\"timestamp\":\"2026-05-15T11:00:00Z\",\"customer_id\":\"C004\",\"message\":\"Cannot place order for SKU-1234 — insufficient stock. Need immediate restock.\",\"severity\":\"high\"},{\"timestamp\":\"2026-05-15T11:10:00Z\",\"customer_id\":\"C005\",\"message\":\"SKU-1234 nearly out of stock. 45 units remaining will not cover pending orders.\",\"severity\":\"high\"}]",
+      "metadata": {
+        "feed_name": "customer-complaints",
+        "timestamp": "2026-05-15T11:10:00Z",
+        "authority_type": "user_generated"
+      }
+    }
+  ],
+  "constraints": {
+    "budget_limit": 500000,
+    "currency": "PKR",
+    "time_limit_hours": 24,
+    "urgency": "critical"
+  }
+}
