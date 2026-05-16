@@ -57,8 +57,10 @@ app.use("/api/agents", agentsRoutes);           // individual agent endpoints (A
 app.use("/api/contracts", contractsRoutes);     // AMCE contract definitions
 app.use("/api/validations", validationsRoutes); // contract validation history per pipeline
 
-// Genkit (Antigravity) orchestrated pipeline endpoint
-// Runs the Genkit agentic flow; falls back to the Express orchestrator if Gemini quota is hit.
+// Thin HTTP shim — Antigravity orchestrator is the central router.
+// Genkit is no longer invoked here as a parallel pipeline; the orchestrator owns
+// all routing decisions and may invoke Genkit internally as one of its tools.
+// The route is preserved so existing clients (frontend, judge bookmarks) keep working.
 app.post("/api/genkit/run", async (req: Request, res: Response) => {
     const { sources, constraints, pipeline_id: reqId } = req.body as {
         sources?: unknown[];
@@ -84,49 +86,22 @@ app.post("/api/genkit/run", async (req: Request, res: Response) => {
     }
 
     try {
-        const { contentToActionFlow } = await import("./genkit/pipeline-flow");
-        const result = await contentToActionFlow(req.body);
-        res.json({ ...result, orchestrator: "genkit-native" });
-    } catch (genkitErr: unknown) {
-        const msg = genkitErr instanceof Error ? genkitErr.message : String(genkitErr);
-        const isQuotaError = msg.includes("429") || msg.includes("quota") || msg.includes("RESOURCE_EXHAUSTED");
-
-        if (isQuotaError) {
-            // Gemini quota hit — fall back to full orchestrator (which has Groq fallback)
-            console.warn("[Genkit] Gemini quota exceeded → falling back to orchestrator with Groq");
-            try {
-                const { v4: uuidv4 } = await import("uuid");
-                const pipelineId = reqId ?? `PIPE-GENKIT-${uuidv4().replace(/-/g, "").slice(0, 8).toUpperCase()}`;
-                const fullResult = await pipelineOrchestrator.run(
-                    { sources: sources as never, constraints: constraints as never },
-                    pipelineId
-                );
-                // Shape the response to match the Genkit flow output schema
-                res.json({
-                    pipeline_id: fullResult.pipeline_id,
-                    status: fullResult.status,
-                    workplan: "Ingest → Score Credibility → Filter Noise → Detect Contradictions → Resolve Conflicts → Temporal Analysis → Extract Insights → Impact Analysis → Generate Actions → Simulate & Visualize",
-                    summary: `Pipeline completed. Identified ${fullResult.insights?.length ?? 0} insights, ${fullResult.contradictions?.length ?? 0} contradictions. Action chain: ${fullResult.action_chain?.actions?.length ?? 0} steps.`,
-                    sources_ingested: fullResult.ingestion?.sources_processed ?? sources.length,
-                    contradictions_found: fullResult.contradictions?.length ?? 0,
-                    insights_extracted: fullResult.insights?.length ?? 0,
-                    actions_generated: fullResult.action_chain?.actions?.length ?? 0,
-                    simulation_success_rate: fullResult.outcome?.metrics?.success_rate ?? 0.75,
-                    total_cost_pkr: fullResult.outcome?.metrics?.total_cost ?? 0,
-                    risk_reduction_pct: fullResult.outcome?.projected_impact?.risk_reduction ?? 65,
-                    ai_reasoning: "Genkit flow routed through orchestrator with Groq fallback due to Gemini quota",
-                    orchestrator: "genkit-with-groq-fallback",
-                    genkit_trace: fullResult.trace,
-                });
-            } catch (fallbackErr: unknown) {
-                const fallbackMsg = fallbackErr instanceof Error ? fallbackErr.message : String(fallbackErr);
-                console.error("[Genkit] Fallback orchestrator also failed:", fallbackMsg);
-                res.status(500).json({ error: fallbackMsg, original_error: msg });
-            }
-        } else {
-            console.error("[Genkit] Flow failed (non-quota):", msg);
-            res.status(500).json({ error: msg });
-        }
+        const { v4: uuidv4 } = await import("uuid");
+        const pipelineId = reqId ?? `PIPE-GENKIT-${uuidv4().replace(/-/g, "").slice(0, 8).toUpperCase()}`;
+        const result = await pipelineOrchestrator.run(
+            { sources: sources as never, constraints: constraints as never },
+            pipelineId
+        );
+        res.json({
+            ...result,
+            orchestrator: "antigravity-central",
+            entry: "genkit-shim",
+            summary: `Pipeline completed. Identified ${result.insights?.length ?? 0} insights, ${result.contradictions?.length ?? 0} contradictions. Action chain: ${result.action_chain?.actions?.length ?? 0} steps.`,
+        });
+    } catch (err: unknown) {
+        const msg = err instanceof Error ? err.message : String(err);
+        console.error("[Genkit-shim] Orchestrator failed:", msg);
+        res.status(500).json({ error: msg, orchestrator: "antigravity-central" });
     }
 });
 

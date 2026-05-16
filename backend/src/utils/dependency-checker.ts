@@ -88,6 +88,9 @@ export function runDependencyCheckerTool(): DependencyCheckerOutput {
         reasoning,
         status: action === "REJECT" ? "FAILED" : "SUCCESS",
         rollback_action: rollback,
+        latency_ms: 0,
+        cost: 0,
+        rubric_category: "constraint_evaluation",
     });
 
     const summary = `${results.filter((r) => r.resolved).length}/${results.length} packages resolved — ${action}`;

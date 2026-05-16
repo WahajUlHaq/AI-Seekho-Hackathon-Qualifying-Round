@@ -1,5 +1,16 @@
 import { v4 as uuidv4 } from "uuid";
-import { antigravityFileLogger } from "./file-logger";
+import { antigravityFileLogger, RubricCategory } from "./file-logger";
+
+const EVENT_TYPE_TO_RUBRIC: Record<TraceEventType, RubricCategory> = {
+    agent_start: "task_execution",
+    agent_complete: "task_execution",
+    llm_call: "tool_calls",
+    contract_gate: "constraint_evaluation",
+    action_execute: "task_execution",
+    failure: "failure_recovery",
+    recovery: "failure_recovery",
+    decision: "workplan_formulation",
+};
 
 export type TraceEventType =
     | "agent_start"
@@ -23,6 +34,7 @@ export interface TraceEvent {
     confidence?: number;
     provider?: string;
     latency_ms?: number;
+    cost?: number;
 }
 
 export interface PipelineTrace {
@@ -97,6 +109,9 @@ export class TraceCollector {
                 : isFailure
                 ? (event.data?.rollback_action as string) ?? "none"
                 : "none",
+            latency_ms: event.latency_ms ?? 0,
+            cost: event.cost ?? 0,
+            rubric_category: EVENT_TYPE_TO_RUBRIC[event.event_type],
         });
 
         if (event.event_type === "decision" && event.decision !== undefined) {

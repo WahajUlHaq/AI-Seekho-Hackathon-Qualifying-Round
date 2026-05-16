@@ -79,7 +79,7 @@ export function validateKeys(
         rollback = "none";
     } else {
         action = "PASS";
-        reasoning = `All required keys present in ${envLabel}. Antigravity environment validated.`;
+        reasoning = `AMCE Base Contract Validation Successful: All required keys present in ${envLabel} against env_validation_v1.yaml schema contract.`;
         rollback = "none";
     }
 
@@ -90,6 +90,9 @@ export function validateKeys(
         reasoning,
         status: action === "REJECT" ? "FAILED" : action === "WARN" ? "SUCCESS" : "SUCCESS",
         rollback_action: rollback,
+        latency_ms: 0,
+        cost: 0,
+        rubric_category: "constraint_evaluation",
     });
 
     return {
@@ -148,6 +151,9 @@ export function runEnvValidatorTool(
         rollback_action: worstAction === "REJECT"
             ? "Antigravity halted — operator must provide required API keys"
             : "none",
+        latency_ms: 0,
+        cost: 0,
+        rubric_category: "constraint_evaluation",
     });
 
     return { results, overall_action: worstAction, summary };
