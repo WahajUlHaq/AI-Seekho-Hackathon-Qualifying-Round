@@ -1,3 +1,4 @@
+```mermaid
 flowchart TD
     subgraph Infrastructure [Shared Infrastructure]
         VSI[VectorStore Interface]
@@ -52,3 +53,4 @@ flowchart TD
     
     class Ingestion,CredScorer,NoiseFilter,Contradiction,Resolution,Temporal,RAG module;
     class VSI,FAI,SDI,IMV,MRF,ADC,ATC infra;
+```
