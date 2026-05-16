@@ -1,12 +1,13 @@
 /**
- * Phase 2 end-to-end pipeline runner.
- * Chains all 7 agents over the mock test-data set, prints the full trace, and
- * writes a summary block to stdout.
+ * Phase 4 end-to-end pipeline runner.
+ * Chains all 14 modules, exercises the HITL gate, writes the compliance
+ * audit log to disk, and prints a full trace + summary.
  *
  * Run: cross-env APP_ENV=development npx ts-node src/pipeline-runner.ts
  */
 import * as dotenv from "dotenv";
 import * as path from "path";
+import * as fs from "fs";
 
 // Load env before any other import that reads process.env
 const envFile =
@@ -28,6 +29,12 @@ import { InsightExtractionAgent } from "./agents/insight-extraction.agent";
 import { ImpactScorerAgent } from "./agents/impact-scorer.agent";
 import { PredictiveForecasterAgent } from "./agents/predictive-forecaster.agent";
 import { StrategicRecommenderAgent } from "./agents/strategic-recommender.agent";
+import { ExecutionSimulatorAgent } from "./agents/execution-simulator.agent";
+import { FailureRecoveryAgent } from "./agents/failure-recovery.agent";
+import { OutcomeVisualizerAgent } from "./agents/outcome-visualizer.agent";
+import { WorkflowAuditAgent } from "./agents/workflow-audit.agent";
+import { sortActionsTopologically } from "./utils/dag-sorter";
+import { pipelineApprovalStore } from "./stores/pipeline-approval.store";
 
 function makePipelineId(): string {
     return `PIPE-${uuidv4().replace(/-/g, "").toUpperCase().slice(0, 8)}`;
@@ -65,7 +72,7 @@ async function main(): Promise<void> {
     const pipeline_id = makePipelineId();
     console.log(`[Pipeline] ID: ${pipeline_id}\n`);
 
-    traceCollector.initPipeline(pipeline_id, "phase-3-full-pipeline", [
+    traceCollector.initPipeline(pipeline_id, "phase-4-full-pipeline", [
         "ingestion",
         "credibility",
         "noise-filter",
@@ -75,6 +82,12 @@ async function main(): Promise<void> {
         "impact-scoring",
         "predictive-forecasting",
         "strategic-recommendation",
+        "hitl-gate",
+        "dag-sort",
+        "execution-simulator",
+        "failure-recovery",
+        "outcome-visualizer",
+        "workflow-audit",
     ]);
 
     // Shared infrastructure — exercises DI fix (constructor injection of feed adapter)
@@ -94,6 +107,10 @@ async function main(): Promise<void> {
     const impactAgent         = new ImpactScorerAgent();
     const forecasterAgent     = new PredictiveForecasterAgent();
     const recommenderAgent    = new StrategicRecommenderAgent();
+    const simulatorAgent      = new ExecutionSimulatorAgent();
+    const recoveryAgent       = new FailureRecoveryAgent();
+    const visualizerAgent     = new OutcomeVisualizerAgent();
+    const auditAgent          = new WorkflowAuditAgent();
 
     // Stage 1: Multi-source ingestion
     const ingestion = await runStage(pipeline_id, "ingestion", () =>
@@ -160,6 +177,90 @@ async function main(): Promise<void> {
         })
     );
 
+    // Stage 10: HITL Gate — submit, log PENDING, auto-approve (CLI flow)
+    pipelineApprovalStore.submit({
+        pipeline_id,
+        proposed_at: new Date().toISOString(),
+        proposal: strategy.strategyProposal,
+    });
+    traceCollector.log(pipeline_id, {
+        pipeline_id,
+        event_type: "hitl_pending",
+        agent: "PipelineOrchestrator",
+        message: "Strategy submitted for HITL approval (PENDING)",
+    });
+    console.log(`[Pipeline] HITL gate: pipeline ${pipeline_id} → PENDING`);
+
+    await new Promise(r => setTimeout(r, 500));
+
+    const approval = pipelineApprovalStore.approve(pipeline_id, "cli-auto-approver");
+    if (!approval.ok) {
+        throw new Error(`HITL approve failed: ${approval.error}`);
+    }
+    traceCollector.log(pipeline_id, {
+        pipeline_id,
+        event_type: "hitl_approved",
+        agent: "PipelineOrchestrator",
+        message: `HITL approved by cli-auto-approver at ${approval.approved_at}`,
+    });
+    console.log(`[Pipeline] HITL gate: approved → EXECUTING`);
+
+    // Stage 11: DAG topological sort (with cycle fallback)
+    const sortedActions = sortActionsTopologically(
+        strategy.strategyProposal.proposedActions,
+        pipeline_id
+    );
+    console.log(`[Pipeline] DAG sort: ${sortedActions.length} actions ordered`);
+
+    // Stage 12: M11 Execution Simulator
+    const execution = await runStage(pipeline_id, "execution-simulator", () =>
+        simulatorAgent.run({
+            pipeline_id,
+            actions: sortedActions,
+            approved_by: "cli-auto-approver",
+            approval_timestamp: approval.approved_at,
+        })
+    );
+
+    // Stage 13: M12 Failure Recovery
+    const recovery = await runStage(pipeline_id, "failure-recovery", () =>
+        recoveryAgent.run({
+            pipeline_id,
+            execution,
+            originalActions: sortedActions,
+        })
+    );
+
+    // Stage 14: M13 Outcome Visualizer
+    const outcome = await runStage(pipeline_id, "outcome-visualizer", () =>
+        visualizerAgent.run({
+            pipeline_id,
+            execution,
+            recovery,
+            impact,
+            forecast,
+        })
+    );
+
+    // Stage 15: M14 Workflow Audit
+    const audit = await runStage(pipeline_id, "workflow-audit", () =>
+        auditAgent.run({
+            pipeline_id,
+            outcome,
+            execution,
+            approver: "cli-auto-approver",
+        })
+    );
+
+    // File I/O — orchestrator only (M14 must NOT touch disk per spec)
+    const auditDir = path.resolve(__dirname, "../audit-logs");
+    fs.mkdirSync(auditDir, { recursive: true });
+    const auditPath = path.join(auditDir, `${pipeline_id}.json`);
+    fs.writeFileSync(auditPath, JSON.stringify(audit, null, 2));
+    console.log(`[Audit] Compliance receipt written → ${auditPath}`);
+
+    pipelineApprovalStore.transition(pipeline_id, "COMPLETED");
+
     // Finalise trace
     traceCollector.finalizePipeline(pipeline_id);
     const trace = traceCollector.getTrace(pipeline_id);
@@ -189,6 +290,19 @@ async function main(): Promise<void> {
     console.log("\n=== FINAL STRATEGY PROPOSAL ===");
     console.log(JSON.stringify(strategy.strategyProposal, null, 2));
 
+    // Phase 4 summary
+    const successes = execution.execution_results.filter(r => r.status === "SUCCESS").length;
+    const failures  = execution.execution_results.filter(r => r.status === "FAILED").length;
+    const skips     = execution.execution_results.filter(r => r.status === "SKIPPED").length;
+    console.log("\n=== PHASE 4 EXECUTION SUMMARY ===");
+    console.log(`Execution status:      ${execution.overall_status} (${execution.execution_results.length} actions, ${execution.total_execution_ms}ms total)`);
+    console.log(`  successes/failures/skips: ${successes}/${failures}/${skips}`);
+    console.log(`Recovery plan:         ${recovery.recovery_plan.length} entries; cascaded skips: ${recovery.cascaded_skips.length}`);
+    console.log(`Outcome:               cost=${outcome.total_cost}, risk-reduction=${outcome.projected_risk_reduction}%, latency-saved=${outcome.simulated_latency_saved}ms`);
+    console.log(`Audit ID:              ${audit.audit_id} (${audit.finalized_status})`);
+    console.log(`Verification hash:     ${audit.verification_hash}`);
+    console.log(`Audit log path:        ${auditPath}`);
+
     const events = trace?.events ?? [];
     const eventCount = (type: string) => events.filter(e => e.event_type === type).length;
     console.log(`\nTrace events:`);
@@ -204,6 +318,11 @@ async function main(): Promise<void> {
         e.event_type === "decision" && (e as { decision?: string }).decision === "extrapolation_unreliable"
     ).length;
     console.log(`  extrapolation_unreliable: ${unreliableEvents}`);
+    console.log(`  action_start:          ${eventCount("action_start")}`);
+    console.log(`  action_complete:       ${eventCount("action_complete")}`);
+    console.log(`  hitl_pending:          ${eventCount("hitl_pending")}`);
+    console.log(`  hitl_approved:         ${eventCount("hitl_approved")}`);
+    console.log(`  graph_cycle_detected:  ${eventCount("graph_cycle_detected")}`);
 }
 
 main().catch(err => {

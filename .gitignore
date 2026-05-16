@@ -156,6 +156,9 @@ chroma_db/
 vector_store/
 embeddings_cache/
 
+# Phase 4 compliance audit receipts (regenerated per pipeline run)
+backend/audit-logs/
+
 # ------------------------------------------------------------
 # Miscellaneous
 # ------------------------------------------------------------

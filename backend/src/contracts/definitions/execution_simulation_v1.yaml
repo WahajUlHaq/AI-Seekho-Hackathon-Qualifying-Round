@@ -1,0 +1,34 @@
+name: execution_simulation_v1
+version: "1.0"
+module: ExecutionSimulatorAgent
+description: "Module 11 contract — per-action execution simulation results for the topologically-sorted action chain."
+fields:
+  execution_results:
+    type: array
+    required: true
+    items:
+      type: object
+      properties:
+        action_id:
+          type: string
+          required: true
+          regex: "^ACT-[A-Z0-9]{6}$"
+        status:
+          type: string
+          required: true
+          enum: [SUCCESS, FAILED, SKIPPED]
+        latency_ms:
+          type: number
+          required: true
+          min: 0
+        error_message:
+          type: string
+          required: false
+        output_summary:
+          type: string
+          required: false
+semantic_checks:
+  - "execution_results must reference unique action_ids (no duplicates)"
+  - "Every entry with status=FAILED should carry a non-empty error_message"
+  - "Every entry with status=SKIPPED should carry an error_message indicating the upstream cause"
+  - "Every entry with status=SUCCESS should carry a non-empty output_summary"

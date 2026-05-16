@@ -1,0 +1,35 @@
+name: failure_recovery_v1
+version: "1.0"
+module: FailureRecoveryAgent
+description: "Module 12 contract — recovery strategy mapping for FAILED actions plus cascaded SKIPPED listing."
+fields:
+  pipelineId:
+    type: string
+    required: true
+  recovery_plan:
+    type: array
+    required: true
+    items:
+      type: object
+      properties:
+        intercepted_action_id:
+          type: string
+          required: true
+          regex: "^ACT-[A-Z0-9]{6}$"
+        applied_strategy:
+          type: string
+          required: true
+          enum: [RETRY, FALLBACK, SKIP]
+        mitigation_status:
+          type: string
+          required: true
+          enum: [PROPOSED, BLOCKED, RESOLVED]
+        rationale:
+          type: string
+          required: true
+  cascaded_skips:
+    type: array
+    required: true
+semantic_checks:
+  - "Each recovery_plan entry's intercepted_action_id must correspond to an action with status=FAILED in the upstream M11 execution_results"
+  - "If recovery_plan is empty, cascaded_skips must also be empty"

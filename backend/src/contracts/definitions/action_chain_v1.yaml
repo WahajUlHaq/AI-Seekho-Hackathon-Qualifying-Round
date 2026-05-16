@@ -1,18 +1,26 @@
-name: action_chain
+name: action_chain_v1
 version: "1.0"
-module: ActionChainGeneratorAgent
-description: "Output contract for the action chain generator"
+module: ExecutionSimulatorAgent
+description: "Module 11 contract — unified execution result for the HITL-approved, topologically-sorted action chain."
 fields:
-  chain_id:
+  pipelineId:
     type: string
     required: true
-    regex: "^CHAIN-[A-Z0-9]{8}$"
-  action_count:
+  overall_status:
+    type: string
+    required: true
+    enum: [SUCCESS, PARTIAL_SUCCESS, FAILED]
+  approved_by:
+    type: string
+    required: false
+  approval_timestamp:
+    type: string
+    required: true
+  total_execution_ms:
     type: number
     required: true
-    min: 3
-    max: 5
-  actions:
+    min: 0
+  execution_results:
     type: array
     required: true
     items:
@@ -21,30 +29,23 @@ fields:
         action_id:
           type: string
           required: true
-        action_type:
+          regex: "^ACT-[A-Z0-9]{6}$"
+        status:
           type: string
           required: true
-          enum: [diagnose, notify, update_system, mitigate, monitor, verify, escalate]
-        description:
+          enum: [SUCCESS, FAILED, SKIPPED]
+        latency_ms:
+          type: number
+          required: true
+          min: 0
+        error_message:
           type: string
-          required: true
-        depends_on:
-          type: array
-          required: true
-        simulatable:
-          type: boolean
-          required: true
-        constraints:
-          type: object
-          required: true
-        failure_recovery:
-          type: object
-          required: true
-  execution_order:
-    type: array
-    required: true
+          required: false
+        output_summary:
+          type: string
+          required: false
 semantic_checks:
-  - "action_count must equal the length of the actions array"
-  - "execution_order must only reference action_ids that exist in the actions array"
-  - "No circular dependencies in the depends_on chains"
-  - "Each action must have at least one constraint defined in its constraints object"
+  - "execution_results length must equal the number of actions submitted to the simulator"
+  - "overall_status must be SUCCESS only if every execution_results entry has status=SUCCESS"
+  - "overall_status must be FAILED only if no execution_results entry has status=SUCCESS"
+  - "execution_results must reference unique action_ids (no duplicates)"

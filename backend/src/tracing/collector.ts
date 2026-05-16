@@ -9,7 +9,12 @@ export type TraceEventType =
     | "failure"
     | "ingestion_error"
     | "recovery"
-    | "decision";
+    | "decision"
+    | "action_start"
+    | "action_complete"
+    | "graph_cycle_detected"
+    | "hitl_pending"
+    | "hitl_approved";
 
 export interface TraceEvent {
     event_id: string;
@@ -107,7 +112,11 @@ export class TraceCollector {
             });
         }
 
-        if (event.event_type === "action_execute") {
+        if (
+            event.event_type === "action_execute" ||
+            event.event_type === "action_start" ||
+            event.event_type === "action_complete"
+        ) {
             trace.action_execution.push(full);
         }
 
