@@ -1,0 +1,46 @@
+name: strategic_recommendation_v1
+version: "1.0"
+module: PredictiveForecasterAgent|StrategicRecommenderAgent
+description: "Shared progressive contract — Module 9 emits forecastingScenarios; Module 10 propagates scenarios and adds strategyProposal."
+fields:
+  strategic_id:
+    type: string
+    required: true
+    regex: "^STR-[A-Z0-9]{8}$"
+  generated_at:
+    type: string
+    required: true
+  forecastingScenarios:
+    type: array
+    required: false
+    items:
+      type: object
+      properties:
+        horizon:
+          type: string
+          required: true
+          enum: ["30-day", "60-day", "90-day"]
+        scenario:
+          type: string
+          required: true
+        confidence:
+          type: number
+          required: true
+          min: 0
+          max: 1
+        derived_from_metrics:
+          type: array
+          required: true
+        reliability_flag:
+          type: string
+          required: true
+          enum: ["reliable", "extrapolation_unreliable"]
+  strategyProposal:
+    type: object
+    required: false
+semantic_checks:
+  - "At least one of forecastingScenarios or strategyProposal must be present and non-empty"
+  - "If forecastingScenarios is present, it must contain exactly three entries covering horizons 30-day, 60-day, and 90-day (no duplicates, no gaps)"
+  - "If strategyProposal is present, it must contain a non-empty proposedActions array; each action must have action_id matching ^ACT-[A-Z0-9]{6}$, title, description, priority in [CRITICAL,HIGH,MEDIUM,LOW], and depends_on as an array of action_ids"
+  - "If strategyProposal is present, every depends_on entry must reference an action_id that exists earlier in proposedActions"
+  - "If both blocks are present, strategyProposal.rationale must reference at least one horizon string from forecastingScenarios"

@@ -25,6 +25,9 @@ import { ContradictionDetectorAgent } from "./agents/contradiction-detector.agen
 import { ConflictResolutionAgent } from "./agents/conflict-resolution.agent";
 import { TemporalAnalysisAgent } from "./agents/temporal-analysis.agent";
 import { InsightExtractionAgent } from "./agents/insight-extraction.agent";
+import { ImpactScorerAgent } from "./agents/impact-scorer.agent";
+import { PredictiveForecasterAgent } from "./agents/predictive-forecaster.agent";
+import { StrategicRecommenderAgent } from "./agents/strategic-recommender.agent";
 
 function makePipelineId(): string {
     return `PIPE-${uuidv4().replace(/-/g, "").toUpperCase().slice(0, 8)}`;
@@ -62,13 +65,16 @@ async function main(): Promise<void> {
     const pipeline_id = makePipelineId();
     console.log(`[Pipeline] ID: ${pipeline_id}\n`);
 
-    traceCollector.initPipeline(pipeline_id, "phase-2-full-pipeline", [
+    traceCollector.initPipeline(pipeline_id, "phase-3-full-pipeline", [
         "ingestion",
         "credibility",
         "noise-filter",
         "contradiction",
         "resolution+temporal (parallel)",
         "insight-extraction",
+        "impact-scoring",
+        "predictive-forecasting",
+        "strategic-recommendation",
     ]);
 
     // Shared infrastructure — exercises DI fix (constructor injection of feed adapter)
@@ -85,6 +91,9 @@ async function main(): Promise<void> {
     const conflictAgent       = new ConflictResolutionAgent();
     const temporalAgent       = new TemporalAnalysisAgent();
     const insightAgent        = new InsightExtractionAgent(vectorStore);
+    const impactAgent         = new ImpactScorerAgent();
+    const forecasterAgent     = new PredictiveForecasterAgent();
+    const recommenderAgent    = new StrategicRecommenderAgent();
 
     // Stage 1: Multi-source ingestion
     const ingestion = await runStage(pipeline_id, "ingestion", () =>
@@ -131,6 +140,26 @@ async function main(): Promise<void> {
         })
     );
 
+    // Stage 7: Impact scoring (M8)
+    const impact = await runStage(pipeline_id, "impact-scoring", () =>
+        impactAgent.run({ pipeline_id, insights })
+    );
+
+    // Stage 8: Predictive forecasting (M9)
+    const forecast = await runStage(pipeline_id, "predictive-forecasting", () =>
+        forecasterAgent.run({ pipeline_id, insights, temporal })
+    );
+
+    // Stage 9: Strategic recommendation (M10) — produces final StrategyProposal
+    const strategy = await runStage(pipeline_id, "strategic-recommendation", () =>
+        recommenderAgent.run({
+            pipeline_id,
+            insights,
+            impactAnalysis: impact,
+            forecast,
+        })
+    );
+
     // Finalise trace
     traceCollector.finalizePipeline(pipeline_id);
     const trace = traceCollector.getTrace(pipeline_id);
@@ -152,6 +181,13 @@ async function main(): Promise<void> {
     console.log(`Insights — risks:      ${insights.risks.length}`);
     console.log(`Insights — opps:       ${insights.opportunities.length}`);
     console.log(`Persistent conflicts:  ${insights.persistentConflicts.length}`);
+    console.log(`Impact magnitude:      ${impact.impactMagnitudeScore}/100  (F=${impact.componentScores.financial} O=${impact.componentScores.operational} R=${impact.componentScores.reputational})`);
+    console.log(`Forecast scenarios:    ${forecast.forecastingScenarios.length} (horizons: ${forecast.forecastingScenarios.map(s => s.horizon).join(", ")})`);
+    console.log(`Unreliable forecasts:  ${forecast.forecastingScenarios.filter(s => s.reliability_flag === "extrapolation_unreliable").length}`);
+    console.log(`Proposed actions:      ${strategy.strategyProposal.proposedActions.length} (overall: ${strategy.strategyProposal.overall_priority})`);
+
+    console.log("\n=== FINAL STRATEGY PROPOSAL ===");
+    console.log(JSON.stringify(strategy.strategyProposal, null, 2));
 
     const events = trace?.events ?? [];
     const eventCount = (type: string) => events.filter(e => e.event_type === type).length;
@@ -163,6 +199,11 @@ async function main(): Promise<void> {
     console.log(`  decision:        ${eventCount("decision")}`);
     console.log(`  ingestion_error: ${eventCount("ingestion_error")}`);
     console.log(`  failure:         ${eventCount("failure")}`);
+
+    const unreliableEvents = events.filter(e =>
+        e.event_type === "decision" && (e as { decision?: string }).decision === "extrapolation_unreliable"
+    ).length;
+    console.log(`  extrapolation_unreliable: ${unreliableEvents}`);
 }
 
 main().catch(err => {
