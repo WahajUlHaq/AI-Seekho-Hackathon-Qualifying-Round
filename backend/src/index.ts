@@ -13,6 +13,7 @@ import { pipelineRoutes } from "./routes/pipeline.routes";
 import { contractsRoutes } from "./routes/contracts.routes";
 import { validationsRoutes } from "./routes/validations.routes";
 import { executionRoutes } from "./routes/execution.routes";
+import { docsRouter } from "./docs/swagger";
 
 const app = express();
 const PORT = process.env.PORT || 8000;
@@ -29,6 +30,10 @@ app.use(
 
 app.use(express.json({ limit: "50mb" }));   // large limit for base64-encoded PDFs
 app.use(express.urlencoded({ extended: true }));
+
+// Phase 5: OpenAPI 3.0 docs — mounted before route handlers so /api-docs and
+// /api-docs.json stay reachable even if a downstream router throws during load.
+app.use(docsRouter);
 
 // Request logger
 app.use((req: Request, _res: Response, next: NextFunction) => {
