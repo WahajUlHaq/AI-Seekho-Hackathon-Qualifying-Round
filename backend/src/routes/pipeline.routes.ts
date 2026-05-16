@@ -6,6 +6,7 @@ import { pipelineOrchestrator } from "../agents/orchestrator";
 import { exportTrace } from "../tracing/exporter";
 import { RawSourceInput } from "../agents/multi-source-ingestion.agent";
 import { Constraints } from "../types/simulation.types";
+import { checkDomain } from "../utils/domain-validator";
 
 export const pipelineRoutes = Router();
 
@@ -25,8 +26,24 @@ pipelineRoutes.post("/run", async (req: Request, res: Response) => {
             return;
         }
 
+        // Domain validation — reject out-of-domain inputs
+        const domain = checkDomain(sources.map((s) => (s as { content?: string }).content ?? ""));
+        if (!domain.passed) {
+            res.status(422).json({
+                error: "DOMAIN_REJECTION",
+                message: domain.reason,
+                domain_score: domain.score,
+                domain_level: domain.level,
+                hint: "This agent specialises in Supply Chain & Operations: inventory, procurement, logistics, warehousing, demand forecasting, risk management.",
+            });
+            return;
+        }
+        if (domain.level === "borderline") {
+            console.warn(`[Pipeline] Borderline domain score ${domain.score}/100 for ${pipelineId}`);
+        }
+
         const result = await pipelineOrchestrator.run({ sources, constraints }, pipelineId);
-        res.json(result);
+        res.json({ ...result, domain_score: domain.score, domain_level: domain.level });
     } catch (err: unknown) {
         const message = err instanceof Error ? err.message : String(err);
         console.error(`[Pipeline] Run failed for ${pipelineId}:`, message);

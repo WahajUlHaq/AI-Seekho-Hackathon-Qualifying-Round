@@ -1,4 +1,5 @@
 import { v4 as uuidv4 } from "uuid";
+import { antigravityFileLogger } from "./file-logger";
 
 export type TraceEventType =
     | "agent_start"
@@ -81,6 +82,22 @@ export class TraceCollector {
         };
 
         trace.events.push(full);
+
+        // Mirror every event to the persistent Antigravity trace log
+        const isFailure = event.event_type === "failure";
+        const isRecovery = event.event_type === "recovery";
+        antigravityFileLogger.append({
+            timestamp: full.timestamp,
+            step: `${event.event_type}:${event.agent}`,
+            tool_called: event.agent,
+            reasoning: event.message,
+            status: isFailure ? "FAILED" : isRecovery ? "ROLLED_BACK" : "SUCCESS",
+            rollback_action: isRecovery
+                ? event.message
+                : isFailure
+                ? (event.data?.rollback_action as string) ?? "none"
+                : "none",
+        });
 
         if (event.event_type === "decision" && event.decision !== undefined) {
             trace.reasoning_steps.push({

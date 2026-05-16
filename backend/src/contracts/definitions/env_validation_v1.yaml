@@ -1,0 +1,41 @@
+name: env_validation
+version: "1.0"
+module: EnvValidatorTool
+description: "AMCE contract for Phase 0 environment and credentials validation"
+fields:
+  action:
+    type: string
+    required: true
+    enum: [PASS, WARN, REJECT]
+  environment:
+    type: string
+    required: true
+  checked:
+    type: array
+    required: true
+    items:
+      type: object
+      properties:
+        key:
+          type: string
+          required: true
+        present:
+          type: boolean
+          required: true
+        required:
+          type: boolean
+          required: true
+  errors:
+    type: array
+    required: true
+  warnings:
+    type: array
+    required: true
+  fallback_available:
+    type: boolean
+    required: true
+semantic_checks:
+  - "action must be PASS when all required keys are present"
+  - "action must be REJECT when required keys are absent and no fallback exists"
+  - "action must be WARN when required keys are absent but fallback provider is available"
+  - "fallback_available must reflect GROQ_API_KEY presence"

@@ -14,6 +14,7 @@ import { pipelineRoutes } from "./routes/pipeline.routes";
 import { agentsRoutes } from "./routes/agents.routes";
 import { contractsRoutes } from "./routes/contracts.routes";
 import { validationsRoutes } from "./routes/validations.routes";
+import { checkDomain } from "./utils/domain-validator";
 
 const app = express();
 const PORT = process.env.PORT || 8000;
@@ -67,6 +68,18 @@ app.post("/api/genkit/run", async (req: Request, res: Response) => {
 
     if (!sources || !Array.isArray(sources) || sources.length === 0) {
         res.status(400).json({ error: "sources array is required" });
+        return;
+    }
+
+    const domain = checkDomain((sources as Array<{ content?: string }>).map((s) => s.content ?? ""));
+    if (!domain.passed) {
+        res.status(422).json({
+            error: "DOMAIN_REJECTION",
+            message: domain.reason,
+            domain_score: domain.score,
+            domain_level: domain.level,
+            hint: "This agent specialises in Supply Chain & Operations: inventory, procurement, logistics, warehousing, demand forecasting, risk management.",
+        });
         return;
     }
 
