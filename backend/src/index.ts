@@ -18,15 +18,12 @@ import { docsRouter } from "./docs/swagger";
 const app = express();
 const PORT = process.env.PORT || 8000;
 
-app.use(
-    cors({
-        origin: [
-            "http://localhost:3000",   // React CRA dev server
-            "http://localhost:5173",   // Vite dev server
-            // Firebase URL added here on Day 6
-        ],
-    })
-);
+app.use(cors({
+    origin: "*",
+    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"],
+    allowedHeaders: ["Content-Type", "Authorization", "ngrok-skip-browser-warning"],
+    credentials: true
+}));
 
 app.use(express.json({ limit: "50mb" }));   // large limit for base64-encoded PDFs
 app.use(express.urlencoded({ extended: true }));

@@ -20,7 +20,7 @@ async function runTests() {
 
     const ingestionContract = contractRegistry.getRequired("multi_source_ingestion_v1");
     const contradictionContract = contractRegistry.getRequired("contradiction_detection_v1");
-    const actionChainContract = contractRegistry.getRequired("action_chain");
+    const actionChainContract = contractRegistry.getRequired("action_chain_v1");
 
     // Test 1: Valid multi_source_ingestion → PASS
     const validIngestion = {
@@ -101,51 +101,33 @@ async function runTests() {
 
     // Test 6: Valid action_chain → PASS
     const validActionChain = {
-        chain_id: "CHAIN-AB12CD34",
-        action_count: 3,
-        actions: [
+        pipelineId: "123e4567-e89b-12d3-a456-426614174000",
+        overall_status: "SUCCESS",
+        approved_by: "Areeb",
+        approval_timestamp: "2026-05-18T17:44:00Z",
+        total_execution_ms: 1500,
+        execution_results: [
             {
-                action_id: "ACT-001",
-                action_type: "diagnose",
-                description: "Run diagnostics",
-                depends_on: [],
-                simulatable: true,
-                constraints: { timeout_ms: 5000 },
-                failure_recovery: { retry: true },
-            },
-            {
-                action_id: "ACT-002",
-                action_type: "notify",
-                description: "Send alert",
-                depends_on: ["ACT-001"],
-                simulatable: true,
-                constraints: { channel: "email" },
-                failure_recovery: { fallback: "sms" },
-            },
-            {
-                action_id: "ACT-003",
-                action_type: "mitigate",
-                description: "Apply mitigation",
-                depends_on: ["ACT-002"],
-                simulatable: false,
-                constraints: { requires_approval: true },
-                failure_recovery: { escalate: true },
-            },
-        ],
-        execution_order: ["ACT-001", "ACT-002", "ACT-003"],
+                action_id: "ACT-000001",
+                status: "SUCCESS",
+                latency_ms: 500,
+                output_summary: "Query returned inventory count"
+            }
+        ]
     };
     const t6 = contractValidator.validate(validActionChain, actionChainContract);
     assert("6 (valid action_chain → PASS)", t6.level === "PASS");
 
-    // Test 7: action_count exceeds max:5 → WARN
+    // Test 7: total_execution_ms below min:0 → WARN
     const overMaxChain = {
-        chain_id: "CHAIN-AB12CD34",
-        action_count: 6,
-        actions: [],
-        execution_order: [],
+        pipelineId: "123e4567-e89b-12d3-a456-426614174000",
+        overall_status: "SUCCESS",
+        approval_timestamp: "2026-05-18T17:44:00Z",
+        total_execution_ms: -5,
+        execution_results: []
     };
     const t7 = contractValidator.validate(overMaxChain, actionChainContract);
-    assert("7 (action_count=6 exceeds max → WARN)", t7.level === "WARN");
+    assert("7 (total_execution_ms below min → WARN)", t7.level === "WARN");
 
     console.log(`\n${passed}/${total} tests passed`);
     if (passed < total) process.exit(1);

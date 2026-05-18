@@ -21,7 +21,9 @@ executionRoutes.get("/:id/pending", (req: Request, res: Response) => {
     res.json(record);
 });
 
-executionRoutes.post("/:id/approve", (req: Request, res: Response) => {
+import { pipelineService } from "../services/pipeline.service";
+
+executionRoutes.post("/:id/approve", async (req: Request, res: Response) => {
     const id = String(req.params.id);
     const approver = (req.body?.approved_by as string | undefined)?.trim();
     if (!approver) {
@@ -29,16 +31,12 @@ executionRoutes.post("/:id/approve", (req: Request, res: Response) => {
         return;
     }
 
-    const result = pipelineApprovalStore.approve(id, approver);
-    if (!result.ok) {
-        res.status(result.code).json({ error: result.error, pipeline_id: id });
-        return;
+    try {
+        const result = await pipelineService.runPhaseB(id, approver);
+        res.json(result);
+    } catch (err: unknown) {
+        const message = err instanceof Error ? err.message : String(err);
+        console.error(`[Execution] Approval/Execution failed for ${id}:`, message);
+        res.status(500).json({ error: message, pipeline_id: id });
     }
-
-    res.json({
-        pipeline_id: id,
-        state: result.state,
-        approved_by: approver,
-        approved_at: result.approved_at,
-    });
 });

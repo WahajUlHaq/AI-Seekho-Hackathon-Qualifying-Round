@@ -142,11 +142,16 @@ Choose mitigation_status:
             // fall through
         }
 
+        const errMsg = String(failure.error_message).toLowerCase();
+        const isTransient = errMsg.includes("timeout") || errMsg.includes("network") || errMsg.includes("rate") || errMsg.includes("temp");
+        const defaultStrategy = isTransient ? "RETRY" : "SKIP";
+        const defaultStatus = isTransient ? "PROPOSED" : "BLOCKED";
+
         return {
             intercepted_action_id: failure.action_id,
-            applied_strategy: "SKIP",
-            mitigation_status: "BLOCKED",
-            rationale: `LLM recovery synthesis unavailable; defaulting to SKIP for ${failure.action_id}.`,
+            applied_strategy: defaultStrategy as any,
+            mitigation_status: defaultStatus as any,
+            rationale: `LLM recovery synthesis unavailable; adaptive fallback to ${defaultStrategy} based on error diagnostics.`,
         };
     }
 }

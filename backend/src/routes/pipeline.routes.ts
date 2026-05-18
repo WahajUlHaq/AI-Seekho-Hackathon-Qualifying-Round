@@ -4,12 +4,14 @@ import { traceCollector } from "../tracing/collector";
 
 export const pipelineRoutes = Router();
 
+import { pipelineService } from "../services/pipeline.service";
+
 // POST /api/pipeline/run
 pipelineRoutes.post("/run", async (req: Request, res: Response) => {
     const pipelineId = `PIPE-${uuidv4().replace(/-/g, "").slice(0, 8).toUpperCase()}`;
     try {
         const { sources, constraints } = req.body as {
-            sources?: unknown[];
+            sources?: any[];
             constraints?: Record<string, unknown>;
         };
 
@@ -20,14 +22,8 @@ pipelineRoutes.post("/run", async (req: Request, res: Response) => {
             return;
         }
 
-        // Orchestrator wired in Phase 4 — stub response for now
-        res.json({
-            pipeline_id: pipelineId,
-            status: "received",
-            message: "Orchestrator not yet implemented — Phase 4",
-            sources_received: sources.length,
-            constraints_received: constraints ?? {},
-        });
+        const result = await pipelineService.runPhaseA(pipelineId, sources, constraints);
+        res.json(result);
     } catch (err: unknown) {
         const message = err instanceof Error ? err.message : String(err);
         console.error(`[Pipeline] Run failed for ${pipelineId}:`, message);
@@ -53,4 +49,51 @@ pipelineRoutes.get("/:id/trace", (req: Request, res: Response) => {
         return;
     }
     res.json(trace);
+});
+
+// GET /api/pipeline/:id/trace/stream — Server-Sent Events (SSE) real-time stream
+pipelineRoutes.get("/:id/trace/stream", (req: Request, res: Response) => {
+    const pipelineId = req.params.id as string;
+    
+    // Set headers for Server-Sent Events (SSE)
+    res.writeHead(200, {
+        "Content-Type": "text/event-stream",
+        "Cache-Control": "no-cache",
+        "Connection": "keep-alive",
+        "Access-Control-Allow-Origin": "*",
+    });
+
+    res.write("retry: 5000\n\n");
+
+    // Immediately push existing logs for instant hydration
+    const existingTrace = traceCollector.getTrace(pipelineId);
+    if (existingTrace && existingTrace.events) {
+        existingTrace.events.forEach((event) => {
+            res.write(`data: ${JSON.stringify(event)}\n\n`);
+        });
+    }
+
+    // Event listener for subsequent dynamic trace additions
+    const listener = (event: any) => {
+        res.write(`data: ${JSON.stringify(event)}\n\n`);
+    };
+
+    traceCollector.on(`trace:${pipelineId}`, listener);
+
+    // Keep-alive heartbeat interval to avoid proxy connection timeouts
+    const heartbeat = setInterval(() => {
+        res.write(": keep-alive\n\n");
+    }, 15000);
+
+    // Unsubscribe when client connection closes
+    req.on("close", () => {
+        traceCollector.off(`trace:${pipelineId}`, listener);
+        clearInterval(heartbeat);
+        res.end();
+    });
+});
+
+// GET /api/pipeline (list all pipelines)
+pipelineRoutes.get("/", (req: Request, res: Response) => {
+    res.json(traceCollector.getAll());
 });

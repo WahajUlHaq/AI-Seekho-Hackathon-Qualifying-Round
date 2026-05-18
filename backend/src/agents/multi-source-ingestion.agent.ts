@@ -15,9 +15,18 @@ export interface IngestionConfig {
     maxContentLengthBytes: number;
 }
 
+export interface CustomSourceInput {
+    type: SourceType;
+    content?: string; // base64 for pdf, raw text for csv/txt/url mock content
+    url?: string;
+    filename?: string;
+    data?: unknown[]; // for realtime feed custom events
+}
+
 export interface MultiSourceIngestionInput extends AgentInput {
     config?: Partial<IngestionConfig>;
     feedAdapter?: FeedAdapter;
+    customSources?: CustomSourceInput[];
 }
 
 export interface MultiSourceIngestionOutput extends AgentOutput {
@@ -73,13 +82,32 @@ export class MultiSourceIngestionAgent extends BaseAgent<
 
         const feedCfg: FeedAdapterConfig = { delayMs: cfg.feedDelayMs, maxEvents: 15 };
 
-        const ingestionTasks: Array<() => Promise<SourceDocument>> = [
-            () => this.ingestPdf(pipeline_id, cfg),
-            () => this.ingestCsv(pipeline_id, cfg),
-            () => this.ingestTxt(pipeline_id, cfg),
-            () => this.ingestUrls(pipeline_id, cfg),
-            () => this.ingestFeed(pipeline_id, feedAdapter, feedCfg, cfg),
-        ];
+        const customSources = input.customSources;
+        const ingestionTasks: Array<() => Promise<SourceDocument>> = [];
+
+        if (customSources && customSources.length > 0) {
+            for (const src of customSources) {
+                if (src.type === "pdf" && src.content) {
+                    ingestionTasks.push(() => this.ingestCustomPdf(pipeline_id, src.content!, src.filename ?? "uploaded_report.pdf", cfg));
+                } else if (src.type === "csv" && src.content) {
+                    ingestionTasks.push(() => this.ingestCustomCsv(pipeline_id, src.content!, src.filename ?? "uploaded_data.csv", cfg));
+                } else if (src.type === "txt" && src.content) {
+                    ingestionTasks.push(() => this.ingestCustomTxt(pipeline_id, src.content!, src.filename ?? "uploaded_notes.txt", cfg));
+                } else if (src.type === "url") {
+                    ingestionTasks.push(() => this.ingestCustomUrl(pipeline_id, src.url ?? "https://example.com", src.content, cfg));
+                } else if (src.type === "realtime_feed") {
+                    ingestionTasks.push(() => this.ingestCustomFeed(pipeline_id, src.data, feedAdapter, feedCfg, cfg));
+                }
+            }
+        } else {
+            ingestionTasks.push(
+                () => this.ingestPdf(pipeline_id, cfg),
+                () => this.ingestCsv(pipeline_id, cfg),
+                () => this.ingestTxt(pipeline_id, cfg),
+                () => this.ingestUrls(pipeline_id, cfg),
+                () => this.ingestCustomFeed(pipeline_id, undefined, feedAdapter, feedCfg, cfg)
+            );
+        }
 
         const results = await Promise.allSettled(ingestionTasks.map(t => t()));
 
@@ -244,16 +272,135 @@ export class MultiSourceIngestionAgent extends BaseAgent<
         };
     }
 
-    private async ingestFeed(
+    private async ingestCustomPdf(pipelineId: string, base64Content: string, filename: string, cfg: IngestionConfig): Promise<SourceDocument> {
+        const buffer = Buffer.from(base64Content, "base64");
+        let text = "";
+        let numpages = 1;
+
+        try {
+            const { PDFParse } = require("pdf-parse") as {
+                PDFParse: new () => { parse(buf: Buffer): Promise<{ text: string; numpages: number }> };
+            };
+            const parser = new PDFParse();
+            const data = await parser.parse(buffer);
+            text = data.text.trim();
+            numpages = data.numpages;
+        } catch {
+            text = buffer
+                .toString("latin1")
+                .replace(/[^\x20-\x7E\n\r\t]/g, " ")
+                .replace(/\s+/g, " ")
+                .trim();
+        }
+
+        const content = truncate(text || "[PDF: no readable text extracted]", cfg.maxContentLengthBytes);
+
+        traceCollector.log(pipelineId, {
+            pipeline_id: pipelineId,
+            event_type: "agent_start",
+            agent: this.agentName,
+            message: `PDF ingested dynamically: ${numpages} pages, ${content.length} chars`,
+        });
+
+        return {
+            source_id: makeId("SRC"),
+            source_type: "pdf" as SourceType,
+            content,
+            ingested_at: new Date().toISOString(),
+            credibility_tier: "UNVERIFIED" as CredibilityTier,
+            metadata: { pages: numpages, file: filename },
+        };
+    }
+
+    private async ingestCustomCsv(pipelineId: string, csvContent: string, filename: string, cfg: IngestionConfig): Promise<SourceDocument> {
+        const result = Papa.parse(csvContent, { header: true, skipEmptyLines: true });
+        const content = truncate(JSON.stringify(result.data), cfg.maxContentLengthBytes);
+
+        traceCollector.log(pipelineId, {
+            pipeline_id: pipelineId,
+            event_type: "agent_start",
+            agent: this.agentName,
+            message: `CSV ingested dynamically: ${(result.data as unknown[]).length} rows`,
+        });
+
+        return {
+            source_id: makeId("SRC"),
+            source_type: "csv" as SourceType,
+            content,
+            ingested_at: new Date().toISOString(),
+            credibility_tier: "UNVERIFIED" as CredibilityTier,
+            metadata: { rows: (result.data as unknown[]).length, file: filename },
+        };
+    }
+
+    private async ingestCustomTxt(pipelineId: string, txtContent: string, filename: string, cfg: IngestionConfig): Promise<SourceDocument> {
+        const content = truncate(txtContent, cfg.maxContentLengthBytes);
+
+        traceCollector.log(pipelineId, {
+            pipeline_id: pipelineId,
+            event_type: "agent_start",
+            agent: this.agentName,
+            message: `TXT ingested dynamically: ${content.length} chars`,
+        });
+
+        return {
+            source_id: makeId("SRC"),
+            source_type: "txt" as SourceType,
+            content,
+            ingested_at: new Date().toISOString(),
+            credibility_tier: "UNVERIFIED" as CredibilityTier,
+            metadata: { file: filename },
+        };
+    }
+
+    private async ingestCustomUrl(pipelineId: string, url: string, rawContent: string | undefined, cfg: IngestionConfig): Promise<SourceDocument> {
+        let contentText = "";
+        
+        if (rawContent) {
+            try {
+                const $ = cheerioLoad(rawContent);
+                contentText = $("body").text().replace(/\s+/g, " ").trim();
+            } catch {
+                contentText = rawContent.trim();
+            }
+        } else {
+            contentText = `[URL: ${url} mock content empty]`;
+        }
+
+        const content = truncate(contentText, cfg.maxContentLengthBytes);
+
+        traceCollector.log(pipelineId, {
+            pipeline_id: pipelineId,
+            event_type: "agent_start",
+            agent: this.agentName,
+            message: `URL ingested dynamically: ${url}`,
+        });
+
+        return {
+            source_id: makeId("SRC"),
+            source_type: "url" as SourceType,
+            content,
+            ingested_at: new Date().toISOString(),
+            credibility_tier: "UNVERIFIED" as CredibilityTier,
+            metadata: { url },
+        };
+    }
+
+    private async ingestCustomFeed(
         pipelineId: string,
+        feedData: unknown[] | undefined,
         adapter: FeedAdapter,
         feedCfg: FeedAdapterConfig,
         cfg: IngestionConfig
     ): Promise<SourceDocument> {
-        const events: unknown[] = [];
+        let events: unknown[] = [];
 
-        for await (const event of adapter.stream(feedCfg)) {
-            events.push(event);
+        if (feedData && Array.isArray(feedData)) {
+            events = feedData;
+        } else {
+            for await (const event of adapter.stream(feedCfg)) {
+                events.push(event);
+            }
         }
 
         const content = truncate(JSON.stringify(events), cfg.maxContentLengthBytes);
@@ -262,7 +409,7 @@ export class MultiSourceIngestionAgent extends BaseAgent<
             pipeline_id: pipelineId,
             event_type: "agent_start",
             agent: this.agentName,
-            message: `Realtime feed ingested: ${events.length} events`,
+            message: `Realtime feed ingested dynamically: ${events.length} events`,
         });
 
         return {

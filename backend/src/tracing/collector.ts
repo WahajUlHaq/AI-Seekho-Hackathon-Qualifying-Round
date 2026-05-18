@@ -1,4 +1,5 @@
 import { v4 as uuidv4 } from "uuid";
+import { EventEmitter } from "events";
 
 export type TraceEventType =
     | "agent_start"
@@ -57,8 +58,12 @@ export interface PipelineTrace {
     events: TraceEvent[];
 }
 
-export class TraceCollector {
+export class TraceCollector extends EventEmitter {
     private traces: Map<string, PipelineTrace> = new Map();
+
+    constructor() {
+        super();
+    }
 
     initPipeline(pipelineId: string, workplan: string, taskPlan: string[]): void {
         this.traces.set(pipelineId, {
@@ -87,6 +92,7 @@ export class TraceCollector {
         };
 
         trace.events.push(full);
+        this.emit(`trace:${pipelineId}`, full);
 
         if (event.event_type === "decision" && event.decision !== undefined) {
             trace.reasoning_steps.push({
