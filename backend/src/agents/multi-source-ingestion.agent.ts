@@ -15,9 +15,17 @@ export interface IngestionConfig {
     maxContentLengthBytes: number;
 }
 
+export interface RawIngestionSource {
+    source_id: string;
+    source_type: string;
+    content: string;
+    fileName?: string;
+}
+
 export interface MultiSourceIngestionInput extends AgentInput {
     config?: Partial<IngestionConfig>;
     feedAdapter?: FeedAdapter;
+    rawSources?: RawIngestionSource[];
 }
 
 export interface MultiSourceIngestionOutput extends AgentOutput {
@@ -64,6 +72,42 @@ export class MultiSourceIngestionAgent extends BaseAgent<
         const { pipeline_id } = input;
         const cfg = { ...this.defaultConfig, ...input.config };
         const now = new Date().toISOString();
+
+        // Dynamic-source branch: FE-staged uploads bypass the disk fallback. Filters
+        // empty-content entries so the multi_source_ingestion_v1 semantic check holds.
+        if (input.rawSources && input.rawSources.length > 0) {
+            const filtered = input.rawSources.filter(r => r.content && r.content.length > 0);
+
+            traceCollector.log(pipeline_id, {
+                pipeline_id,
+                event_type: "thinking",
+                agent: this.agentName,
+                message: `Dynamic source mode: ingesting ${filtered.length} FE-staged source(s); disk fallback skipped.`,
+                data: { source_count: filtered.length, source_ids: filtered.map(r => r.source_id) },
+            });
+
+            const sources: SourceDocument[] = filtered.map(raw => ({
+                source_id: raw.source_id,
+                source_type: raw.source_type as SourceType,
+                content: raw.content,
+                ingested_at: now,
+                credibility_tier: "UNVERIFIED" as CredibilityTier,
+                metadata: {
+                    source_origin: "frontend-raw",
+                    ...(raw.fileName ? { fileName: raw.fileName } : {}),
+                },
+            }));
+
+            return {
+                pipeline_id,
+                agent_name: this.agentName,
+                completed_at: new Date().toISOString(),
+                ingestion_id: makeId("ING"),
+                timestamp: now,
+                sources_processed: sources.length,
+                sources,
+            };
+        }
 
         // Resolution order: per-call input override → constructor-injected default → local fallback
         const feedAdapter =

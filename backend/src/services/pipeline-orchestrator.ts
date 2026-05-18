@@ -3,7 +3,7 @@ import * as path from "path";
 import { traceCollector } from "../tracing/collector";
 import { InMemoryVectorStore } from "../stores/in-memory-vector.store";
 import { MockRealtimeFeedAdapter } from "../adapters/mock-realtime-feed.adapter";
-import { MultiSourceIngestionAgent } from "../agents/multi-source-ingestion.agent";
+import { MultiSourceIngestionAgent, RawIngestionSource } from "../agents/multi-source-ingestion.agent";
 import { CredibilityScorerAgent } from "../agents/credibility-scorer.agent";
 import { NoiseFilterAgent } from "../agents/noise-filter.agent";
 import { ContradictionDetectorAgent } from "../agents/contradiction-detector.agent";
@@ -68,11 +68,17 @@ const pendingExecutionContexts = new Map<string, PendingExecutionContext>();
  * M1 -> M10 + HITL submit. Runs as fire-and-forget; the worker handles its own
  * errors. On success, leaves the pipeline in PENDING state in the approval store.
  */
-export async function processFullPipelineUpToHITL(pipelineId: string): Promise<void> {
+export async function processFullPipelineUpToHITL(
+    pipelineId: string,
+    rawSources?: RawIngestionSource[],
+): Promise<void> {
     const agents = makeAgents();
 
     try {
-        const ingestion = await agents.ingestionAgent.run({ pipeline_id: pipelineId });
+        const ingestion = await agents.ingestionAgent.run({
+            pipeline_id: pipelineId,
+            ...(rawSources && rawSources.length > 0 ? { rawSources } : {}),
+        });
 
         const credibility = await agents.credibilityAgent.run({
             pipeline_id: pipelineId,

@@ -189,13 +189,25 @@ pipelineRoutes.post("/run", (req: Request, res: Response) => {
 
     res.json({ pipeline_id: pipelineId, status: "initialized" });
 
-    if (sources && Array.isArray(sources) && sources.length > 0) {
+    const hasSources = sources && Array.isArray(sources) && sources.length > 0;
+
+    if (hasSources) {
         void processAnalyticsPool(pipelineId, sources).catch((err) => {
             console.error(`[Pipeline ${pipelineId}] processAnalyticsPool unhandled rejection:`, err);
         });
     }
 
-    void processFullPipelineUpToHITL(pipelineId).catch((err) => {
+    // Coerce optional RawSource fields into the strict shape the ingestion agent
+    // expects. Mirrors the SRC-${idx+1} fabrication used by processAnalyticsPool.
+    const rawSourcesForIngestion = hasSources
+        ? sources.map((s, i) => ({
+            source_id: s.source_id ?? `SRC-${i + 1}`,
+            source_type: s.source_type ?? "txt",
+            content: s.content ?? "",
+        }))
+        : undefined;
+
+    void processFullPipelineUpToHITL(pipelineId, rawSourcesForIngestion).catch((err) => {
         console.error(`[Pipeline ${pipelineId}] processFullPipelineUpToHITL unhandled rejection:`, err);
     });
 });
