@@ -1,0 +1,8 @@
+FACTORY_INGEST_LOG // FAISALABAD TEXTILE MILLS // GATE 4
+RECEIPT_ID: REC-2026-05-16 // TIME: 2026-05-16T11:15:00Z
+INBOUND_CONTAINER: TEX-PK-99102
+STATUS: DELIVERED (DELAYED)
+ACTUAL_WEIGHT_AT_GATE: 24,520 KG
+SEAL_STATUS: INTACT
+DELIVERY_TIMELINE_METRICS:
+Consignment arrived 48 hours behind schedule. Mill inventory depletion rate climbed to 85% due to the delayed safety stock. Factory throughput volatility index remained stable floating around a performant 0.045 during assembly processing.

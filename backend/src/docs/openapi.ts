@@ -418,6 +418,7 @@ const schemas: Record<string, OpenAPIV3.SchemaObject> = {
                     "graph_cycle_detected",
                     "hitl_pending",
                     "hitl_approved",
+                    "thinking",
                 ],
             },
             agent: { type: "string", example: "StrategicRecommenderAgent" },
@@ -427,6 +428,49 @@ const schemas: Record<string, OpenAPIV3.SchemaObject> = {
             confidence: { type: "number", minimum: 0, maximum: 1 },
             provider: { type: "string", example: "gemini-free" },
             latency_ms: { type: "number", minimum: 0 },
+        },
+    },
+
+    ForecastPoint: {
+        type: "object",
+        required: ["timestamp", "value", "is_extrapolation"],
+        properties: {
+            timestamp: { type: "string", format: "date-time" },
+            value: { type: "number" },
+            is_extrapolation: {
+                type: "boolean",
+                description: "True beyond the current cursor (predicted region).",
+            },
+        },
+    },
+
+    ContradictionRecord: {
+        type: "object",
+        required: ["source_id", "timestamp", "raw_claim", "baseline_context", "conflict_rationale"],
+        properties: {
+            source_id: { type: "string", example: "SRC-001" },
+            timestamp: { type: "string", format: "date-time" },
+            raw_claim: { type: "string" },
+            baseline_context: { type: "string" },
+            conflict_rationale: { type: "string" },
+        },
+    },
+
+    PipelineAnalytics: {
+        type: "object",
+        required: ["extrapolation_unreliable", "forecast_data", "contradictions"],
+        description:
+            "AMCE-judged analytics payload returned by GET /api/pipeline/:id/analytics. forecast_data carries 30 historical + 60 predicted points.",
+        properties: {
+            extrapolation_unreliable: { type: "boolean" },
+            forecast_data: {
+                type: "array",
+                items: { $ref: "#/components/schemas/ForecastPoint" },
+            },
+            contradictions: {
+                type: "array",
+                items: { $ref: "#/components/schemas/ContradictionRecord" },
+            },
         },
     },
 
@@ -704,6 +748,54 @@ export const openApiSpec: OpenAPIV3.Document = {
                     },
                     "404": {
                         description: "Pipeline trace not found.",
+                        content: {
+                            "application/json": {
+                                schema: { $ref: "#/components/schemas/ErrorEnvelope" },
+                            },
+                        },
+                    },
+                },
+            },
+        },
+
+        "/api/pipeline/{id}/stream": {
+            get: {
+                tags: ["Pipeline"],
+                summary: "Server-Sent Events stream of pipeline TraceEvent frames.",
+                description:
+                    "Long-lived text/event-stream connection. Each `data:` frame is a JSON-serialized TraceEvent. Emits an `end` event when the trace is finalized. Heartbeat comments keep the connection alive while the pipeline is starting.",
+                parameters: [pipelineIdParam],
+                responses: {
+                    "200": {
+                        description: "Event stream open. Frames are TraceEvent JSON objects.",
+                        content: {
+                            "text/event-stream": {
+                                schema: { $ref: "#/components/schemas/TraceEvent" },
+                            },
+                        },
+                    },
+                },
+            },
+        },
+
+        "/api/pipeline/{id}/analytics": {
+            get: {
+                tags: ["Pipeline"],
+                summary: "Compiled analytics for a pipeline.",
+                description:
+                    "404 while the multi-agent pool is still synthesizing; 200 once the AMCE-judged PipelineAnalytics record lands in the cache.",
+                parameters: [pipelineIdParam],
+                responses: {
+                    "200": {
+                        description: "Analytics ready.",
+                        content: {
+                            "application/json": {
+                                schema: { $ref: "#/components/schemas/PipelineAnalytics" },
+                            },
+                        },
+                    },
+                    "404": {
+                        description: "Sub-agents still processing.",
                         content: {
                             "application/json": {
                                 schema: { $ref: "#/components/schemas/ErrorEnvelope" },

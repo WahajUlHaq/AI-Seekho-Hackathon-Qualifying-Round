@@ -14,7 +14,8 @@ export type TraceEventType =
     | "action_complete"
     | "graph_cycle_detected"
     | "hitl_pending"
-    | "hitl_approved";
+    | "hitl_approved"
+    | "thinking";
 
 export interface TraceEvent {
     event_id: string;

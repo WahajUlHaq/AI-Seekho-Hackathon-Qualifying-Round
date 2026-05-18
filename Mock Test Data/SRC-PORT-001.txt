@@ -1,0 +1,8 @@
+KICT_MANIFEST_DB_EXPORT // TIMESTAMP: 2026-05-12T08:00:00Z
+CONTAINER_ID: TEX-PK-99102
+STATUS: CLEARED_CUSTOMS
+CARGO_WEIGHT: 24,500 KG (Raw Cotton Bales)
+DISPATCH_TIMESTAMP: 2026-05-12T14:30:00Z
+CARRIER_ASSIGNED: Indus Freight Corp, Fleet Vehicle ID: IND-TRK-77
+ROUTING: Karachi KICT terminal -> National Highway 5 (N-5) -> Faisalabad Industrial Zone.
+NOTES: Consignment passed physical customs clearance on initial scan. Zero anomalies flagged at port gate.

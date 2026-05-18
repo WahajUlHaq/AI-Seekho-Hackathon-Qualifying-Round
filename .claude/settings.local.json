@@ -13,7 +13,9 @@
       "Bash(xargs head -5)",
       "Bash(curl -s -X POST http://localhost:8000/api/pipeline/run -H 'Content-Type: application/json' -d '{\"sources\":[{\"type\":\"test\"}]}')",
       "Bash(python3 -m json.tool)",
-      "Bash(curl -s http://localhost:8000/api/validations)"
+      "Bash(curl -s http://localhost:8000/api/validations)",
+      "WebSearch",
+      "Bash(npm install *)"
     ]
   }
 }
