@@ -7,6 +7,7 @@ import { ForecasterAgent } from "../agents/forecaster.agent";
 import { AuditorAgent } from "../agents/auditor.agent";
 import type { ForecastPoint, PipelineAnalytics, RawSource } from "../agents/analytics.types";
 import { PipelineAnalyticsSchema } from "../docs/contracts/analytics.contracts";
+import { processFullPipelineUpToHITL } from "../services/pipeline-orchestrator";
 
 export const pipelineRoutes = Router();
 
@@ -61,13 +62,10 @@ function fallbackAnalytics(pipelineId: string): PipelineAnalytics {
     return { extrapolation_unreliable: true, forecast_data, contradictions: [] };
 }
 
-async function processMultiAgentPipeline(pipelineId: string, sources: RawSource[]): Promise<void> {
-    traceCollector.initPipeline(
-        pipelineId,
-        "multi_agent_synthesis",
-        ["ingestion_parsing", "trend_forecasting", "contradiction_auditing"]
-    );
-
+// Analytics-pool worker runs in parallel with the full M1-M14 flow. It does NOT
+// init or finalize the trace; the route handler initializes once, and the
+// post-approval worker (or rejection handler) finalizes.
+async function processAnalyticsPool(pipelineId: string, sources: RawSource[]): Promise<void> {
     let approvedAnalytics: PipelineAnalytics | null = null;
 
     try {
@@ -150,31 +148,55 @@ async function processMultiAgentPipeline(pipelineId: string, sources: RawSource[
         approvedAnalytics = fallbackAnalytics(pipelineId);
     } finally {
         if (approvedAnalytics) analyticsCache.set(pipelineId, approvedAnalytics);
-        try {
-            traceCollector.finalizePipeline(pipelineId);
-        } catch {
-            // Already finalized or never initialized — safe to swallow.
-        }
+        // Trace finalization is deferred to the post-approval worker / rejection
+        // handler so the SSE stream stays open through the HITL gate.
     }
 }
 
 // -------- Routes --------
 
-// POST /api/pipeline/run
+// POST /api/pipeline/run — hybrid orchestrator
+//
+// Initializes a single trace, then fires:
+//   1. processFullPipelineUpToHITL — M1-M10 + HITL submit (always)
+//   2. processAnalyticsPool        — legacy 3-agent forecast/contradiction surface (only if sources provided)
+//
+// The legacy analytics flow populates the secondary CredibilityGrid/ForecasterChart/
+// ContradictionPanel panels on the FE. The M1-M10 flow ingests autonomously from
+// disk + feed adapter and produces the StrategyProposal that the HITL gate releases.
 pipelineRoutes.post("/run", (req: Request, res: Response) => {
     const pipelineId = `PIPE-${uuidv4().replace(/-/g, "").slice(0, 8).toUpperCase()}`;
     const { sources } = req.body as { sources?: RawSource[] };
 
-    if (!sources || !Array.isArray(sources) || sources.length === 0) {
-        res.status(400).json({ error: "sources array is required and must not be empty" });
-        return;
-    }
+    traceCollector.initPipeline(pipelineId, "hybrid_synthesis", [
+        "analytics_pool (M-Parser+M-Forecaster+M-Auditor)",
+        "ingestion",
+        "credibility",
+        "noise-filter",
+        "contradiction",
+        "resolution+temporal (parallel)",
+        "insight-extraction",
+        "impact-scoring",
+        "predictive-forecasting",
+        "strategic-recommendation",
+        "hitl-gate",
+        "dag-sort",
+        "execution-simulator",
+        "failure-recovery",
+        "outcome-visualizer",
+        "workflow-audit",
+    ]);
 
     res.json({ pipeline_id: pipelineId, status: "initialized" });
 
-    // Fire-and-forget; the worker handles its own errors and writes to analyticsCache.
-    void processMultiAgentPipeline(pipelineId, sources).catch((err) => {
-        console.error(`[Pipeline ${pipelineId}] processMultiAgentPipeline unhandled rejection:`, err);
+    if (sources && Array.isArray(sources) && sources.length > 0) {
+        void processAnalyticsPool(pipelineId, sources).catch((err) => {
+            console.error(`[Pipeline ${pipelineId}] processAnalyticsPool unhandled rejection:`, err);
+        });
+    }
+
+    void processFullPipelineUpToHITL(pipelineId).catch((err) => {
+        console.error(`[Pipeline ${pipelineId}] processFullPipelineUpToHITL unhandled rejection:`, err);
     });
 });
 

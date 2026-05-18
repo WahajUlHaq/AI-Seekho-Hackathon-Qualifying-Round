@@ -74,6 +74,14 @@ const schemas: Record<string, OpenAPIV3.SchemaObject> = {
                 example: "2026-05-16T14:25:01.902Z",
             },
             approved_by: { type: "string", nullable: true, example: "alex.chen" },
+            rejected_at: {
+                type: "string",
+                format: "date-time",
+                nullable: true,
+                example: "2026-05-16T14:24:30.114Z",
+            },
+            rejected_by: { type: "string", nullable: true, example: "alex.chen" },
+            rejection_reason: { type: "string", nullable: true, example: "Risk too high for current freeze." },
             proposal: { $ref: "#/components/schemas/StrategyProposal" },
         },
     },
@@ -100,6 +108,36 @@ const schemas: Record<string, OpenAPIV3.SchemaObject> = {
             state: { $ref: "#/components/schemas/ApprovalState" },
             approved_by: { type: "string", example: "alex.chen" },
             approved_at: { type: "string", format: "date-time", example: "2026-05-16T14:25:01.902Z" },
+        },
+    },
+
+    RejectRequest: {
+        type: "object",
+        required: ["rejected_by"],
+        properties: {
+            rejected_by: {
+                type: "string",
+                minLength: 1,
+                description: "Human rejector signature name (operator handle). Trimmed; empty string yields 400.",
+                example: "alex.chen",
+            },
+            reason: {
+                type: "string",
+                description: "Optional free-text justification, surfaced on the FE rejection banner and the trace event.",
+                example: "Risk too high for current freeze.",
+            },
+        },
+    },
+
+    RejectResponse: {
+        type: "object",
+        required: ["pipeline_id", "state", "rejected_by", "rejected_at"],
+        properties: {
+            pipeline_id: { type: "string", pattern: PIPE_ID_PATTERN, example: "PIPE-7K2A9F31" },
+            state: { $ref: "#/components/schemas/ApprovalState" },
+            rejected_by: { type: "string", example: "alex.chen" },
+            rejected_at: { type: "string", format: "date-time", example: "2026-05-16T14:24:30.114Z" },
+            rejection_reason: { type: "string", nullable: true, example: "Risk too high for current freeze." },
         },
     },
 
@@ -418,6 +456,7 @@ const schemas: Record<string, OpenAPIV3.SchemaObject> = {
                     "graph_cycle_detected",
                     "hitl_pending",
                     "hitl_approved",
+                    "hitl_rejected",
                     "thinking",
                 ],
             },
@@ -538,11 +577,12 @@ const schemas: Record<string, OpenAPIV3.SchemaObject> = {
 
     PipelineRunRequest: {
         type: "object",
-        required: ["sources"],
+        description:
+            "Submitting `sources` is OPTIONAL. The full 14-module flow ingests autonomously from local disk + the realtime feed adapter; sources are only used by the legacy analytics-pool flow that populates the secondary forecast/contradiction panels.",
         properties: {
             sources: {
                 type: "array",
-                minItems: 1,
+                minItems: 0,
                 items: { $ref: "#/components/schemas/MultiSourceIngestionSource" },
             },
             constraints: {
@@ -1016,6 +1056,166 @@ export const openApiSpec: OpenAPIV3.Document = {
                                     error: "Pipeline PIPE-7K2A9F31 is EXECUTING, not PENDING",
                                     pipeline_id: "PIPE-7K2A9F31",
                                 },
+                            },
+                        },
+                    },
+                },
+            },
+        },
+
+        "/api/execution/{id}/reject": {
+            post: {
+                tags: ["Execution (HITL)"],
+                summary: "Reject a PENDING pipeline (atomic PENDING -> REJECTED).",
+                description:
+                    "Atomic check-and-set: only a pipeline in state PENDING can transition to REJECTED. Symmetric with /approve; records `rejected_by` and an optional `reason` on the PipelineApprovalRecord, emits a `hitl_rejected` trace event, and discards the cached M11-M14 execution context.",
+                parameters: [pipelineIdParam],
+                requestBody: {
+                    required: true,
+                    content: {
+                        "application/json": {
+                            schema: { $ref: "#/components/schemas/RejectRequest" },
+                        },
+                    },
+                },
+                responses: {
+                    "200": {
+                        description: "Rejected — pipeline transitioned to REJECTED.",
+                        content: {
+                            "application/json": {
+                                schema: { $ref: "#/components/schemas/RejectResponse" },
+                            },
+                        },
+                    },
+                    "400": {
+                        description: "Missing or empty `rejected_by`.",
+                        content: {
+                            "application/json": {
+                                schema: { $ref: "#/components/schemas/ErrorEnvelope" },
+                            },
+                        },
+                    },
+                    "404": {
+                        description: "Pipeline id unknown.",
+                        content: {
+                            "application/json": {
+                                schema: { $ref: "#/components/schemas/ErrorEnvelope" },
+                            },
+                        },
+                    },
+                    "409": {
+                        description: "Atomic concurrency lock — pipeline is not PENDING.",
+                        content: {
+                            "application/json": {
+                                schema: { $ref: "#/components/schemas/ErrorEnvelope" },
+                            },
+                        },
+                    },
+                },
+            },
+        },
+
+        "/api/execution/{id}/chain": {
+            get: {
+                tags: ["Execution (HITL)"],
+                summary: "M11 ActionChain for a post-approval pipeline.",
+                description:
+                    "404 while the M11 ExecutionSimulator is still running; 200 once the topologically-sorted action chain has finished executing.",
+                parameters: [pipelineIdParam],
+                responses: {
+                    "200": {
+                        description: "Action chain ready.",
+                        content: {
+                            "application/json": {
+                                schema: { $ref: "#/components/schemas/ActionChain" },
+                            },
+                        },
+                    },
+                    "404": {
+                        description: "Chain not yet available.",
+                        content: {
+                            "application/json": {
+                                schema: { $ref: "#/components/schemas/ErrorEnvelope" },
+                            },
+                        },
+                    },
+                },
+            },
+        },
+
+        "/api/execution/{id}/recovery": {
+            get: {
+                tags: ["Execution (HITL)"],
+                summary: "M12 FailureRecovery plan for a post-approval pipeline.",
+                parameters: [pipelineIdParam],
+                responses: {
+                    "200": {
+                        description: "Recovery plan ready.",
+                        content: {
+                            "application/json": {
+                                schema: { $ref: "#/components/schemas/FailureRecovery" },
+                            },
+                        },
+                    },
+                    "404": {
+                        description: "Recovery not yet available.",
+                        content: {
+                            "application/json": {
+                                schema: { $ref: "#/components/schemas/ErrorEnvelope" },
+                            },
+                        },
+                    },
+                },
+            },
+        },
+
+        "/api/execution/{id}/outcome": {
+            get: {
+                tags: ["Execution (HITL)"],
+                summary: "M13 OutcomeVisualization for a post-approval pipeline.",
+                parameters: [pipelineIdParam],
+                responses: {
+                    "200": {
+                        description: "Outcome ready.",
+                        content: {
+                            "application/json": {
+                                schema: { $ref: "#/components/schemas/OutcomeVisualization" },
+                            },
+                        },
+                    },
+                    "404": {
+                        description: "Outcome not yet available.",
+                        content: {
+                            "application/json": {
+                                schema: { $ref: "#/components/schemas/ErrorEnvelope" },
+                            },
+                        },
+                    },
+                },
+            },
+        },
+
+        "/api/execution/{id}/audit": {
+            get: {
+                tags: ["Execution (HITL)"],
+                summary: "M14 WorkflowAudit (compliance receipt) for a post-approval pipeline.",
+                description:
+                    "Returns the immutable receipt with the SHA-256 verification_hash. The hash is computed over the canonical-key-sorted JSON of {pipelineId, audit_id, generated_at, finalized_status, signature_block, event_summary} and can be reconstructed client-side for tamper detection.",
+                parameters: [pipelineIdParam],
+                responses: {
+                    "200": {
+                        description: "Audit ready.",
+                        content: {
+                            "application/json": {
+                                schema: { $ref: "#/components/schemas/WorkflowAudit" },
+                            },
+                        },
+                    },
+                    "404": {
+                        description: "Audit not yet available.",
+                        content: {
+                            "application/json": {
+                                schema: { $ref: "#/components/schemas/ErrorEnvelope" },
                             },
                         },
                     },
