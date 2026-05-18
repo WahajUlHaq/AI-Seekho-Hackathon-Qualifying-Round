@@ -641,6 +641,292 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/execution/{id}/reject": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Reject a PENDING pipeline (atomic PENDING -> REJECTED).
+         * @description Atomic check-and-set: only a pipeline in state PENDING can transition to REJECTED. Symmetric with /approve; records `rejected_by` and an optional `reason` on the PipelineApprovalRecord, emits a `hitl_rejected` trace event, and discards the cached M11-M14 execution context.
+         */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    /**
+                     * @description Pipeline identifier returned by POST /api/pipeline/run.
+                     * @example PIPE-7K2A9F31
+                     */
+                    id: string;
+                };
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["RejectRequest"];
+                };
+            };
+            responses: {
+                /** @description Rejected — pipeline transitioned to REJECTED. */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["RejectResponse"];
+                    };
+                };
+                /** @description Missing or empty `rejected_by`. */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorEnvelope"];
+                    };
+                };
+                /** @description Pipeline id unknown. */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorEnvelope"];
+                    };
+                };
+                /** @description Atomic concurrency lock — pipeline is not PENDING. */
+                409: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorEnvelope"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/execution/{id}/chain": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * M11 ActionChain for a post-approval pipeline.
+         * @description 404 while the M11 ExecutionSimulator is still running; 200 once the topologically-sorted action chain has finished executing.
+         */
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    /**
+                     * @description Pipeline identifier returned by POST /api/pipeline/run.
+                     * @example PIPE-7K2A9F31
+                     */
+                    id: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Action chain ready. */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ActionChain"];
+                    };
+                };
+                /** @description Chain not yet available. */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorEnvelope"];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/execution/{id}/recovery": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** M12 FailureRecovery plan for a post-approval pipeline. */
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    /**
+                     * @description Pipeline identifier returned by POST /api/pipeline/run.
+                     * @example PIPE-7K2A9F31
+                     */
+                    id: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Recovery plan ready. */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["FailureRecovery"];
+                    };
+                };
+                /** @description Recovery not yet available. */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorEnvelope"];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/execution/{id}/outcome": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** M13 OutcomeVisualization for a post-approval pipeline. */
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    /**
+                     * @description Pipeline identifier returned by POST /api/pipeline/run.
+                     * @example PIPE-7K2A9F31
+                     */
+                    id: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Outcome ready. */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["OutcomeVisualization"];
+                    };
+                };
+                /** @description Outcome not yet available. */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorEnvelope"];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/execution/{id}/audit": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * M14 WorkflowAudit (compliance receipt) for a post-approval pipeline.
+         * @description Returns the immutable receipt with the SHA-256 verification_hash. The hash is computed over the canonical-key-sorted JSON of {pipelineId, audit_id, generated_at, finalized_status, signature_block, event_summary} and can be reconstructed client-side for tamper detection.
+         */
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    /**
+                     * @description Pipeline identifier returned by POST /api/pipeline/run.
+                     * @example PIPE-7K2A9F31
+                     */
+                    id: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Audit ready. */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["WorkflowAudit"];
+                    };
+                };
+                /** @description Audit not yet available. */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorEnvelope"];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
@@ -697,6 +983,15 @@ export interface components {
             approved_at?: string | null;
             /** @example alex.chen */
             approved_by?: string | null;
+            /**
+             * Format: date-time
+             * @example 2026-05-16T14:24:30.114Z
+             */
+            rejected_at?: string | null;
+            /** @example alex.chen */
+            rejected_by?: string | null;
+            /** @example Risk too high for current freeze. */
+            rejection_reason?: string | null;
             proposal: components["schemas"]["StrategyProposal"];
         };
         ApproveRequest: {
@@ -717,6 +1012,32 @@ export interface components {
              * @example 2026-05-16T14:25:01.902Z
              */
             approved_at: string;
+        };
+        RejectRequest: {
+            /**
+             * @description Human rejector signature name (operator handle). Trimmed; empty string yields 400.
+             * @example alex.chen
+             */
+            rejected_by: string;
+            /**
+             * @description Optional free-text justification, surfaced on the FE rejection banner and the trace event.
+             * @example Risk too high for current freeze.
+             */
+            reason?: string;
+        };
+        RejectResponse: {
+            /** @example PIPE-7K2A9F31 */
+            pipeline_id: string;
+            state: components["schemas"]["ApprovalState"];
+            /** @example alex.chen */
+            rejected_by: string;
+            /**
+             * Format: date-time
+             * @example 2026-05-16T14:24:30.114Z
+             */
+            rejected_at: string;
+            /** @example Risk too high for current freeze. */
+            rejection_reason?: string | null;
         };
         ErrorEnvelope: {
             /** @example Pipeline PIPE-7K2A9F31 is EXECUTING, not PENDING */
@@ -930,7 +1251,7 @@ export interface components {
             /** Format: date-time */
             timestamp: string;
             /** @enum {string} */
-            event_type: "agent_start" | "agent_complete" | "llm_call" | "contract_gate" | "action_execute" | "failure" | "ingestion_error" | "recovery" | "decision" | "action_start" | "action_complete" | "graph_cycle_detected" | "hitl_pending" | "hitl_approved" | "thinking";
+            event_type: "agent_start" | "agent_complete" | "llm_call" | "contract_gate" | "action_execute" | "failure" | "ingestion_error" | "recovery" | "decision" | "action_start" | "action_complete" | "graph_cycle_detected" | "hitl_pending" | "hitl_approved" | "hitl_rejected" | "thinking";
             /** @example StrategicRecommenderAgent */
             agent: string;
             message: string;
@@ -996,8 +1317,9 @@ export interface components {
             recovery_steps: string[];
             events: components["schemas"]["TraceEvent"][];
         };
+        /** @description Submitting `sources` is OPTIONAL. The full 14-module flow ingests autonomously from local disk + the realtime feed adapter; sources are only used by the legacy analytics-pool flow that populates the secondary forecast/contradiction panels. */
         PipelineRunRequest: {
-            sources: components["schemas"]["MultiSourceIngestionSource"][];
+            sources?: components["schemas"]["MultiSourceIngestionSource"][];
             /**
              * @example {
              *       "max_actions": 10,
