@@ -13,8 +13,10 @@ import { ActionChainGeneratorAgent, ActionChainGeneratorOutput } from "./action-
 
 import { ConstraintValidator } from "../simulation/constraint-validator";
 import { ActionChainSimulator } from "../simulation/chain-simulator";
+import { DAGExecutor, ForcedFailuresConfig } from "../simulation/dag-executor";
 import { FailureRecoveryEngine } from "../simulation/failure-recovery";
 import { OutcomeVisualizer } from "../simulation/outcome-visualizer";
+import { SagaConstraintLedger } from "../simulation/saga-ledger";
 import { AMCEBlockError } from "../contracts/base-model-benchmark";
 import { antigravityFileLogger } from "../tracing/file-logger";
 
@@ -31,6 +33,11 @@ import {
 export interface PipelineRequest {
     sources: RawSourceInput[];
     constraints?: Partial<Constraints>;
+    /**
+     * V2 Phase 3 — reproducible failure injection so the M12 selective
+     * rollback path can be exercised deterministically in demos and tests.
+     */
+    forcedFailures?: ForcedFailuresConfig;
 }
 
 export interface PipelineResult {
@@ -81,7 +88,8 @@ export class PipelineOrchestrator {
     private impactAgent = new ImpactAnalysisAgent();
     private actionChainAgent = new ActionChainGeneratorAgent();
     private constraintValidator = new ConstraintValidator();
-    private simulator = new ActionChainSimulator();
+    private simulator = new ActionChainSimulator();    // V1 legacy adapter (kept for back-compat)
+    private dagExecutor = new DAGExecutor();           // V2 Phase 3 M11
     private recoveryEngine = new FailureRecoveryEngine();
     private visualizer = new OutcomeVisualizer();
 
@@ -237,8 +245,44 @@ export class PipelineOrchestrator {
                 constraint_violations: actionOut.constraint_violations,
             };
 
-            // ── Module 10: Constraint Validation ──────────────────────────────────
-            const validations = this.constraintValidator.validateActionChain(actionChain, constraints);
+            // ── Phase E (V2): Antigravity initializes the shared SagaConstraintLedger.
+            // Same instance is used by M10 (reserve), M11 (commit), M12 (refund-first).
+            const sagaLedger = new SagaConstraintLedger(pipelineId, constraints.budget_limit.amount);
+            antigravityFileLogger.append({
+                timestamp: new Date().toISOString(),
+                step: "M10_SagaLedgerInit",
+                tool_called: "SagaConstraintLedger",
+                reasoning: `Antigravity initialized the saga ledger with budget PKR ${constraints.budget_limit.amount}. The ledger is shared across M10/M11/M12 for cumulative reserve→commit/refund tracking.`,
+                status: "SUCCESS",
+                rollback_action: "none",
+                latency_ms: 0,
+                cost: 0,
+                rubric_category: "constraint_evaluation",
+                data_lineage: {
+                    from: "AntigravityOrchestrator",
+                    to: "SagaConstraintLedger",
+                    data_type: "LedgerInit",
+                    key_change: `budget_limit_pkr=${constraints.budget_limit.amount}`,
+                },
+            });
+
+            // ── Module 10: Constraint Validation (Saga reserve, cumulative) ──────
+            traceCollector.log(pipelineId, {
+                pipeline_id: pipelineId,
+                event_type: "decision",
+                agent: "AntigravityOrchestrator",
+                message: "Phase E routing → M10 (Saga Constraint Validator). Cumulative reserve via the shared SagaConstraintLedger; relaxation suggestions on infeasibility.",
+                decision: "ROUTE_M10_SAGA_LEDGER",
+                confidence: 1.0,
+                data: { schema: "constraint_validation_v1", mode: "ALERT_ONLY" },
+            });
+            const m10 = this.constraintValidator.validateWithLedger({
+                pipeline_id: pipelineId,
+                chain: actionChain,
+                constraints,
+                ledger: sagaLedger,
+            });
+            const validations = m10.results;
 
             validations.forEach((v) => {
                 if (!v.is_feasible) {
@@ -246,7 +290,7 @@ export class PipelineOrchestrator {
                         pipeline_id: pipelineId,
                         event_type: "decision",
                         agent: "ConstraintValidator",
-                        message: `Action ${v.action_id} is infeasible: ${v.violations.map(vl => vl.constraint_type).join(", ")} violation`,
+                        message: `Action ${v.action_id} is infeasible: ${v.violations.map(vl => vl.constraint_type).join(", ")} violation. ${v.recommended_modification ?? ""}`,
                         decision: "CONSTRAINT_REJECT",
                         confidence: 1.0,
                         data: { violations: v.violations, recommendation: v.recommended_modification },
@@ -254,12 +298,12 @@ export class PipelineOrchestrator {
                 }
             });
 
-            // ── Module 11: Action Chain Simulation ────────────────────────────────
+            // ── Module 11: Level-Parallel DAG Executor ──────────────────────────
             const initialState: SimulationState = {
                 state_id: `STATE-${uuidv4().slice(0, 8).toUpperCase()}`,
                 timestamp: new Date().toISOString(),
                 variables: {
-                    stock_level: null,
+                    stock_level: 50,
                     stock_verified: false,
                     notification_sent: false,
                     order_placed: false,
@@ -270,52 +314,90 @@ export class PipelineOrchestrator {
                 },
             };
 
-            const simulationResults = await this.simulator.simulateChain(
-                actionChain,
-                initialState,
-                true,  // simulateFailures: true — demonstrates robustness
-                pipelineId
-            );
+            traceCollector.log(pipelineId, {
+                pipeline_id: pipelineId,
+                event_type: "decision",
+                agent: "AntigravityOrchestrator",
+                message: `Phase E routing → M11 (Level-Parallel DAG Executor). State mutations strictly BETWEEN dependency levels; Promise.allSettled inside each level. forcedFailures.fail count = ${request.forcedFailures?.fail.length ?? 0}.`,
+                decision: "ROUTE_M11_DAG_EXECUTOR",
+                confidence: 1.0,
+                data: { simulate_random_failures: !request.forcedFailures, forced: request.forcedFailures?.fail ?? [] },
+            });
 
-            // ── Module 12: Failure Recovery ────────────────────────────────────────
+            const dagOut = await this.dagExecutor.execute({
+                pipeline_id: pipelineId,
+                chain: actionChain,
+                initialState,
+                ledger: sagaLedger,
+                forcedFailures: request.forcedFailures,
+                // If forcedFailures was specified, suppress stochastic noise so the
+                // demo is reproducible. Otherwise leave random failures enabled to
+                // exercise the recovery path.
+                simulateRandomFailures: !request.forcedFailures,
+            });
+            const simulationResults = dagOut.results;
+
+            // ── Module 12: Failure Recovery (refund-first) ──────────────────────
             const recoveryPlans: RecoveryPlan[] = [];
-            const stateHistory = [initialState];
+            const stateHistory: SimulationState[] = dagOut.state_history.slice();
 
             for (const result of simulationResults) {
-                if (result.status === "success") {
-                    stateHistory.push(result.after_state);
-                }
-                if (result.status === "failed") {
-                    const failedAction = actionChain.actions.find(
-                        (a) => a.action_id === result.action_id
-                    );
-                    if (failedAction) {
-                        const plan = await this.recoveryEngine.handleFailure(
-                            failedAction,
-                            result,
-                            actionChain,
-                            stateHistory
-                        );
-                        recoveryPlans.push(plan);
-                        traceCollector.log(pipelineId, {
-                            pipeline_id: pipelineId,
-                            event_type: "recovery",
-                            agent: "FailureRecoveryEngine",
-                            message: `Recovery for ${result.action_id}: strategy=${plan.recovery_strategy}`,
-                            decision: plan.recovery_strategy,
-                            data: { log: plan.recovery_execution_log },
-                        });
-                    }
-                }
+                if (result.status !== "failed") continue;
+                const failedAction = actionChain.actions.find((a) => a.action_id === result.action_id);
+                if (!failedAction) continue;
+
+                traceCollector.log(pipelineId, {
+                    pipeline_id: pipelineId,
+                    event_type: "decision",
+                    agent: "AntigravityOrchestrator",
+                    message: `Phase E routing → M12 for failed action ${result.action_id}. Antigravity contract requires ledger.refund() FIRST before retry/fallback.`,
+                    decision: "ROUTE_M12_RECOVERY",
+                    confidence: 1.0,
+                    data: { failed_action_id: result.action_id, failure_reason: result.failure_reason },
+                });
+
+                const plan = await this.recoveryEngine.handle({
+                    pipeline_id: pipelineId,
+                    failedAction,
+                    failureResult: result,
+                    chain: actionChain,
+                    stateHistory,
+                    ledger: sagaLedger,
+                });
+                recoveryPlans.push(plan);
+
+                traceCollector.log(pipelineId, {
+                    pipeline_id: pipelineId,
+                    event_type: "recovery",
+                    agent: "FailureRecoveryEngine",
+                    message: `Recovery for ${result.action_id}: strategy=${plan.recovery_strategy}, refund_invoked=${plan.refund_invoked}, refund_amount_pkr=${plan.refund_amount_pkr}, recovery_cost_pkr=${plan.recovery_cost_pkr}`,
+                    decision: plan.recovery_strategy,
+                    data: {
+                        log: plan.recovery_execution_log,
+                        refund_status: plan.refund_status,
+                    },
+                });
             }
 
-            // ── Module 13: Outcome Visualization ──────────────────────────────────
-            const outcome = this.visualizer.generate(
+            // ── Module 13: Outcome Visualization (5 mandatory outputs) ──────────
+            traceCollector.log(pipelineId, {
+                pipeline_id: pipelineId,
+                event_type: "decision",
+                agent: "AntigravityOrchestrator",
+                message: "Phase F routing → M13 (Outcome Visualizer). Synthesizes state diff + timeline + residual risk + agentic-vs-heuristic baseline + cost/scalability.",
+                decision: "ROUTE_M13_VISUALIZER",
+                confidence: 1.0,
+                data: { schema: "outcome_visualization_v1", mode: "ALERT_ONLY" },
+            });
+            const outcome = this.visualizer.build({
+                pipeline_id: pipelineId,
                 initialState,
-                simulationResults,
+                executionResults: simulationResults,
                 recoveryPlans,
-                actionChain
-            );
+                actionChain,
+                ledgerSnapshot: sagaLedger.snapshot(),
+                dagLevels: dagOut.levels,
+            });
 
             const trace = traceCollector.finalizePipeline(pipelineId);
 

@@ -31,6 +31,20 @@ export interface FailureRecovery {
     strategy: string;
 }
 
+/**
+ * V2 Phase 3 — Data lineage. Phase 3 of the V2 architecture requires
+ * every inter-module interaction to carry explicit lineage so the
+ * judges can reconstruct *which module shipped which payload to which
+ * other module* and *what key state delta resulted*. These fields are
+ * top-level on the persisted entry (next to the 5 rubric keys).
+ */
+export interface DataLineage {
+    from: string;            // e.g., "M11_DAGExecutor"
+    to: string;              // e.g., "M12_FailureRecoveryEngine"
+    data_type: string;       // e.g., "StateTransition", "LedgerRefund"
+    key_change: string;      // e.g., "Budget +450K", "stock_level 50→47"
+}
+
 // What callers pass to append(). The 5 rubric-shaped fields are derived inside.
 export interface TraceEntryInput {
     timestamp: string;
@@ -42,6 +56,8 @@ export interface TraceEntryInput {
     latency_ms: number;
     cost: number;
     rubric_category: RubricCategory;
+    /** Optional V2 data lineage descriptor. */
+    data_lineage?: DataLineage;
 }
 
 // What gets persisted: input + 5 derived rubric fields so the auditor's parser

@@ -136,6 +136,55 @@ export interface OutcomeVisualization {
         estimated_value: number;
         affected_entities: string[];
     };
+
+    /** V2 mandatory output #3 — residual risk assessment. */
+    residual_risk: {
+        score: number;                        // 0 (none) → 1 (max risk remains)
+        level: "low" | "moderate" | "elevated" | "high";
+        unresolved_actions: string[];         // action_ids that did not succeed
+        cascading_concerns: string[];         // remaining issues callers should watch
+        rationale: string;
+    };
+
+    /** V2 mandatory output #4 — agentic-vs-heuristic baseline comparison. */
+    baseline_comparison: {
+        heuristic: {
+            description: string;
+            estimated_cost_pkr: number;
+            estimated_duration_hours: number;
+            success_rate_estimate: number;
+        };
+        agentic: {
+            description: string;
+            actual_cost_pkr: number;
+            actual_duration_hours: number;
+            success_rate_actual: number;
+        };
+        delta: {
+            cost_savings_pkr: number;
+            duration_savings_hours: number;
+            success_rate_uplift: number;
+        };
+        verdict: "agentic_wins" | "heuristic_wins" | "tie";
+    };
+
+    /** V2 mandatory output #5 — cost / scalability analysis. */
+    cost_scalability: {
+        cost_per_action_pkr: number;
+        cost_per_resolved_insight_pkr: number;
+        wall_clock_ms: number;
+        parallel_levels: number;            // M11 DAG depth
+        max_concurrency: number;            // largest single level
+        projected_pipelines_per_hour: number;
+        projected_cost_for_100_runs_pkr: number;
+        ledger: {
+            budget_limit_pkr: number;
+            reserved_pkr: number;
+            committed_pkr: number;
+            refunded_pkr: number;
+            available_pkr: number;
+        };
+    };
 }
 
 export interface ImpactOption {

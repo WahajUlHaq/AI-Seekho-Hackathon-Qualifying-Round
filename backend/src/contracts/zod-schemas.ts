@@ -273,6 +273,163 @@ export const ActionChainGeneratorOutputSchema = z.object({
     ),
 });
 
+// ===== Phase 3: M10 / M11 / M12 / M13 (deterministic — Zod-only AMCE) =====
+
+const ConstraintViolationSchema = z.object({
+    constraint_type: z.enum(["budget", "time", "resource", "urgency"]),
+    limit: z.number(),
+    required: z.number(),
+    severity: z.enum(["blocking", "warning"]),
+});
+
+const ConstraintValidationResultSchema = z.object({
+    action_id: z.string().min(1),
+    is_feasible: z.boolean(),
+    violations: z.array(ConstraintViolationSchema),
+    recommended_modification: z.string().nullable(),
+});
+
+const SagaLedgerRowSchema = z.object({
+    row_id: z.string().min(1),
+    pipeline_id: z.string().min(1),
+    action_id: z.string().min(1),
+    amount_pkr: z.number().min(0),
+    status: z.enum(["reserved", "committed", "refunded"]),
+    reserved_at: z.string(),
+    committed_at: z.string().nullable(),
+    refunded_at: z.string().nullable(),
+    purpose: z.string(),
+});
+
+const SagaLedgerSnapshotSchema = z.object({
+    pipeline_id: z.string().min(1),
+    budget_limit_pkr: z.number().min(0),
+    available_pkr: z.number().min(0),
+    reserved_pkr: z.number().min(0),
+    committed_pkr: z.number().min(0),
+    refunded_pkr: z.number().min(0),
+    rows: z.array(SagaLedgerRowSchema),
+    history: z.array(z.unknown()),
+});
+
+export const ConstraintValidationOutputSchema = z.object({
+    pipeline_id: z.string().min(1),
+    results: z.array(ConstraintValidationResultSchema),
+    ledger_snapshot: SagaLedgerSnapshotSchema,
+    cumulative_cost_pkr: z.number().min(0),
+    cumulative_duration_hours: z.number().min(0),
+    infeasible_count: z.number().int().min(0),
+});
+
+const SimulationStateSchema = z.object({
+    state_id: z.string().min(1),
+    timestamp: z.string().min(1),
+    variables: z.record(z.string(), z.unknown()),
+});
+
+const ActionExecutionResultSchema = z.object({
+    action_id: z.string().min(1),
+    status: z.enum(["success", "failed", "skipped"]),
+    before_state: SimulationStateSchema,
+    after_state: SimulationStateSchema,
+    execution_log: z.array(z.string()),
+    cost: z.number(),
+    duration_ms: z.number().min(0),
+    failure_reason: z.string().nullable(),
+});
+
+export const DAGExecutorOutputSchema = z.object({
+    pipeline_id: z.string().min(1),
+    results: z.array(ActionExecutionResultSchema),
+    levels: z.array(z.object({ level: z.number().int().min(0), action_ids: z.array(z.string()) })),
+    state_history: z.array(SimulationStateSchema).min(1),
+    final_state: SimulationStateSchema,
+});
+
+export const RecoveryPlanOutputSchema = z.object({
+    failed_action_id: z.string().min(1),
+    recovery_strategy: z.enum(["retry", "fallback", "rollback", "skip_and_continue"]),
+    retry_attempts: z.number().int().min(0),
+    fallback_action: z.unknown().nullable(),
+    rollback_to_state: z.unknown().nullable(),
+    recovery_execution_log: z.array(z.string()),
+    refund_invoked: z.boolean().optional(),
+    refund_amount_pkr: z.number().optional(),
+    refund_status: z.enum(["SUCCESS", "NOT_ELIGIBLE", "NO_LEDGER"]).optional(),
+    recovery_cost_pkr: z.number().min(0).optional(),
+});
+
+export const OutcomeVisualizationOutputSchema = z.object({
+    before_state: SimulationStateSchema,
+    after_state: SimulationStateSchema,
+    state_diff: z.array(
+        z.object({
+            variable: z.string(),
+            before_value: z.unknown(),
+            after_value: z.unknown(),
+            change_type: z.enum(["added", "removed", "modified", "unchanged"]),
+        })
+    ),
+    action_execution_timeline: z.array(z.unknown()),
+    metrics: z.object({
+        total_cost: z.number(),
+        total_duration_ms: z.number().min(0),
+        success_rate: z.number().min(0).max(1),
+        actions_attempted: z.number().int().min(0),
+        actions_succeeded: z.number().int().min(0),
+        actions_failed: z.number().int().min(0),
+        failures_recovered: z.number().int().min(0),
+    }),
+    projected_impact: z.object({
+        risk_reduction: z.number(),
+        estimated_value: z.number(),
+        affected_entities: z.array(z.string()),
+    }),
+    residual_risk: z.object({
+        score: z.number().min(0).max(1),
+        level: z.enum(["low", "moderate", "elevated", "high"]),
+        unresolved_actions: z.array(z.string()),
+        cascading_concerns: z.array(z.string()),
+        rationale: z.string().min(1),
+    }),
+    baseline_comparison: z.object({
+        heuristic: z.object({
+            description: z.string().min(1),
+            estimated_cost_pkr: z.number(),
+            estimated_duration_hours: z.number(),
+            success_rate_estimate: z.number().min(0).max(1),
+        }),
+        agentic: z.object({
+            description: z.string().min(1),
+            actual_cost_pkr: z.number(),
+            actual_duration_hours: z.number(),
+            success_rate_actual: z.number().min(0).max(1),
+        }),
+        delta: z.object({
+            cost_savings_pkr: z.number(),
+            duration_savings_hours: z.number(),
+            success_rate_uplift: z.number(),
+        }),
+        verdict: z.enum(["agentic_wins", "heuristic_wins", "tie"]),
+    }),
+    cost_scalability: z.object({
+        cost_per_action_pkr: z.number(),
+        cost_per_resolved_insight_pkr: z.number(),
+        wall_clock_ms: z.number().min(0),
+        parallel_levels: z.number().int().min(1),
+        max_concurrency: z.number().int().min(1),
+        projected_pipelines_per_hour: z.number().min(0),
+        projected_cost_for_100_runs_pkr: z.number(),
+        ledger: z.object({
+            budget_limit_pkr: z.number().min(0),
+            reserved_pkr: z.number().min(0),
+            committed_pkr: z.number().min(0),
+            refunded_pkr: z.number().min(0),
+            available_pkr: z.number().min(0),
+        }),
+    }),
+});
+
 // ===== AMCE evaluator =====
 export type AMCEMode = "ALERT_ONLY" | "QUARANTINE" | "BLOCK";
 
