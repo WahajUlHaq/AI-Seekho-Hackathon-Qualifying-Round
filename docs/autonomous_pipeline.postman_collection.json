@@ -1,0 +1,293 @@
+{
+  "info": {
+    "name": "Autonomous Content-to-Action Agent — Backend",
+    "_postman_id": "a8f3c4e9-b27d-4051-8fb2-4ce8d1972a4c",
+    "description": "Postman Collection v2.1.0 for the Autonomous Content-to-Action Agent backend. Mirrors backend/src/docs/openapi.ts (Phase 5 OpenAPI 3.0 spec). All requests resolve {{baseUrl}} from the collection variables; pipeline-scoped requests resolve their `:id` path variable from {{active_pipeline_id}}, and the contract lookup resolves `:name` from {{contract_name}} — flip these once at the collection level to retarget every dependent endpoint.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:8000",
+      "type": "string",
+      "description": "Root for every request URL. Override per environment if running against staging."
+    },
+    {
+      "key": "active_pipeline_id",
+      "value": "PIPE-3F27EB3E",
+      "type": "string",
+      "description": "Default pipeline_id (matches ^PIPE-[A-Z0-9]{8}$) — wired into the `:id` path variable on all four pipeline-scoped requests."
+    },
+    {
+      "key": "contract_name",
+      "value": "action_chain_v1",
+      "type": "string",
+      "description": "Default contract slug — wired into the `:name` path variable on GET /api/contracts/:name."
+    }
+  ],
+  "item": [
+    {
+      "name": "System Metrics",
+      "description": "Liveness + environment probe used by judges and CI smoke tests.",
+      "item": [
+        {
+          "name": "GET /health",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/health",
+              "host": ["{{baseUrl}}"],
+              "path": ["health"]
+            },
+            "description": "Liveness + environment + loaded contracts. Returns { status, environment, provider, contracts_loaded[], timestamp }."
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Ingestion Pipeline",
+      "description": "Entrypoint for the multi-source ingestion → orchestration pipeline.",
+      "item": [
+        {
+          "name": "POST /api/pipeline/run",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"sources\": [\n    {\n      \"source_id\": \"SRC-001\",\n      \"source_type\": \"url\",\n      \"content\": \"https://example.com/incident-2026-05-15\",\n      \"credibility_tier\": \"HIGH\",\n      \"ingested_at\": \"2026-05-17T09:15:00.000Z\"\n    },\n    {\n      \"source_id\": \"SRC-002\",\n      \"source_type\": \"txt\",\n      \"content\": \"Q2 latency regression observed in checkout flow; affects ~5% of cohort.\",\n      \"credibility_tier\": \"MEDIUM\",\n      \"ingested_at\": \"2026-05-17T09:15:30.000Z\"\n    }\n  ],\n  \"constraints\": {\n    \"max_actions\": 5,\n    \"forbidden_action_types\": [\"IRREVERSIBLE_DELETE\"]\n  }\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/pipeline/run",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "pipeline", "run"]
+            },
+            "description": "Submit a multi-source pipeline run. The sample body carries one URL source and one text source matching the MultiSourceIngestionSource schema. Returns { pipeline_id, status, sources_received, constraints_received }."
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Telemetry & Tracing",
+      "description": "Read the full PipelineTrace (events, reasoning steps, tool calls, action execution) for a given pipeline_id.",
+      "item": [
+        {
+          "name": "GET /api/pipeline/:id",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/pipeline/:id",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "pipeline", ":id"],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "{{active_pipeline_id}}",
+                  "description": "Pipeline identifier (PIPE-XXXXXXXX)."
+                }
+              ]
+            },
+            "description": "Full pipeline trace. 404 if the pipeline_id is unknown."
+          },
+          "response": []
+        },
+        {
+          "name": "GET /api/pipeline/:id/trace",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/pipeline/:id/trace",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "pipeline", ":id", "trace"],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "{{active_pipeline_id}}",
+                  "description": "Pipeline identifier (PIPE-XXXXXXXX)."
+                }
+              ]
+            },
+            "description": "Antigravity trace export (judge-facing alias). Same shape as GET /api/pipeline/:id."
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Contract Enforcement",
+      "description": "Browse loaded YAML contracts (registry summaries + full definitions) and inspect contract_gate validation events.",
+      "item": [
+        {
+          "name": "GET /api/contracts",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/contracts",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "contracts"]
+            },
+            "description": "List all loaded YAML contracts (summary view: name, version, module, description, field_count)."
+          },
+          "response": []
+        },
+        {
+          "name": "GET /api/contracts/:name",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/contracts/:name",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "contracts", ":name"],
+              "variable": [
+                {
+                  "key": "name",
+                  "value": "{{contract_name}}",
+                  "description": "Contract slug, e.g. action_chain_v1 or workflow_audit_v1."
+                }
+              ]
+            },
+            "description": "Full contract definition by name. 404 if the contract slug is not registered."
+          },
+          "response": []
+        },
+        {
+          "name": "GET /api/validations",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/validations",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "validations"]
+            },
+            "description": "All contract_gate events grouped by pipeline_id — cross-pipeline contract-violation analytics."
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Human-In-The-Loop Execution",
+      "description": "HITL approval gate. State machine: PENDING → EXECUTING → COMPLETED|REJECTED. Only PENDING → EXECUTING is reachable through POST /approve (atomic check-and-set; concurrent approvals get 409).",
+      "item": [
+        {
+          "name": "GET /api/execution/:id/pending",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/execution/:id/pending",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "execution", ":id", "pending"],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "{{active_pipeline_id}}",
+                  "description": "Pipeline identifier (PIPE-XXXXXXXX)."
+                }
+              ]
+            },
+            "description": "Inspect a pipeline blocked at the HITL approval gate. 200 returns the full PipelineApprovalRecord; 404 if unknown; 409 if the pipeline has already left PENDING state."
+          },
+          "response": []
+        },
+        {
+          "name": "POST /api/execution/:id/approve",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"approved_by\": \"postman-qa-runner\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/execution/:id/approve",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "execution", ":id", "approve"],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "{{active_pipeline_id}}",
+                  "description": "Pipeline identifier (PIPE-XXXXXXXX)."
+                }
+              ]
+            },
+            "description": "Approve a PENDING pipeline (atomic PENDING → EXECUTING). 400 if approved_by is missing/empty; 404 if the pipeline_id is unknown; 409 if the pipeline is not in PENDING state (e.g. already EXECUTING due to a prior approve, or REJECTED/COMPLETED)."
+          },
+          "response": []
+        }
+      ]
+    }
+  ]
+}
