@@ -32,11 +32,37 @@ async function test() {
             primary_impact: "Stockout within 24 hours",
             impact_category: "risk",
             impact_severity: "critical",
-            quantified_impact: { estimated_cost: 450000, estimated_time_hours: 4, affected_count: 200 },
+            quantified_impact: {
+                estimated_cost: 450000,
+                estimated_time_hours: 4,
+                affected_count: 200,
+                cost_pkr: 450000,
+                affected_customers: 200,
+            },
             constraints_violated: [],
             time_horizon: "immediate",
             cascading_effects: ["Customer churn", "Revenue loss"],
             risk_if_ignored: "Complete stockout leading to PKR 2M revenue loss",
+            options: [
+                {
+                    option_id: "OPT-A",
+                    label: "Fastest resolution via air freight",
+                    tradeoff: "fastest_resolution",
+                    cost_pkr: 480000,
+                    time_hours: 6,
+                    affected_customers: 40,
+                    rationale: "Resolves stockout inside 6 h",
+                },
+                {
+                    option_id: "OPT-B",
+                    label: "Standard freight + queuing",
+                    tradeoff: "lowest_cost",
+                    cost_pkr: 180000,
+                    time_hours: 48,
+                    affected_customers: 200,
+                    rationale: "Cheapest path; 1-2 day customer delay",
+                },
+            ],
         },
     ];
 

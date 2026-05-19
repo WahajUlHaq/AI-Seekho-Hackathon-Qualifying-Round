@@ -138,6 +138,16 @@ export interface OutcomeVisualization {
     };
 }
 
+export interface ImpactOption {
+    option_id: string;
+    label: string;
+    tradeoff: "lowest_cost" | "fastest_resolution" | "balanced" | "lowest_risk";
+    cost_pkr: number;
+    time_hours: number;
+    affected_customers: number;
+    rationale: string;
+}
+
 export interface ImpactAnalysis {
     insight_id: string;
     primary_impact: string;
@@ -147,9 +157,13 @@ export interface ImpactAnalysis {
         estimated_cost: number | null;
         estimated_time_hours: number | null;
         affected_count: number | null;
+        // V2: explicit PKR + customers fields for the constraint-tradeoff judges
+        cost_pkr?: number;
+        affected_customers?: number;
     };
     constraints_violated: string[];
     time_horizon: "immediate" | "short_term" | "medium_term" | "long_term";
     cascading_effects: string[];
     risk_if_ignored: string;
+    options: ImpactOption[];   // V2: 2-3 explicit tradeoff options per insight
 }

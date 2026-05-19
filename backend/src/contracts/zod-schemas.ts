@@ -141,6 +141,138 @@ export const ConflictResolutionOutputSchema = z.object({
     cascading_conflicts: z.array(z.string()),
 });
 
+// ===== M5: Insight Extraction =====
+export const InsightSchema = z.object({
+    insight_id: z.string().min(1),
+    title: z.string().min(1),
+    description: z.string().min(1),
+    category: z.enum(["trend", "risk", "opportunity", "contradiction"]),
+    severity: z.enum(["critical", "high", "medium", "low"]),
+    confidence: z.number().min(0).max(1),
+    supporting_sources: z.array(z.string()).min(1),
+    requires_resolution: z.boolean(),
+    contradiction_details: z.unknown().nullable(),
+    temporal_pattern: z.string().nullable(),
+    affected_entities: z.array(z.string()),
+    data_points: z.array(z.string()),
+});
+
+export const InsightExtractionOutputSchema = z.object({
+    pipeline_id: z.string(),
+    insights: z.array(InsightSchema).min(1).max(7),
+    rag_context_chunks_used: z.number().int().min(0),
+});
+
+// ===== M6: Temporal Analysis =====
+export const DataPointSchema = z.object({
+    timestamp: z.string().min(1),
+    value: z.number(),
+});
+
+export const TemporalPatternSchema = z.object({
+    metric_name: z.string().min(1),
+    pattern_type: z.enum(["decline", "spike", "drift", "anomaly", "stable", "insufficient_data"]),
+    time_window: z.string().min(1),
+    change_magnitude: z.number(),
+    change_direction: z.enum(["increasing", "decreasing", "volatile", "unknown"]),
+    confidence: z.number().min(0).max(1),
+    data_points: z.array(DataPointSchema),
+});
+
+export const TemporalAnalysisOutputSchema = z.object({
+    pipeline_id: z.string(),
+    patterns: z.array(TemporalPatternSchema),
+});
+
+// ===== M8: Impact Analysis =====
+export const ImpactOptionSchema = z.object({
+    option_id: z.string().min(1),
+    label: z.string().min(1),
+    tradeoff: z.enum(["lowest_cost", "fastest_resolution", "balanced", "lowest_risk"]),
+    cost_pkr: z.number().min(0),
+    time_hours: z.number().min(0),
+    affected_customers: z.number().int().min(0),
+    rationale: z.string().min(1),
+});
+
+export const ImpactAnalysisItemSchema = z.object({
+    insight_id: z.string(),
+    primary_impact: z.string().min(1),
+    impact_category: z.enum(["revenue", "cost", "risk", "compliance", "reputation", "operational"]),
+    impact_severity: z.enum(["critical", "high", "medium", "low"]),
+    quantified_impact: z.object({
+        estimated_cost: z.number().nullable(),
+        estimated_time_hours: z.number().nullable(),
+        affected_count: z.number().nullable(),
+        cost_pkr: z.number().min(0).optional(),
+        affected_customers: z.number().int().min(0).optional(),
+    }),
+    constraints_violated: z.array(z.string()),
+    time_horizon: z.enum(["immediate", "short_term", "medium_term", "long_term"]),
+    cascading_effects: z.array(z.string()),
+    risk_if_ignored: z.string().min(1),
+    options: z.array(ImpactOptionSchema).min(2).max(3),
+});
+
+export const ImpactAnalysisOutputSchema = z.object({
+    pipeline_id: z.string(),
+    impact_analyses: z.array(ImpactAnalysisItemSchema).min(1),
+});
+
+// ===== M9: Action Chain Generator =====
+export const ActionNodeSchema = z.object({
+    action_id: z.string().regex(/^ACT-\d{3}$/),
+    action_type: z.enum([
+        "diagnose",
+        "notify",
+        "update_system",
+        "mitigate",
+        "monitor",
+        "verify",
+        "escalate",
+    ]),
+    title: z.string().min(1),
+    description: z.string().min(1),
+    priority: z.enum(["critical", "high", "medium", "low"]),
+    depends_on: z.array(z.string()),
+    blocks: z.array(z.string()),
+    constraints: z.object({
+        max_cost: z.number().min(0),
+        max_duration_hours: z.number().min(0),
+        required_resources: z.array(z.string()),
+        api_rate_limit: z.number().int().min(0),
+    }),
+    simulatable: z.boolean(),
+    simulation_details: z.object({
+        simulation_type: z.string().min(1),
+        parameters: z.record(z.string(), z.unknown()),
+        expected_success_rate: z.number().min(0).max(1),
+    }),
+    failure_recovery: z.object({
+        retry_count: z.number().int().min(0),
+        fallback_action_id: z.string().nullable(),
+        rollback_required: z.boolean(),
+    }),
+});
+
+export const ActionChainGeneratorOutputSchema = z.object({
+    pipeline_id: z.string(),
+    chain_id: z.string().min(1),
+    action_count: z.number().int().min(3).max(5),
+    insight_id: z.string(),
+    actions: z.array(ActionNodeSchema).min(3).max(5),
+    execution_order: z.array(z.string()).min(3).max(5),
+    total_estimated_cost: z.number().min(0),
+    total_estimated_duration_hours: z.number().min(0),
+    constraint_violations: z.array(
+        z.object({
+            action_id: z.string(),
+            constraint_type: z.string(),
+            violation_details: z.string(),
+        })
+    ),
+});
+
 // ===== AMCE evaluator =====
 export type AMCEMode = "ALERT_ONLY" | "QUARANTINE" | "BLOCK";
 

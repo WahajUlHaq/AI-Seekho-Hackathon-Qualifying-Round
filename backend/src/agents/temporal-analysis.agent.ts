@@ -1,16 +1,42 @@
+/**
+ * Module 6 — Temporal Analysis Engine (V2).
+ *
+ * Detects pattern_type ∈ {decline, spike, drift, anomaly, stable,
+ * insufficient_data}. Enforces the V2 minimum-sample guard: any series
+ * with fewer than 3 data points short-circuits to `insufficient_data`
+ * BEFORE running regression so we never emit spurious patterns from
+ * 1-2 samples.
+ *
+ * AMCE: ALERT_ONLY Zod structural validation — no LLM judge needed for
+ * deterministic numeric output.
+ */
+
 import { BaseAgent, AgentInput, AgentOutput } from "./base.agent";
+import { antigravityFileLogger } from "../tracing/file-logger";
+import {
+    TemporalAnalysisOutputSchema,
+    evaluateWithZod,
+} from "../contracts/zod-schemas";
 
 export interface DataPoint {
     timestamp: string;
     value: number;
 }
 
+export type TemporalPatternType =
+    | "decline"
+    | "spike"
+    | "drift"
+    | "anomaly"
+    | "stable"
+    | "insufficient_data";
+
 export interface TemporalPattern {
-    pattern_type: "decline" | "spike" | "drift" | "anomaly" | "stable";
+    pattern_type: TemporalPatternType;
     metric_name: string;
     time_window: string;
     change_magnitude: number;
-    change_direction: "increasing" | "decreasing" | "volatile";
+    change_direction: "increasing" | "decreasing" | "volatile" | "unknown";
     confidence: number;
     data_points: DataPoint[];
 }
@@ -24,7 +50,10 @@ export interface TemporalAnalysisInput extends AgentInput {
 
 export interface TemporalAnalysisOutput extends AgentOutput {
     patterns: TemporalPattern[];
+    insufficient_data_count: number;
 }
+
+const MIN_SAMPLES_FOR_PATTERN = 3;
 
 export class TemporalAnalysisAgent extends BaseAgent<
     TemporalAnalysisInput,
@@ -38,6 +67,7 @@ export class TemporalAnalysisAgent extends BaseAgent<
         input: TemporalAnalysisInput
     ): Promise<TemporalAnalysisOutput> {
         const { pipeline_id, time_series_data } = input;
+        const startTime = Date.now();
 
         const patterns = await Promise.all(
             time_series_data.map((series) =>
@@ -45,19 +75,47 @@ export class TemporalAnalysisAgent extends BaseAgent<
             )
         );
 
+        const insufficient_data_count = patterns.filter(
+            (p) => p.pattern_type === "insufficient_data"
+        ).length;
+
         this.logDecision(
             pipeline_id,
-            `Temporal analysis complete: ${patterns.map(p => `${p.metric_name}=${p.pattern_type}`).join(", ")}`,
+            `Temporal analysis: ${patterns.map((p) => `${p.metric_name}=${p.pattern_type}`).join(", ")} — ${insufficient_data_count} series below min-sample guard (<${MIN_SAMPLES_FOR_PATTERN} points)`,
             "temporal_analysis_complete",
             patterns.reduce((sum, p) => sum + p.confidence, 0) / (patterns.length || 1)
         );
 
-        return {
+        const output: TemporalAnalysisOutput = {
             pipeline_id,
             agent_name: this.agentName,
             completed_at: new Date().toISOString(),
             patterns,
+            insufficient_data_count,
         };
+
+        // AMCE ALERT_ONLY — deterministic Zod, no expensive LLM judge.
+        const amce = evaluateWithZod(
+            output,
+            TemporalAnalysisOutputSchema,
+            "temporal_analysis_v1",
+            "ALERT_ONLY"
+        );
+        antigravityFileLogger.append({
+            timestamp: new Date().toISOString(),
+            step: "AMCE_M6_StructuralValidation",
+            tool_called: "ZodValidator",
+            reasoning: amce.passed
+                ? `M6 output passed Zod structural schema (ALERT_ONLY). Patterns: ${patterns.length}, insufficient_data: ${insufficient_data_count}`
+                : `M6 output Zod warnings: ${amce.errors.join("; ")}`,
+            status: amce.passed ? "SUCCESS" : "FAILED",
+            rollback_action: amce.passed ? "none" : "Log warning; continue (ALERT_ONLY)",
+            latency_ms: Date.now() - startTime,
+            cost: 0,
+            rubric_category: "constraint_evaluation",
+        });
+
+        return output;
     }
 
     private async analyzeTimeSeries(
@@ -65,15 +123,27 @@ export class TemporalAnalysisAgent extends BaseAgent<
         dataPoints: DataPoint[],
         pipelineId: string
     ): Promise<TemporalPattern> {
-        if (dataPoints.length === 0) {
+        // ── V2 minimum-sample guard. ──
+        if (dataPoints.length < MIN_SAMPLES_FOR_PATTERN) {
+            antigravityFileLogger.append({
+                timestamp: new Date().toISOString(),
+                step: "M6_InsufficientData",
+                tool_called: this.agentName,
+                reasoning: `Metric '${metricName}' has only ${dataPoints.length} point(s) (<${MIN_SAMPLES_FOR_PATTERN}). Returning insufficient_data instead of inferring a spurious pattern.`,
+                status: "SUCCESS",
+                rollback_action: "Downstream insight extraction must skip this metric or request additional data",
+                latency_ms: 0,
+                cost: 0,
+                rubric_category: "constraint_evaluation",
+            });
             return {
-                pattern_type: "stable",
+                pattern_type: "insufficient_data",
                 metric_name: metricName,
                 time_window: "unknown",
                 change_magnitude: 0,
-                change_direction: "volatile",
+                change_direction: "unknown",
                 confidence: 0,
-                data_points: [],
+                data_points: dataPoints,
             };
         }
 
@@ -87,7 +157,7 @@ export class TemporalAnalysisAgent extends BaseAgent<
         const mean = values.reduce((a, b) => a + b, 0) / values.length;
         const normalizedSlope = Math.abs(regression.slope) / (Math.abs(mean) + 0.0001);
 
-        let pattern_type: TemporalPattern["pattern_type"];
+        let pattern_type: TemporalPatternType;
         if (hasSpike && Math.abs(regression.percent_change) > 30) {
             pattern_type = "spike";
         } else if (normalizedSlope < 0.02 && regression.r_squared > 0.5) {
@@ -107,11 +177,7 @@ export class TemporalAnalysisAgent extends BaseAgent<
                 ? "increasing"
                 : "decreasing";
 
-        const time_window = await this.describeTimeWindow(
-            metricName,
-            sorted,
-            pipelineId
-        );
+        const time_window = await this.describeTimeWindow(metricName, sorted, pipelineId);
 
         this.logDecision(
             pipelineId,
@@ -186,15 +252,14 @@ export class TemporalAnalysisAgent extends BaseAgent<
         const ms = new Date(last).getTime() - new Date(first).getTime();
         const hours = ms / 3_600_000;
 
-        // Use LLM for a natural language description
-        const prompt = `Given the time series metric "${metricName}" with ${sorted.length} data points from ${first} to ${last}, describe the time window in a short phrase (e.g., "last 7 days", "past 4 hours", "past week"). Respond with ONLY the phrase, no explanation or punctuation.`;
+        const prompt = `Given the time series metric "${metricName}" with ${sorted.length} data points from ${first} to ${last}, describe the time window in a short phrase (e.g., "last 7 days", "past 4 hours"). Respond with ONLY the phrase, no explanation or punctuation.`;
 
         try {
             const result = await this.llmComplete(pipelineId, prompt, false, "time_window_description");
             const clean = result.trim().replace(/^["']|["']$/g, "");
             if (clean.length > 0 && clean.length < 50) return clean;
         } catch {
-            // fallback below
+            // fall through
         }
 
         if (hours < 1) return `last ${Math.round(hours * 60)} minutes`;
