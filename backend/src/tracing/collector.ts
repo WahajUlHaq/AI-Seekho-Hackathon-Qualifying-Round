@@ -1,6 +1,16 @@
 import { v4 as uuidv4 } from "uuid";
 import { antigravityFileLogger, RubricCategory } from "./file-logger";
 
+export type TraceEventType =
+    | "agent_start"
+    | "agent_complete"
+    | "llm_call"
+    | "contract_gate"
+    | "action_execute"
+    | "failure"
+    | "recovery"
+    | "decision";
+
 const EVENT_TYPE_TO_RUBRIC: Record<TraceEventType, RubricCategory> = {
     agent_start: "task_execution",
     agent_complete: "task_execution",
@@ -11,16 +21,6 @@ const EVENT_TYPE_TO_RUBRIC: Record<TraceEventType, RubricCategory> = {
     recovery: "failure_recovery",
     decision: "workplan_formulation",
 };
-
-export type TraceEventType =
-    | "agent_start"
-    | "agent_complete"
-    | "llm_call"
-    | "contract_gate"
-    | "action_execute"
-    | "failure"
-    | "recovery"
-    | "decision";
 
 export interface TraceEvent {
     event_id: string;

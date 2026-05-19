@@ -1,0 +1,58 @@
+{
+  "document_id": "BUDGET-2026-Q2",
+  "title": "Procurement Budget & Emergency Sourcing Rules — Q2 2026",
+  "effective_from": "2026-04-01",
+  "effective_until": "2026-06-30",
+  "authority_type": "company_policy",
+  "currency": "PKR",
+  "issued_by": "Finance & Procurement Steering Committee",
+  "constraints": {
+    "emergency_sourcing_cap": {
+      "amount": 500000,
+      "currency": "PKR",
+      "scope": "per inventory shortage incident",
+      "approval_required": "Operations Director sign-off above this cap",
+      "rule_id": "RULE-EMERGENCY-001"
+    },
+    "single_supplier_cap": {
+      "amount": 1500000,
+      "currency": "PKR",
+      "scope": "per single supplier per month",
+      "rule_id": "RULE-SINGLE-SUPPLIER-002"
+    },
+    "expedited_freight_cap": {
+      "amount": 150000,
+      "currency": "PKR",
+      "scope": "per shipment for air or premium ground freight",
+      "rule_id": "RULE-FREIGHT-003"
+    },
+    "minimum_supplier_reliability": {
+      "threshold": 0.85,
+      "scope": "any new purchase order must originate from supplier with reliability ≥ threshold",
+      "exceptions": "Operations Director can waive on documented emergency",
+      "rule_id": "RULE-RELIABILITY-004"
+    },
+    "stock_safety_floor": {
+      "sku_examples": {
+        "SKU-1234": 150,
+        "SKU-1235": 200,
+        "SKU-1240": 80
+      },
+      "scope": "do not allow on-hand to fall below per-SKU safety floor without alert",
+      "rule_id": "RULE-SAFETY-FLOOR-005"
+    }
+  },
+  "preferred_suppliers": [
+    {"supplier_id": "SUP-104", "sku": "SKU-1234", "tier": "primary"},
+    {"supplier_id": "SUP-422", "sku": "SKU-1234", "tier": "backup"},
+    {"supplier_id": "SUP-318", "sku": "SKU-1235", "tier": "primary"},
+    {"supplier_id": "SUP-209", "sku": "SKU-1240", "tier": "primary"}
+  ],
+  "approval_chain": [
+    {"role": "Procurement Lead", "spend_limit_pkr": 100000},
+    {"role": "Operations Manager", "spend_limit_pkr": 350000},
+    {"role": "Operations Director", "spend_limit_pkr": 1000000},
+    {"role": "CFO", "spend_limit_pkr": null}
+  ],
+  "notes": "All emergency sourcing actions must be logged in the Saga Ledger with reserve→commit/refund semantics. No simple deduction allowed."
+}

@@ -1,0 +1,92 @@
+[
+  {
+    "complaint_id": "CMP-2026-05-19-0001",
+    "timestamp": "2026-05-19T08:42:00+05:00",
+    "channel": "support_portal",
+    "customer_segment": "B2B_industrial",
+    "sku_referenced": "SKU-1234",
+    "message": "Ordered 40 cartons of SKU-1234 yesterday — system says 'out of stock'. Last week your portal showed 500 units available. We have a production line waiting. Please confirm availability immediately.",
+    "severity_self_reported": "high",
+    "language": "en"
+  },
+  {
+    "complaint_id": "CMP-2026-05-19-0002",
+    "timestamp": "2026-05-19T09:11:00+05:00",
+    "channel": "phone_support",
+    "customer_segment": "B2B_industrial",
+    "sku_referenced": "SKU-1234",
+    "message": "SKU-1234 unavailable for the third time this week. Stock count is 0 on our buyer portal. This contradicts what your sales rep told us on Monday.",
+    "severity_self_reported": "high",
+    "language": "en"
+  },
+  {
+    "complaint_id": "CMP-2026-05-19-0003",
+    "timestamp": "2026-05-19T10:03:00+05:00",
+    "channel": "email",
+    "customer_segment": "B2B_industrial",
+    "sku_referenced": "SKU-1234",
+    "message": "SKU-1234 ka stock kab tak available ho jaye ga? Hum 3 din se wait kar rahe hain. Production line shutdown ka risk hai. Please urgent reply karein.",
+    "severity_self_reported": "high",
+    "language": "ur"
+  },
+  {
+    "complaint_id": "CMP-2026-05-19-0004",
+    "timestamp": "2026-05-19T10:48:00+05:00",
+    "channel": "support_portal",
+    "customer_segment": "B2B_industrial",
+    "sku_referenced": "SKU-1234",
+    "message": "Zero units on SKU-1234. Your reorder portal blocks the cart at quantity 1. We were planning a 60-carton purchase order this week.",
+    "severity_self_reported": "medium",
+    "language": "en"
+  },
+  {
+    "complaint_id": "CMP-2026-05-19-0005",
+    "timestamp": "2026-05-19T11:22:00+05:00",
+    "channel": "support_portal",
+    "customer_segment": "spam",
+    "sku_referenced": null,
+    "message": "!!!!! FREE SAMPLE GIVEAWAY!!!! CLICK HERE TO WIN FREE FREE FREE PRODUCT BUY NOW SALE SALE SALE !!!! DISCOUNT DISCOUNT DISCOUNT DISCOUNT DISCOUNT DISCOUNT !!!!",
+    "severity_self_reported": "low",
+    "language": "en"
+  },
+  {
+    "complaint_id": "CMP-2026-05-19-0006",
+    "timestamp": "2026-05-19T12:05:00+05:00",
+    "channel": "email",
+    "customer_segment": "B2B_industrial",
+    "sku_referenced": "SKU-1234",
+    "message": "Confirming our purchase order of 80 cartons of SKU-1234 is rejected by your system citing zero on-hand. Please escalate. Our contract specifies 14-day delivery guarantee.",
+    "severity_self_reported": "critical",
+    "language": "en"
+  },
+  {
+    "complaint_id": "CMP-2026-05-19-0007",
+    "timestamp": "2026-05-19T12:51:00+05:00",
+    "channel": "phone_support",
+    "customer_segment": "B2B_industrial",
+    "sku_referenced": "SKU-1234",
+    "message": "0 stock dikha raha hai SKU-1234 par. Pichle hafte 500 units thi. Kya hua? Hum dosre supplier dhundnay par majbur ho jayenge.",
+    "severity_self_reported": "high",
+    "language": "ur"
+  },
+  {
+    "complaint_id": "CMP-2026-05-19-0008",
+    "timestamp": "2026-05-19T13:34:00+05:00",
+    "channel": "support_portal",
+    "customer_segment": "B2B_industrial",
+    "sku_referenced": "SKU-1234",
+    "message": "Stock = 0 on SKU-1234. Customs strike in Karachi being blamed by your CSR. We need a recovery ETA within 24 hours or we will escalate to procurement leadership.",
+    "severity_self_reported": "critical",
+    "language": "en"
+  },
+  {
+    "complaint_id": "CMP-2026-05-19-0009",
+    "timestamp": "2026-05-19T14:10:00+05:00",
+    "channel": "support_portal",
+    "customer_segment": "B2B_industrial",
+    "sku_referenced": "SKU-1234",
+    "message": "Out of stock alert on SKU-1234 — your audit report from last week claimed 500 units. The mismatch is unacceptable. We require an explanation for the variance.",
+    "severity_self_reported": "high",
+    "language": "en"
+  }
+]

@@ -2,6 +2,12 @@ import { BaseAgent, AgentInput, AgentOutput } from "./base.agent";
 import { Contradiction } from "./contradiction-detector.agent";
 import { CredibilityScore } from "./credibility-scorer.agent";
 import { NormalizedSource } from "./multi-source-ingestion.agent";
+import { pipelineState, ResolvedFact } from "./pipeline-state";
+import { antigravityFileLogger } from "../tracing/file-logger";
+import {
+    ConflictResolutionOutputSchema,
+    evaluateWithZod,
+} from "../contracts/zod-schemas";
 
 export interface ConflictResolution {
     contradiction_id: string;
@@ -29,6 +35,8 @@ export interface ConflictResolutionInput extends AgentInput {
 
 export interface ConflictResolutionOutput extends AgentOutput {
     resolutions: ConflictResolution[];
+    resolved_facts_topics: string[];
+    cascading_conflicts: string[];
 }
 
 export class ConflictResolutionAgent extends BaseAgent<
@@ -43,6 +51,10 @@ export class ConflictResolutionAgent extends BaseAgent<
         input: ConflictResolutionInput
     ): Promise<ConflictResolutionOutput> {
         const { pipeline_id, contradictions, credibility_scores, normalized_sources } = input;
+        const startTime = Date.now();
+
+        // Ensure the per-pipeline state container exists.
+        pipelineState.init(pipeline_id);
 
         const resolutions = await Promise.all(
             contradictions.map((c) =>
@@ -50,19 +62,80 @@ export class ConflictResolutionAgent extends BaseAgent<
             )
         );
 
+        // V2: deterministically mutate PipelineState.resolvedFacts so that
+        // every downstream module (M5 onward) reads a single source of truth
+        // instead of replaying contradictions.
+        for (let i = 0; i < resolutions.length; i++) {
+            const resolution = resolutions[i];
+            const contradiction = contradictions[i];
+            if (resolution.recommended_value === null || resolution.recommended_value === undefined) continue;
+
+            const fact: ResolvedFact = {
+                topic: contradiction.topic,
+                value: resolution.recommended_value,
+                sources_involved: contradiction.sources_involved,
+                resolution_strategy: resolution.resolution_strategy,
+                confidence: resolution.confidence,
+                resolved_at: new Date().toISOString(),
+            };
+            pipelineState.setResolvedFact(pipeline_id, fact, this.agentName);
+        }
+
+        const stateSnapshot = pipelineState.get(pipeline_id);
+        const resolvedTopics = Object.keys(stateSnapshot.resolvedFacts);
+        const cascading = stateSnapshot.cascading_conflicts;
+
+        if (cascading.length > 0) {
+            antigravityFileLogger.append({
+                timestamp: new Date().toISOString(),
+                step: "M7_CascadingConflictDetected",
+                tool_called: this.agentName,
+                reasoning: `Resolution caused ${cascading.length} cascading conflicts: ${cascading.join("; ")}`,
+                status: "ROLLED_BACK",
+                rollback_action: "Topics flagged for re-resolution; downstream insights must read latest resolvedFact",
+                latency_ms: Date.now() - startTime,
+                cost: 0,
+                rubric_category: "failure_recovery",
+            });
+        }
+
         this.logDecision(
             pipeline_id,
-            `Resolved ${resolutions.length} contradictions — strategies: ${resolutions.map(r => r.resolution_strategy).join(", ")}`,
+            `Resolved ${resolutions.length} contradictions — strategies: ${resolutions.map(r => r.resolution_strategy).join(", ")}. Mutated ${resolvedTopics.length} resolvedFacts topics. Cascading: ${cascading.length}.`,
             "resolution_complete",
             resolutions.reduce((sum, r) => sum + r.confidence, 0) / (resolutions.length || 1)
         );
 
-        return {
+        const output: ConflictResolutionOutput = {
             pipeline_id,
             agent_name: this.agentName,
             completed_at: new Date().toISOString(),
             resolutions,
+            resolved_facts_topics: resolvedTopics,
+            cascading_conflicts: cascading,
         };
+
+        const amce = evaluateWithZod(
+            output,
+            ConflictResolutionOutputSchema,
+            "conflict_resolution_v1",
+            "ALERT_ONLY"
+        );
+        antigravityFileLogger.append({
+            timestamp: new Date().toISOString(),
+            step: "AMCE_M7_StructuralValidation",
+            tool_called: "ZodValidator",
+            reasoning: amce.passed
+                ? `M7 output passed Zod structural validation (ALERT_ONLY). resolvedFacts topics: ${resolvedTopics.length}`
+                : `M7 output Zod errors: ${amce.errors.join("; ")}`,
+            status: amce.passed ? "SUCCESS" : "FAILED",
+            rollback_action: amce.passed ? "none" : "Log warning; continue (ALERT_ONLY)",
+            latency_ms: Date.now() - startTime,
+            cost: 0,
+            rubric_category: "constraint_evaluation",
+        });
+
+        return output;
     }
 
     private async resolveOne(

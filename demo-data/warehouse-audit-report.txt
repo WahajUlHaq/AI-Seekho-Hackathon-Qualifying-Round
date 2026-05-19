@@ -1,0 +1,59 @@
+WAREHOUSE AUDIT REPORT — LAHORE DISTRIBUTION HUB
+Document Ref: WAR-AUDIT-2026-0512
+Audit Date: 2026-05-12  (7 days prior to current cycle)
+Audited By: Internal Audit Division, Operations Compliance Unit
+Distribution: Restricted — Senior Operations, Procurement, Finance
+Classification: Internal Use Only
+
+============================================================
+1. EXECUTIVE SUMMARY
+============================================================
+This periodic audit confirms inventory positions and physical-system reconciliation
+for the Lahore Distribution Hub (Facility Code: LHE-DC-01) on the audit date.
+Variance against the WMS-recorded position is within tolerance.
+
+Total SKUs audited: 412
+Total reconciled units: 47,832
+Variance count: 6 SKUs flagged for re-count (none critical)
+
+============================================================
+2. KEY SKU POSITIONS (HIGH-VELOCITY ITEMS)
+============================================================
+SKU-1234 — Industrial Grade Adhesive (50ml, Carton of 100):
+  - System (WMS) quantity   : 500 units
+  - Physical count          : 500 units
+  - Variance                : 0 units
+  - Storage location        : Rack B-12, Zone 3
+  - Last receipt            : 2026-05-02 (Supplier SUP-104)
+  - Reorder threshold       : 150 units
+  - Reorder lead time       : 14 days (standard route)
+  - Status                  : ADEQUATE — above reorder threshold
+
+SKU-1235 — Hydraulic Sealant Pack (12-pack):
+  - System (WMS) quantity   : 1,240 units
+  - Physical count          : 1,240 units
+  - Variance                : 0 units
+  - Status                  : ADEQUATE
+
+SKU-1240 — High-Pressure Coupling Bracket:
+  - System (WMS) quantity   : 86 units
+  - Physical count          : 84 units
+  - Variance                : -2 units (within ±2% tolerance)
+  - Status                  : LOW — flag for replenishment
+
+============================================================
+3. SUPPLIER NOTES (AT AUDIT DATE)
+============================================================
+Supplier SUP-104 (primary for SKU-1234) reliability score on audit date: 0.92
+Reliability trend over preceding 60 days: STABLE
+Next scheduled delivery: 2026-05-26 (200 units)
+
+============================================================
+4. SIGN-OFF
+============================================================
+Audited By  : M. Tariq, Senior Internal Auditor
+Reviewed By : F. Khan, Operations Compliance Manager
+Authority   : Internal Audit Division (authority_type = internal_audit)
+
+NOTE: Audit reflects state as of 2026-05-12. Real-time variances between audit
+cycles must be verified against the live WMS feed.
