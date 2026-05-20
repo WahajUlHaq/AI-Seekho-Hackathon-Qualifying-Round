@@ -1,6 +1,7 @@
 import React from "react";
 import { Pressable, StyleSheet, Text, View } from "react-native";
 import type { StagedSource } from "@/services/IngestionService";
+import { T } from "@/lib/theme";
 
 interface Props {
     source: StagedSource;
@@ -20,8 +21,8 @@ export function StagedSourceCard({ source, onRemove }: Props): React.ReactElemen
                 </Text>
                 <Text style={styles.id}>{source.id}</Text>
             </View>
-            <Pressable onPress={onRemove} style={styles.remove}>
-                <Text style={styles.removeText}>×</Text>
+            <Pressable onPress={onRemove} style={styles.remove} hitSlop={8}>
+                <Text style={styles.removeText}>REMOVE</Text>
             </Pressable>
         </View>
     );
@@ -36,11 +37,15 @@ function formatBytes(n: number): string {
 const styles = StyleSheet.create({
     card: {
         flexDirection: "row",
-        backgroundColor: "#1f2937",
-        borderRadius: 8,
-        padding: 10,
-        marginBottom: 6,
         alignItems: "center",
+        gap: 10,
+        backgroundColor: T.bgSurface,
+        borderRadius: T.rMd,
+        borderWidth: 1,
+        borderColor: T.bdDefault,
+        paddingHorizontal: 10,
+        paddingVertical: 8,
+        marginBottom: 6,
     },
     body: {
         flex: 1,
@@ -51,39 +56,44 @@ const styles = StyleSheet.create({
         marginBottom: 2,
     },
     type: {
-        color: "#60a5fa",
-        fontFamily: "Menlo",
+        color: T.blue,
+        fontFamily: T.fontMono,
         fontSize: 10,
         fontWeight: "700",
     },
     size: {
-        color: "#6b7280",
-        fontFamily: "Menlo",
+        color: T.tx3,
+        fontFamily: T.fontMono,
         fontSize: 10,
     },
     name: {
-        color: "#e5e7eb",
-        fontFamily: "Menlo",
-        fontSize: 12,
+        color: T.tx1,
+        fontFamily: T.fontMono,
+        fontSize: 11,
+        fontWeight: "600",
     },
     id: {
-        color: "#6b7280",
-        fontFamily: "Menlo",
-        fontSize: 10,
+        color: T.tx3,
+        fontFamily: T.fontMono,
+        fontSize: 9,
         marginTop: 2,
     },
     remove: {
-        marginLeft: 8,
-        width: 32,
-        height: 32,
-        alignItems: "center",
+        backgroundColor: T.crimsonDim,
+        borderWidth: 1,
+        borderColor: T.crimsonBd,
+        borderRadius: T.rSm,
+        paddingHorizontal: 8,
+        paddingVertical: 3,
+        minHeight: 44,
         justifyContent: "center",
-        borderRadius: 16,
-        backgroundColor: "#374151",
+        alignItems: "center",
     },
     removeText: {
-        color: "#e5e7eb",
-        fontSize: 18,
+        color: T.crimson,
+        fontFamily: T.fontMono,
+        fontSize: 10,
         fontWeight: "700",
+        letterSpacing: 0.6,
     },
 });

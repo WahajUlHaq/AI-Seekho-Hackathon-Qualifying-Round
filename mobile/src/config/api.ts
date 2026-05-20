@@ -7,13 +7,43 @@
 
 const trim = (s: string | undefined): string => (s ?? "").trim();
 
-export const API_BASE_URL: string =
-    trim(process.env.EXPO_PUBLIC_API_BASE_URL) || "http://10.0.2.2:8000";
+/**
+ * Twelve-Factor strict enforcement: EXPO_PUBLIC_API_BASE_URL MUST be set at
+ * bundle time. App boot calls assertConfig() to surface the failure to the UI
+ * instead of crashing into an unhandled fetch later.
+ */
+const RAW_API_BASE_URL = trim(process.env.EXPO_PUBLIC_API_BASE_URL);
+
+export interface ConfigError {
+    field: string;
+    expected: string;
+    hint: string;
+}
+
+export function assertConfig(): ConfigError[] {
+    const errors: ConfigError[] = [];
+    if (!RAW_API_BASE_URL) {
+        errors.push({
+            field: "EXPO_PUBLIC_API_BASE_URL",
+            expected: "http(s)://<host>:<port>",
+            hint: "Set in mobile/.env and restart Expo with `npx expo start -c`.",
+        });
+    } else if (!/^https?:\/\//i.test(RAW_API_BASE_URL)) {
+        errors.push({
+            field: "EXPO_PUBLIC_API_BASE_URL",
+            expected: "http(s)://<host>:<port>",
+            hint: `Value '${RAW_API_BASE_URL}' is not a valid http(s) URL.`,
+        });
+    }
+    return errors;
+}
+
+export const API_BASE_URL: string = RAW_API_BASE_URL;
 
 /**
- * Empty string means "no env-provided operator". IdentityService will then
- * read from secure-store, and if that is also empty, App.tsx routes to the
- * provisioning screen so the user can register a handle.
+ * Empty string means "no env-provided operator". IdentityService then reads
+ * from secure-store, and if that is also empty, App.tsx routes to the
+ * one-time Operator Provisioning screen.
  */
 export const ENV_OPERATOR_HANDLE: string = trim(process.env.EXPO_PUBLIC_OPERATOR_HANDLE);
 

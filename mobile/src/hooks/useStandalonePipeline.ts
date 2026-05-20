@@ -52,7 +52,7 @@ import {
     isNotFound,
 } from "@/lib/errors";
 import { signApproval } from "@/services/BiometricSecurityService";
-import { commitReceipt } from "@/services/AuditLedgerService";
+import { commitReceipt, listReceipts } from "@/services/AuditLedgerService";
 import type {
     ClientPipelineStatus,
     PipelineApprovalRecord,
@@ -83,6 +83,7 @@ interface State {
     outcome: OutcomeReportOutput | null;
     audit: WorkflowAuditOutput | null;
     ledgerReceipt: LedgerReceipt | null;
+    ledgerReceipts: LedgerReceipt[];
     lastError: NormalizedError | null;
     isStarting: boolean;
     isActing: boolean;
@@ -100,6 +101,7 @@ const initialState: State = {
     outcome: null,
     audit: null,
     ledgerReceipt: null,
+    ledgerReceipts: [],
     lastError: null,
     isStarting: false,
     isActing: false,
@@ -119,17 +121,23 @@ type Action =
     | { type: "PHASE_OUTCOME"; data: OutcomeReportOutput }
     | { type: "PHASE_AUDIT"; data: WorkflowAuditOutput }
     | { type: "LEDGER_COMMITTED"; receipt: LedgerReceipt }
+    | { type: "LEDGER_LIST"; receipts: LedgerReceipt[] }
     | { type: "ERROR"; error: NormalizedError }
     | { type: "ACTING"; value: boolean };
 
 function reducer(state: State, action: Action): State {
     switch (action.type) {
         case "RESET":
-            return initialState;
+            return { ...initialState, ledgerReceipts: state.ledgerReceipts };
         case "STARTING":
             return { ...state, isStarting: true, lastError: null };
         case "STARTED":
-            return { ...initialState, pipelineId: action.pipelineId, sseStatus: "connecting" };
+            return {
+                ...initialState,
+                ledgerReceipts: state.ledgerReceipts,
+                pipelineId: action.pipelineId,
+                sseStatus: "connecting",
+            };
         case "START_FAILED":
             return { ...state, isStarting: false, lastError: action.error };
         case "SSE_STATUS":
@@ -153,8 +161,16 @@ function reducer(state: State, action: Action): State {
             return { ...state, outcome: action.data };
         case "PHASE_AUDIT":
             return { ...state, audit: action.data };
-        case "LEDGER_COMMITTED":
-            return { ...state, ledgerReceipt: action.receipt };
+        case "LEDGER_COMMITTED": {
+            const without = state.ledgerReceipts.filter((r) => r.pipeline_id !== action.receipt.pipeline_id);
+            return {
+                ...state,
+                ledgerReceipt: action.receipt,
+                ledgerReceipts: [action.receipt, ...without],
+            };
+        }
+        case "LEDGER_LIST":
+            return { ...state, ledgerReceipts: action.receipts };
         case "ERROR":
             return { ...state, lastError: action.error };
         case "ACTING":
@@ -208,6 +224,7 @@ export interface UseStandalonePipeline {
     outcome: OutcomeReportOutput | null;
     audit: WorkflowAuditOutput | null;
     ledgerReceipt: LedgerReceipt | null;
+    ledgerReceipts: LedgerReceipt[];
     sseStatus: SseStatus;
     lastError: NormalizedError | null;
     isStarting: boolean;
@@ -217,6 +234,7 @@ export interface UseStandalonePipeline {
     approve: (operatorHandle: string) => Promise<void>;
     reject: (operatorHandle: string, reason?: string) => Promise<void>;
     reset: () => void;
+    refreshLedger: () => Promise<void>;
 }
 
 export function useStandalonePipeline(): UseStandalonePipeline {
@@ -586,6 +604,20 @@ export function useStandalonePipeline(): UseStandalonePipeline {
         dispatch({ type: "RESET" });
     }, [clearSse, stopAllPollers]);
 
+    const refreshLedger = useCallback(async (): Promise<void> => {
+        try {
+            const receipts = await listReceipts();
+            dispatch({ type: "LEDGER_LIST", receipts });
+        } catch {
+            // ledger read failure is non-fatal — UI just sees stale data
+        }
+    }, []);
+
+    // Initial ledger hydration on mount.
+    useEffect(() => {
+        void refreshLedger();
+    }, [refreshLedger]);
+
     const derivedStatus = useMemo(() => deriveClientStatus(state), [state]);
 
     return {
@@ -598,6 +630,7 @@ export function useStandalonePipeline(): UseStandalonePipeline {
         outcome: state.outcome,
         audit: state.audit,
         ledgerReceipt: state.ledgerReceipt,
+        ledgerReceipts: state.ledgerReceipts,
         sseStatus: state.sseStatus,
         lastError: state.lastError,
         isStarting: state.isStarting,
@@ -607,5 +640,6 @@ export function useStandalonePipeline(): UseStandalonePipeline {
         approve,
         reject,
         reset,
+        refreshLedger,
     };
 }

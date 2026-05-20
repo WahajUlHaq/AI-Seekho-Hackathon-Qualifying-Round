@@ -10,6 +10,7 @@ import {
     View,
 } from "react-native";
 import { isValidHandle, setOperatorHandle } from "@/services/IdentityService";
+import { T } from "@/lib/theme";
 
 interface Props {
     onProvisioned: (handle: string) => void;
@@ -19,6 +20,7 @@ export function OperatorProvisioningScreen({ onProvisioned }: Props): React.Reac
     const [handle, setHandle] = useState("");
     const [error, setError] = useState<string | null>(null);
     const [saving, setSaving] = useState(false);
+    const [focused, setFocused] = useState(false);
 
     const valid = isValidHandle(handle);
 
@@ -53,19 +55,21 @@ export function OperatorProvisioningScreen({ onProvisioned }: Props): React.Reac
                     audit ledger. It cannot be changed for committed receipts, so choose carefully.
                 </Text>
 
-                <Text style={styles.label}>Handle</Text>
+                <Text style={styles.label}>HANDLE</Text>
                 <TextInput
-                    style={styles.input}
+                    style={[styles.input, focused && styles.inputFocused]}
                     value={handle}
                     onChangeText={(v) => {
                         setHandle(v);
                         setError(null);
                     }}
                     placeholder="operator-arham"
-                    placeholderTextColor="#6b7280"
+                    placeholderTextColor={T.tx3}
                     autoCapitalize="none"
                     autoCorrect={false}
                     editable={!saving}
+                    onFocus={() => setFocused(true)}
+                    onBlur={() => setFocused(false)}
                 />
                 <Text style={styles.hint}>
                     2–64 chars · letters, digits, '.', '_', '-'
@@ -74,17 +78,14 @@ export function OperatorProvisioningScreen({ onProvisioned }: Props): React.Reac
                 {error ? <Text style={styles.error}>{error}</Text> : null}
 
                 <Pressable
-                    style={[
-                        styles.btn,
-                        (!valid || saving) && styles.btnDisabled,
-                    ]}
+                    style={[styles.btn, (!valid || saving) && styles.btnDisabled]}
                     onPress={submit}
                     disabled={!valid || saving}
                 >
                     {saving ? (
-                        <ActivityIndicator color="#0b0b0f" />
+                        <ActivityIndicator color={T.bgBase} />
                     ) : (
-                        <Text style={styles.btnText}>Provision &amp; Continue</Text>
+                        <Text style={styles.btnText}>PROVISION &amp; CONTINUE</Text>
                     )}
                 </Pressable>
             </View>
@@ -95,79 +96,91 @@ export function OperatorProvisioningScreen({ onProvisioned }: Props): React.Reac
 const styles = StyleSheet.create({
     root: {
         flex: 1,
-        backgroundColor: "#0b0b0f",
+        backgroundColor: T.bgBase,
         alignItems: "center",
         justifyContent: "center",
         padding: 20,
     },
     card: {
-        backgroundColor: "#111827",
-        borderRadius: 12,
+        backgroundColor: T.bgSurface,
+        borderWidth: 1,
+        borderColor: T.bdDim,
+        borderRadius: T.rLg,
         padding: 20,
         width: "100%",
         maxWidth: 480,
     },
     eyebrow: {
-        color: "#fbbf24",
-        fontFamily: "Menlo",
+        color: T.amber,
+        fontFamily: T.fontMono,
         fontSize: 10,
         fontWeight: "700",
-        letterSpacing: 1,
+        letterSpacing: 1.0,
     },
     title: {
-        color: "#e5e7eb",
+        color: T.tx1,
         fontSize: 22,
         fontWeight: "700",
         marginTop: 4,
-        marginBottom: 8,
+        marginBottom: 10,
     },
     body: {
-        color: "#9ca3af",
-        fontFamily: "Menlo",
-        fontSize: 12,
+        color: T.tx3,
+        fontFamily: T.fontMono,
+        fontSize: 11,
         lineHeight: 17,
         marginBottom: 20,
     },
     label: {
-        color: "#e5e7eb",
-        fontFamily: "Menlo",
-        fontSize: 11,
-        marginBottom: 4,
+        color: T.tx2,
+        fontFamily: T.fontMono,
+        fontSize: 10,
+        fontWeight: "700",
+        letterSpacing: 0.6,
+        marginBottom: 6,
     },
     input: {
-        backgroundColor: "#0b0b0f",
-        color: "#e5e7eb",
-        borderRadius: 8,
+        backgroundColor: T.bgInput,
+        borderWidth: 1,
+        borderColor: T.bdDefault,
+        borderRadius: T.rMd,
+        color: T.tx1,
+        fontFamily: T.fontMono,
+        fontSize: 12,
         padding: 12,
-        fontFamily: "Menlo",
-        fontSize: 14,
+    },
+    inputFocused: {
+        borderColor: T.blue,
     },
     hint: {
-        color: "#6b7280",
-        fontFamily: "Menlo",
+        color: T.tx3,
+        fontFamily: T.fontMono,
         fontSize: 10,
-        marginTop: 4,
+        marginTop: 6,
     },
     error: {
-        color: "#f87171",
-        fontFamily: "Menlo",
+        color: T.crimson,
+        fontFamily: T.fontMono,
         fontSize: 11,
-        marginTop: 8,
+        marginTop: 10,
     },
     btn: {
-        backgroundColor: "#34d399",
-        borderRadius: 8,
+        backgroundColor: T.emerald,
+        borderRadius: T.rMd,
         paddingVertical: 14,
         alignItems: "center",
-        marginTop: 16,
+        justifyContent: "center",
+        marginTop: 18,
+        minHeight: 44,
     },
     btnDisabled: {
-        opacity: 0.4,
+        opacity: 0.35,
     },
     btnText: {
-        color: "#0b0b0f",
-        fontFamily: "Menlo",
+        color: T.bgBase,
+        fontFamily: T.fontMono,
         fontWeight: "700",
-        fontSize: 14,
+        fontSize: 13,
+        letterSpacing: 0.6,
     },
 });

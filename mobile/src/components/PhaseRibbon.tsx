@@ -7,6 +7,7 @@ import type {
     RecoveryPlanOutput,
     WorkflowAuditOutput,
 } from "@/types/execution";
+import { T } from "@/lib/theme";
 
 interface Props {
     chain: ExecutionChainOutput | null;
@@ -39,10 +40,32 @@ export function PhaseRibbon({
 
     return (
         <View style={styles.row}>
-            <PhaseCard title="Chain" state={cellState(chain)} summary={chainSummary} raw={chain} />
-            <PhaseCard title="Recovery" state={cellState(recovery)} summary={recoverySummary} raw={recovery} />
-            <PhaseCard title="Outcome" state={cellState(outcome)} summary={outcomeSummary} raw={outcome} />
-            <PhaseCard title="Audit" state={cellState(audit)} summary={auditSummary} raw={audit} />
+            <PhaseCard
+                title="Chain"
+                state={cellState(chain)}
+                summary={chainSummary}
+                raw={chain}
+                statusKey={chain?.overall_status}
+            />
+            <PhaseCard
+                title="Recovery"
+                state={cellState(recovery)}
+                summary={recoverySummary}
+                raw={recovery}
+            />
+            <PhaseCard
+                title="Outcome"
+                state={cellState(outcome)}
+                summary={outcomeSummary}
+                raw={outcome}
+            />
+            <PhaseCard
+                title="Audit"
+                state={cellState(audit)}
+                summary={auditSummary}
+                raw={audit}
+                statusKey={audit?.finalized_status}
+            />
         </View>
     );
 }
@@ -57,7 +80,10 @@ const styles = StyleSheet.create({
     row: {
         flexDirection: "row",
         gap: 6,
-        padding: 8,
-        backgroundColor: "#0b0b0f",
+        paddingHorizontal: 8,
+        paddingVertical: 8,
+        backgroundColor: T.bgBase,
+        borderTopWidth: 1,
+        borderTopColor: T.bdDim,
     },
 });

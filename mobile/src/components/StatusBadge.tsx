@@ -1,15 +1,26 @@
 import React from "react";
-import { StyleSheet, Text, View } from "react-native";
+import { Animated, StyleSheet, Text, View } from "react-native";
 import type { ClientPipelineStatus } from "@/types/pipeline";
+import { T } from "@/lib/theme";
+import { usePulse } from "@/lib/animations";
 
-const COLORS: Record<ClientPipelineStatus, { bg: string; fg: string; label: string }> = {
-    INITIALIZED: { bg: "#1f2937", fg: "#9ca3af", label: "INITIALIZED" },
-    PROCESSING: { bg: "#1e3a8a", fg: "#bfdbfe", label: "PROCESSING" },
-    HITL_PENDING: { bg: "#78350f", fg: "#fde68a", label: "HITL PENDING" },
-    EXECUTING: { bg: "#065f46", fg: "#a7f3d0", label: "EXECUTING" },
-    POLLING_COMPLETED: { bg: "#064e3b", fg: "#6ee7b7", label: "COMPLETED" },
-    REJECTED: { bg: "#4c1d95", fg: "#ddd6fe", label: "REJECTED" },
-    FAILED: { bg: "#7f1d1d", fg: "#fecaca", label: "FAILED" },
+interface StatusConfig {
+    color: string;
+    dim: string;
+    bd: string;
+    icon: string;
+    label: string;
+    pulse?: boolean;
+}
+
+const STATUS_CFG: Record<ClientPipelineStatus, StatusConfig> = {
+    INITIALIZED: { color: T.slate, dim: T.slateDim, bd: T.slateBd, icon: "○", label: "INITIALIZED" },
+    PROCESSING: { color: T.blue, dim: T.blueDim, bd: T.blueBd, icon: "◉", label: "PROCESSING", pulse: true },
+    HITL_PENDING: { color: T.amber, dim: T.amberDim, bd: T.amberBd, icon: "⏸", label: "HITL PENDING", pulse: true },
+    EXECUTING: { color: T.emerald, dim: T.emeraldDim, bd: T.emeraldBd, icon: "▶", label: "EXECUTING", pulse: true },
+    POLLING_COMPLETED: { color: T.emerald, dim: T.emeraldDim, bd: T.emeraldBd, icon: "✓", label: "COMPLETED" },
+    REJECTED: { color: T.violet, dim: T.violetDim, bd: T.violetBd, icon: "✕", label: "REJECTED" },
+    FAILED: { color: T.crimson, dim: T.crimsonDim, bd: T.crimsonBd, icon: "✗", label: "FAILED" },
 };
 
 interface Props {
@@ -17,25 +28,44 @@ interface Props {
 }
 
 export function StatusBadge({ status }: Props): React.ReactElement {
-    const c = COLORS[status];
+    const cfg = STATUS_CFG[status];
+    const pulseAnim = usePulse(Boolean(cfg.pulse), 1400);
+    const opacity = cfg.pulse
+        ? pulseAnim.interpolate({ inputRange: [0, 0.5, 1], outputRange: [1, 0.6, 1] })
+        : 1;
+
     return (
-        <View style={[styles.pill, { backgroundColor: c.bg }]}>
-            <Text style={[styles.text, { color: c.fg }]}>{c.label}</Text>
-        </View>
+        <Animated.View
+            style={[
+                styles.pill,
+                { backgroundColor: cfg.dim, borderColor: cfg.bd, opacity },
+            ]}
+        >
+            <Text style={[styles.icon, { color: cfg.color }]}>{cfg.icon}</Text>
+            <Text style={[styles.text, { color: cfg.color }]}>{cfg.label}</Text>
+        </Animated.View>
     );
 }
 
 const styles = StyleSheet.create({
     pill: {
+        flexDirection: "row",
+        alignItems: "center",
+        gap: 5,
         paddingHorizontal: 10,
         paddingVertical: 4,
-        borderRadius: 999,
+        borderRadius: T.rFull,
+        borderWidth: 1,
         alignSelf: "flex-start",
     },
+    icon: {
+        fontFamily: T.fontMono,
+        fontSize: 10,
+    },
     text: {
-        fontFamily: "Menlo",
-        fontSize: 11,
+        fontFamily: T.fontMono,
+        fontSize: 10,
         fontWeight: "700",
-        letterSpacing: 0.5,
+        letterSpacing: 0.6,
     },
 });
