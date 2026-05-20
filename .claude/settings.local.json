@@ -18,7 +18,10 @@
       "Bash(npm install *)",
       "Bash(ls backend/src/docs)",
       "Bash(ls backend/openapi*)",
-      "Bash(ls backend/src/docs/contracts/)"
+      "Bash(ls backend/src/docs/contracts/)",
+      "Bash(npx --yes create-expo-app@latest . --template blank-typescript --no-install)",
+      "WebFetch(domain:docs.expo.dev)",
+      "Bash(npx expo *)"
     ]
   }
 }
