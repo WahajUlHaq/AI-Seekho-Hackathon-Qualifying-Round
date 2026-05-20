@@ -21,7 +21,10 @@
       "Bash(ls backend/src/docs/contracts/)",
       "Bash(npx --yes create-expo-app@latest . --template blank-typescript --no-install)",
       "WebFetch(domain:docs.expo.dev)",
-      "Bash(npx expo *)"
+      "Bash(npx expo *)",
+      "Bash(Get-ChildItem -Path \"D:\\\\Google Ai Seekho 2026\\\\Autonomous Content-to-Action Agent\\\\mobile\\\\src\" -Recurse -Filter \"*.ts*\")",
+      "Bash(Select-Object -ExpandProperty FullName)",
+      "Bash(Select-Object -First 30)"
     ]
   }
 }

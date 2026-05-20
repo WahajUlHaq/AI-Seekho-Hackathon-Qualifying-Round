@@ -80,6 +80,44 @@ export const T = {
     // ── Typography ────────────────────────────────────
     fontMono: "Menlo" as const,
 
+    // ─────────────────────────────────────────────────
+    // ChainFlow v2 palette — additive. New screens consume
+    // *V2 backgrounds + the new color names (teal/green/
+    // gradients). Old screens / kept components continue
+    // to use the original tokens above.
+    // ─────────────────────────────────────────────────
+
+    // ── v2 backgrounds (slightly bluer, more layered) ──
+    bgBaseV2: "#0c0f14",
+    bgSurfaceV2: "#131822",
+    bgElevatedV2: "#1a2235",
+
+    // ── v2 borders ─────────────────────────────────────
+    bdDimV2: "#1c2535",
+    bdDefaultV2: "#232e42",
+    bdBrightV2: "#2d3f58",
+
+    // ── v2 text ────────────────────────────────────────
+    tx1V2: "#e4eaf4",
+    tx2V2: "#7a93b4",
+    tx3V2: "#3d5068",
+
+    // ── Teal accent (v2 primary) ───────────────────────
+    teal: "#00d4b4",
+    tealDim: "rgba(0,212,180,0.12)",
+    tealBd: "rgba(0,212,180,0.30)",
+
+    // ── Green (distinct from emerald — brighter v2) ────
+    green: "#18c864",
+    greenDim: "rgba(24,200,100,0.12)",
+    greenBd: "rgba(24,200,100,0.30)",
+
+    // ── Gradients (readonly tuples for expo-linear-gradient) ──
+    gradCta: ["#00e5c0", "#4060f8", "#e040c0"] as readonly [string, string, string],
+    gradBlue: ["#00c8ff", "#4466ff", "#b040ff"] as readonly [string, string, string],
+    gradAccept: ["#18c864", "#0ea855"] as readonly [string, string],
+    gradReject: ["#e83040", "#b02030"] as readonly [string, string],
+
     // ── Shadows ───────────────────────────────────────
     shadowCard: {
         shadowColor: "#000",

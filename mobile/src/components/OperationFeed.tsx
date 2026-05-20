@@ -1,26 +1,19 @@
-import React, { useMemo } from "react";
-import {
-    Animated,
-    FlatList,
-    StyleSheet,
-    Text,
-    View,
-    type ListRenderItem,
-} from "react-native";
+import React from "react";
+import { FlatList, StyleSheet, Text, View, type ListRenderItem } from "react-native";
 import { OperationCard } from "./OperationCard";
 import type { TraceEvent } from "@/types/pipeline";
 import { T } from "@/lib/theme";
-import { useSlideIn } from "@/lib/animations";
 
 interface Props {
     events: readonly TraceEvent[];
 }
 
 export function OperationFeed({ events }: Props): React.ReactElement {
-    const reversed = useMemo(() => [...events].reverse(), [events]);
+    const lastIndex = events.length - 1;
 
-    const renderItem: ListRenderItem<TraceEvent> = ({ item, index }) =>
-        index === 0 ? <NewestCard event={item} /> : <OperationCard event={item} />;
+    const renderItem: ListRenderItem<TraceEvent> = ({ item, index }) => (
+        <OperationCard event={item} isLatest={index === lastIndex} />
+    );
 
     if (events.length === 0) {
         return (
@@ -34,7 +27,7 @@ export function OperationFeed({ events }: Props): React.ReactElement {
 
     return (
         <FlatList
-            data={reversed}
+            data={events as TraceEvent[]}
             keyExtractor={(e) => e.event_id}
             renderItem={renderItem}
             style={styles.list}
@@ -46,19 +39,10 @@ export function OperationFeed({ events }: Props): React.ReactElement {
     );
 }
 
-function NewestCard({ event }: { event: TraceEvent }): React.ReactElement {
-    const { translateY, opacity } = useSlideIn(true);
-    return (
-        <Animated.View style={{ transform: [{ translateY }], opacity }}>
-            <OperationCard event={event} />
-        </Animated.View>
-    );
-}
-
 const styles = StyleSheet.create({
     list: {
         flex: 1,
-        backgroundColor: T.bgBase,
+        backgroundColor: T.bgBaseV2,
     },
     listContent: {
         paddingHorizontal: 12,
@@ -66,19 +50,18 @@ const styles = StyleSheet.create({
     },
     emptyWrapper: {
         flex: 1,
-        backgroundColor: T.bgBase,
+        backgroundColor: T.bgBaseV2,
     },
     emptyBox: {
         margin: 12,
-        backgroundColor: T.bgSurface,
+        backgroundColor: T.bgSurfaceV2,
         borderRadius: T.rMd,
         borderWidth: 1,
-        borderColor: T.bdDim,
+        borderColor: T.bdDimV2,
         padding: 16,
     },
     emptyText: {
-        color: T.tx3,
-        fontFamily: T.fontMono,
+        color: T.tx3V2,
         fontSize: 11,
         textAlign: "center",
     },

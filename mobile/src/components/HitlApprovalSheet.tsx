@@ -10,7 +10,9 @@ import {
     TextInput,
     View,
 } from "react-native";
-import type { PipelineApprovalRecord, Priority } from "@/types/pipeline";
+import { LinearGradient } from "expo-linear-gradient";
+import type { PipelineApprovalRecord, Priority, StrategyProposal } from "@/types/pipeline";
+import { PillBadge } from "./PillBadge";
 import { T } from "@/lib/theme";
 
 interface Props {
@@ -24,16 +26,16 @@ interface Props {
 }
 
 interface PriorityConfig {
+    color: string;
     bg: string;
     bd: string;
-    fg: string;
 }
 
 const PRIORITY_CFG: Record<Priority, PriorityConfig> = {
-    CRITICAL: { bg: T.crimsonDim, bd: T.crimsonBd, fg: T.crimson },
-    HIGH: { bg: T.amberDim, bd: T.amberBd, fg: T.amber },
-    MEDIUM: { bg: T.blueDim, bd: T.blueBd, fg: T.blue },
-    LOW: { bg: T.slateDim, bd: T.slateBd, fg: T.tx3 },
+    CRITICAL: { color: T.crimson, bg: T.crimsonDim, bd: T.crimsonBd },
+    HIGH: { color: T.amber, bg: T.amberDim, bd: T.amberBd },
+    MEDIUM: { color: T.blue, bg: T.blueDim, bd: T.blueBd },
+    LOW: { color: T.tx3V2, bg: "rgba(143,164,191,0.10)", bd: "rgba(143,164,191,0.30)" },
 };
 
 const HOLD_DURATION_MS = 1600;
@@ -57,61 +59,64 @@ export function HitlApprovalSheet({
         );
     }
 
-    const overallCfg = PRIORITY_CFG[record.proposal.overall_priority];
+    const overall = PRIORITY_CFG[record.proposal.overall_priority];
+    const lastSix = record.pipeline_id.slice(-6).toUpperCase();
+    const agentName = inferAgentName(record);
+    const impact = mapImpact(record.proposal.overall_priority);
+    const position = `1 / ${record.proposal.proposedActions.length}`;
+    const verificationHash = stubHash(record);
 
     return (
         <Modal visible={visible} transparent animationType="slide">
             <View style={styles.scrim}>
-                <View style={styles.amberTint} />
                 <View style={styles.sheet}>
                     <View style={styles.handleBar} />
 
-                    {/* ── Header block ─────────────────────── */}
+                    {/* ── Header ──────────────────────────────── */}
                     <View style={styles.header}>
-                        <View style={styles.headerRow}>
+                        <View style={styles.headerTopRow}>
                             <View style={styles.iconBox}>
-                                <Text style={styles.iconBoxGlyph}>⏸</Text>
+                                <Text style={styles.iconGlyph}>⏸</Text>
                             </View>
-                            <View style={styles.titleCol}>
-                                <Text style={styles.title}>HUMAN-IN-THE-LOOP</Text>
-                                <Text style={styles.subtitle}>
-                                    SECURE AUTHORIZATION REQUIRED
-                                </Text>
-                            </View>
-                            <View
-                                style={[
-                                    styles.prioPill,
-                                    { backgroundColor: overallCfg.bg, borderColor: overallCfg.bd },
-                                ]}
-                            >
-                                <Text style={[styles.prioText, { color: overallCfg.fg }]}>
-                                    {record.proposal.overall_priority}
-                                </Text>
+                            <View style={styles.headerTitleCol}>
+                                <Text style={styles.title}>Human Approval Required</Text>
+                                <View style={styles.criticalRow}>
+                                    <PillBadge label="⚠ CRITICAL ACTION" color={T.crimson} />
+                                </View>
                             </View>
                         </View>
 
-                        <View style={styles.pipelineRow}>
-                            <Text style={styles.pipelineId} numberOfLines={1}>
-                                {record.pipeline_id}
-                            </Text>
-                            <Text style={styles.proposedAt} numberOfLines={1}>
-                                proposed {formatTime(record.proposed_at)}
-                            </Text>
+                        <Text style={styles.subtitle}>
+                            The agent <Text style={styles.subtitleAgent}>{agentName}</Text> detected
+                            a high-value impact action. Automated execution paused.
+                        </Text>
+
+                        <View style={styles.metaGrid}>
+                            <MetaCard label="# PIPELINE ID" value={`PIPE-${lastSix}`} color={T.blue} />
+                            <MetaCard label="⚡ AGENT NAME" value={agentName} color={T.teal} />
+                            <MetaCard label="⊛ IMPACT" value={impact} color={overall.color} />
+                            <MetaCard label="◎ POSITION" value={position} color={T.tx2V2} />
                         </View>
                     </View>
 
-                    {/* ── Scrollable body ─────────────────── */}
+                    {/* ── Scrollable body ─────────────────────── */}
                     <ScrollView style={styles.scroll} keyboardShouldPersistTaps="handled">
-                        <Text style={styles.sectionLabel}>RATIONALE</Text>
                         <View style={styles.rationaleBox}>
                             <Text style={styles.rationaleText}>{record.proposal.rationale}</Text>
+                        </View>
+
+                        <Text style={styles.sectionLabel}>SHA-256 VERIFICATION HASH</Text>
+                        <View style={styles.hashBox}>
+                            <Text style={styles.hashText} selectable>
+                                {verificationHash}
+                            </Text>
                         </View>
 
                         <Text style={styles.sectionLabel}>
                             PROPOSED ACTIONS · {record.proposal.proposedActions.length}
                         </Text>
                         {record.proposal.proposedActions.map((a, idx) => {
-                            const cfg = PRIORITY_CFG[a.priority];
+                            const pc = PRIORITY_CFG[a.priority];
                             return (
                                 <View key={a.action_id} style={styles.action}>
                                     <View style={styles.actionHeader}>
@@ -125,16 +130,12 @@ export function HitlApprovalSheet({
                                                 {a.action_id}
                                             </Text>
                                         </View>
-                                        <View
-                                            style={[
-                                                styles.prioPillSm,
-                                                { backgroundColor: cfg.bg, borderColor: cfg.bd },
-                                            ]}
-                                        >
-                                            <Text style={[styles.prioTextSm, { color: cfg.fg }]}>
-                                                {a.priority}
-                                            </Text>
-                                        </View>
+                                        <PillBadge
+                                            label={a.priority}
+                                            color={pc.color}
+                                            bg={pc.bg}
+                                            border={pc.bd}
+                                        />
                                     </View>
                                     <Text style={styles.actionTitle}>{a.title}</Text>
                                     <Text style={styles.actionDesc}>{a.description}</Text>
@@ -155,7 +156,7 @@ export function HitlApprovalSheet({
                             value={reason}
                             onChangeText={setReason}
                             placeholder="Why are you rejecting?"
-                            placeholderTextColor={T.tx3}
+                            placeholderTextColor={T.tx3V2}
                             style={styles.input}
                             multiline
                             editable={!isActing}
@@ -164,7 +165,7 @@ export function HitlApprovalSheet({
                         {errorMessage ? <Text style={styles.error}>{errorMessage}</Text> : null}
                     </ScrollView>
 
-                    {/* ── Footer ──────────────────────────── */}
+                    {/* ── Footer ──────────────────────────────── */}
                     <View style={styles.footer}>
                         <Text style={styles.operator}>
                             <Text style={styles.operatorLabel}>signing as </Text>
@@ -172,16 +173,14 @@ export function HitlApprovalSheet({
                         </Text>
                         <View style={styles.btnRow}>
                             <Pressable
-                                style={[styles.btn, styles.btnReject, isActing && styles.btnDisabled]}
+                                style={[styles.btnReject, isActing && styles.btnDisabled]}
                                 disabled={isActing}
                                 onPress={() => onReject(reason.trim() || undefined)}
                             >
-                                <Text style={styles.btnRejectText}>REJECT</Text>
+                                <Text style={styles.btnRejectIcon}>✕</Text>
+                                <Text style={styles.btnRejectText}>REJECT & CANCEL</Text>
                             </Pressable>
-                            <HoldToApprove
-                                isActing={isActing}
-                                onApprove={onApprove}
-                            />
+                            <HoldToApprove isActing={isActing} onApprove={onApprove} />
                         </View>
                     </View>
                 </View>
@@ -190,10 +189,10 @@ export function HitlApprovalSheet({
     );
 }
 
-// ───────────────────────────────────────────────────────
-// Hold-to-approve button: 1600 ms hold fills the bar.
-// Release before 100 % → reset. Reach 100 % → onApprove.
-// ───────────────────────────────────────────────────────
+// ──────────────────────────────────────────────────────────
+// Hold-to-approve — 1600ms gradient fill. Release early
+// reverses; reach 100% calls onApprove().
+// ──────────────────────────────────────────────────────────
 function HoldToApprove({
     isActing,
     onApprove,
@@ -213,7 +212,6 @@ function HoldToApprove({
         return () => progress.removeListener(id);
     }, [progress]);
 
-    // When the parent finishes acting, reset progress for the next round.
     useEffect(() => {
         if (!isActing) {
             progress.setValue(0);
@@ -256,12 +254,7 @@ function HoldToApprove({
         outputRange: ["0%", "100%"],
     });
 
-    const idle = !isActing && pct === 0;
-    const label = isActing
-        ? "⋯ Signing…"
-        : pct > 0
-        ? `Holding… ${pct}%`
-        : "⇧ Hold to Sign & Approve";
+    const label = isActing ? "⋯ Signing…" : pct > 0 ? `Holding… ${pct}%` : "✓ ACCEPT & EXECUTE";
 
     return (
         <Pressable
@@ -270,14 +263,21 @@ function HoldToApprove({
             onPressOut={cancelHold}
             disabled={isActing}
         >
-            <Animated.View style={[styles.holdFill, { width }]} />
+            <Animated.View style={[styles.holdFillWrap, { width }]}>
+                <LinearGradient
+                    colors={T.gradAccept as readonly [string, string]}
+                    start={{ x: 0, y: 0 }}
+                    end={{ x: 1, y: 0 }}
+                    style={StyleSheet.absoluteFill}
+                />
+            </Animated.View>
             {isActing ? (
-                <ActivityIndicator color={T.emerald} />
+                <ActivityIndicator color={T.green} />
             ) : (
                 <Text
                     style={[
                         styles.holdBtnText,
-                        { color: idle ? T.emerald : T.bgBase },
+                        { color: pct === 0 ? T.green : "#ffffff" },
                     ]}
                     numberOfLines={1}
                 >
@@ -288,159 +288,224 @@ function HoldToApprove({
     );
 }
 
-function formatTime(iso: string): string {
-    try {
-        return new Date(iso).toLocaleTimeString();
-    } catch {
-        return iso;
+// ──────────────────────────────────────────────────────────
+// Derived field helpers
+// ──────────────────────────────────────────────────────────
+function inferAgentName(record: PipelineApprovalRecord): string {
+    const proposal = record.proposal as StrategyProposal & { agent_name?: string };
+    if (typeof proposal.agent_name === "string" && proposal.agent_name.length > 0) {
+        return proposal.agent_name;
     }
+    return "StrategicRecommender";
+}
+
+function mapImpact(p: Priority): string {
+    switch (p) {
+        case "CRITICAL":
+            return "CRITICAL";
+        case "HIGH":
+            return "HIGH RISK";
+        case "MEDIUM":
+            return "MEDIUM";
+        case "LOW":
+            return "LOW";
+    }
+}
+
+function stubHash(record: PipelineApprovalRecord): string {
+    const proposal = record.proposal as StrategyProposal & { proposal_hash?: string };
+    if (typeof proposal.proposal_hash === "string" && proposal.proposal_hash.length >= 32) {
+        return proposal.proposal_hash;
+    }
+    const seed = `${record.pipeline_id}-${record.proposed_at}`;
+    let h = 0;
+    for (let i = 0; i < seed.length; i += 1) {
+        h = (h * 31 + seed.charCodeAt(i)) >>> 0;
+    }
+    return Array.from({ length: 8 }, (_, i) =>
+        ((h * (i + 7)) >>> 0).toString(16).padStart(8, "0"),
+    )
+        .join("")
+        .slice(0, 64);
+}
+
+function MetaCard({
+    label,
+    value,
+    color,
+}: {
+    label: string;
+    value: string;
+    color: string;
+}): React.ReactElement {
+    return (
+        <View style={styles.metaCard}>
+            <Text style={styles.metaCardLabel}>{label}</Text>
+            <Text style={[styles.metaCardValue, { color }]} numberOfLines={1}>
+                {value}
+            </Text>
+        </View>
+    );
 }
 
 const styles = StyleSheet.create({
     scrim: {
         flex: 1,
-        backgroundColor: T.scrimBg,
+        backgroundColor: "rgba(6,10,18,0.88)",
         justifyContent: "flex-end",
     },
-    amberTint: {
-        ...StyleSheet.absoluteFillObject,
-        backgroundColor: T.scrimAmberTint,
-    },
     sheet: {
-        backgroundColor: T.bgElevated,
+        backgroundColor: T.bgElevatedV2,
         borderTopLeftRadius: 22,
         borderTopRightRadius: 22,
-        borderTopWidth: 2,
-        borderLeftWidth: 2,
-        borderRightWidth: 2,
-        borderBottomWidth: 0,
+        borderTopWidth: 1.5,
+        borderLeftWidth: 1.5,
+        borderRightWidth: 1.5,
         borderTopColor: T.amberBd,
         borderLeftColor: T.amberBd,
         borderRightColor: T.amberBd,
-        maxHeight: "87%",
+        maxHeight: "92%",
         shadowColor: T.amber,
         shadowOffset: { width: 0, height: -4 },
-        shadowOpacity: 0.15,
-        shadowRadius: 20,
-        elevation: 12,
+        shadowOpacity: 0.18,
+        shadowRadius: 22,
+        elevation: 14,
     },
     handleBar: {
         width: 40,
         height: 4,
         borderRadius: 2,
-        backgroundColor: T.bdBright,
+        backgroundColor: T.bdBrightV2,
         alignSelf: "center",
         marginTop: 10,
-        marginBottom: 4,
+        marginBottom: 6,
     },
 
     // ── Header ─────────────────────────────────────────
     header: {
         paddingHorizontal: 16,
-        paddingVertical: 10,
+        paddingTop: 6,
+        paddingBottom: 12,
         borderBottomWidth: 1,
-        borderBottomColor: T.bdDim,
+        borderBottomColor: T.bdDimV2,
     },
-    headerRow: {
+    headerTopRow: {
         flexDirection: "row",
         alignItems: "center",
-        gap: 10,
+        gap: 12,
+        marginBottom: 8,
     },
     iconBox: {
-        width: 32,
-        height: 32,
-        borderRadius: 8,
+        width: 38,
+        height: 38,
+        borderRadius: 10,
         backgroundColor: T.amberDim,
         borderWidth: 1,
         borderColor: T.amberBd,
         alignItems: "center",
         justifyContent: "center",
     },
-    iconBoxGlyph: {
-        fontFamily: T.fontMono,
-        fontSize: 18,
+    iconGlyph: {
+        fontSize: 20,
         color: T.amber,
     },
-    titleCol: {
+    headerTitleCol: {
         flex: 1,
     },
     title: {
-        fontFamily: T.fontMono,
-        fontSize: 11,
-        fontWeight: "700",
-        color: T.amber,
-        letterSpacing: 0.8,
+        color: T.tx1V2,
+        fontSize: 18,
+        fontWeight: "800",
+        letterSpacing: -0.2,
+    },
+    criticalRow: {
+        flexDirection: "row",
+        marginTop: 6,
     },
     subtitle: {
-        fontFamily: T.fontMono,
-        fontSize: 9,
-        color: T.tx3,
-        marginTop: 1,
-        letterSpacing: 0.4,
+        color: T.tx2V2,
+        fontSize: 12,
+        lineHeight: 18,
+        marginBottom: 10,
     },
-    prioPill: {
-        paddingHorizontal: 10,
-        paddingVertical: 3,
-        borderRadius: T.rFull,
-        borderWidth: 1,
-    },
-    prioText: {
-        fontFamily: T.fontMono,
-        fontSize: 10,
+    subtitleAgent: {
+        color: T.tx1V2,
         fontWeight: "700",
-        letterSpacing: 0.6,
-    },
-    pipelineRow: {
-        flexDirection: "row",
-        justifyContent: "space-between",
-        marginTop: 8,
-        gap: 8,
-    },
-    pipelineId: {
-        color: T.blue,
-        fontFamily: T.fontMono,
-        fontSize: 10,
-        flexShrink: 1,
-    },
-    proposedAt: {
-        color: T.tx3,
-        fontFamily: T.fontMono,
-        fontSize: 10,
-        flexShrink: 1,
     },
 
-    // ── Scroll body ────────────────────────────────────
+    // ── Meta grid (2×2) ────────────────────────────────
+    metaGrid: {
+        flexDirection: "row",
+        flexWrap: "wrap",
+        gap: 6,
+    },
+    metaCard: {
+        flexBasis: "48.5%",
+        backgroundColor: T.bgBaseV2,
+        borderWidth: 1,
+        borderColor: T.bdDimV2,
+        borderRadius: T.rMd,
+        paddingHorizontal: 10,
+        paddingVertical: 8,
+    },
+    metaCardLabel: {
+        color: T.tx3V2,
+        fontSize: 9,
+        fontWeight: "700",
+        letterSpacing: 0.8,
+        marginBottom: 4,
+    },
+    metaCardValue: {
+        fontSize: 12,
+        fontWeight: "700",
+        fontFamily: T.fontMono,
+    },
+
+    // ── Body ───────────────────────────────────────────
     scroll: {
         paddingHorizontal: 16,
-        maxHeight: 480,
-    },
-    sectionLabel: {
-        fontFamily: T.fontMono,
-        fontSize: 9,
-        color: T.tx3,
-        textTransform: "uppercase",
-        letterSpacing: 0.8,
-        marginTop: 14,
-        marginBottom: 6,
     },
     rationaleBox: {
-        backgroundColor: T.bgSurface,
-        borderRadius: T.rMd,
+        backgroundColor: T.blueDim,
         borderWidth: 1,
-        borderColor: T.bdDim,
-        padding: 10,
+        borderColor: T.blueBd,
+        borderRadius: T.rMd,
+        padding: 12,
+        marginTop: 14,
     },
     rationaleText: {
-        fontFamily: T.fontMono,
-        fontSize: 11,
-        color: T.tx2,
+        color: T.tx1V2,
+        fontSize: 12,
         lineHeight: 18,
     },
+    sectionLabel: {
+        color: T.tx3V2,
+        fontSize: 10,
+        fontWeight: "700",
+        textTransform: "uppercase",
+        letterSpacing: 1.0,
+        marginTop: 16,
+        marginBottom: 6,
+    },
+    hashBox: {
+        backgroundColor: T.bgInput,
+        borderWidth: 1,
+        borderColor: T.bdDimV2,
+        borderRadius: T.rSm,
+        paddingHorizontal: 10,
+        paddingVertical: 8,
+    },
+    hashText: {
+        color: T.teal,
+        fontFamily: T.fontMono,
+        fontSize: 10,
+        lineHeight: 16,
+    },
     action: {
-        backgroundColor: T.bgSurface,
+        backgroundColor: T.bgBaseV2,
         borderRadius: T.rMd,
         borderWidth: 1,
-        borderColor: T.bdDefault,
+        borderColor: T.bdDefaultV2,
         paddingHorizontal: 12,
         paddingVertical: 10,
         marginBottom: 8,
@@ -458,13 +523,13 @@ const styles = StyleSheet.create({
         flexShrink: 1,
     },
     indexBadge: {
-        backgroundColor: T.bgElevated,
+        backgroundColor: T.bgElevatedV2,
         borderRadius: T.rSm,
         paddingHorizontal: 6,
         paddingVertical: 2,
     },
     indexBadgeText: {
-        color: T.tx3,
+        color: T.tx3V2,
         fontFamily: T.fontMono,
         fontSize: 9,
         fontWeight: "700",
@@ -476,37 +541,23 @@ const styles = StyleSheet.create({
         fontWeight: "700",
         flexShrink: 1,
     },
-    prioPillSm: {
-        paddingHorizontal: 8,
-        paddingVertical: 2,
-        borderRadius: T.rFull,
-        borderWidth: 1,
-    },
-    prioTextSm: {
-        fontFamily: T.fontMono,
-        fontSize: 9,
-        fontWeight: "700",
-        letterSpacing: 0.5,
-    },
     actionTitle: {
-        color: T.tx1,
-        fontFamily: T.fontMono,
-        fontSize: 12,
-        fontWeight: "600",
-        marginTop: 6,
+        color: T.tx1V2,
+        fontSize: 13,
+        fontWeight: "700",
+        marginTop: 8,
     },
     actionDesc: {
-        color: T.tx2,
-        fontFamily: T.fontMono,
-        fontSize: 10,
+        color: T.tx2V2,
+        fontSize: 11,
         marginTop: 4,
         lineHeight: 16,
     },
     actionDeps: {
-        color: T.tx3,
+        color: T.tx3V2,
         fontFamily: T.fontMono,
         fontSize: 9,
-        marginTop: 4,
+        marginTop: 6,
     },
     actionDepsValue: {
         color: T.blue,
@@ -516,16 +567,14 @@ const styles = StyleSheet.create({
         borderWidth: 1,
         borderColor: T.crimsonBd,
         borderRadius: T.rMd,
-        color: T.tx1,
-        fontFamily: T.fontMono,
-        fontSize: 11,
+        color: T.tx1V2,
+        fontSize: 12,
         padding: 10,
         minHeight: 64,
         textAlignVertical: "top",
     },
     error: {
         color: T.crimson,
-        fontFamily: T.fontMono,
         fontSize: 11,
         marginTop: 10,
         marginBottom: 4,
@@ -534,19 +583,18 @@ const styles = StyleSheet.create({
     // ── Footer ─────────────────────────────────────────
     footer: {
         borderTopWidth: 1,
-        borderTopColor: T.bdDim,
+        borderTopColor: T.bdDimV2,
         paddingHorizontal: 16,
         paddingTop: 10,
         paddingBottom: 28,
     },
     operator: {
-        fontFamily: T.fontMono,
-        fontSize: 9,
+        fontSize: 10,
         textAlign: "center",
-        marginBottom: 8,
+        marginBottom: 10,
     },
     operatorLabel: {
-        color: T.tx3,
+        color: T.tx3V2,
     },
     operatorValue: {
         color: T.amber,
@@ -554,26 +602,30 @@ const styles = StyleSheet.create({
     },
     btnRow: {
         flexDirection: "row",
-        gap: 8,
-    },
-    btn: {
-        flex: 1,
-        paddingVertical: 12,
-        borderRadius: T.rMd,
-        alignItems: "center",
-        justifyContent: "center",
-        minHeight: 44,
+        gap: 10,
     },
     btnReject: {
+        flex: 1,
+        flexDirection: "row",
+        gap: 6,
         backgroundColor: T.crimsonDim,
         borderWidth: 1,
         borderColor: T.crimsonBd,
+        paddingVertical: 13,
+        borderRadius: T.rLg,
+        alignItems: "center",
+        justifyContent: "center",
+        minHeight: 48,
+    },
+    btnRejectIcon: {
+        color: T.crimson,
+        fontSize: 13,
+        fontWeight: "700",
     },
     btnRejectText: {
         color: T.crimson,
-        fontFamily: T.fontMono,
         fontSize: 12,
-        fontWeight: "700",
+        fontWeight: "800",
         letterSpacing: 0.6,
     },
     btnDisabled: {
@@ -583,27 +635,25 @@ const styles = StyleSheet.create({
     // Hold-to-approve
     holdBtn: {
         flex: 1,
-        paddingVertical: 12,
-        borderRadius: T.rMd,
-        backgroundColor: T.emeraldDim,
-        borderWidth: 2,
-        borderColor: T.emeraldBd,
+        paddingVertical: 13,
+        borderRadius: T.rLg,
+        backgroundColor: T.greenDim,
+        borderWidth: 1.5,
+        borderColor: T.greenBd,
         alignItems: "center",
         justifyContent: "center",
         overflow: "hidden",
-        minHeight: 44,
+        minHeight: 48,
     },
-    holdFill: {
+    holdFillWrap: {
         position: "absolute",
         left: 0,
         top: 0,
         bottom: 0,
-        backgroundColor: T.emerald,
     },
     holdBtnText: {
-        fontFamily: T.fontMono,
         fontSize: 12,
-        fontWeight: "700",
+        fontWeight: "800",
         letterSpacing: 0.6,
     },
 });

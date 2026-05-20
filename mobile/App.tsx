@@ -1,10 +1,14 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import { ActivityIndicator, Animated, StyleSheet, Text, View } from "react-native";
 import { StatusBar } from "expo-status-bar";
 import { SafeAreaProvider } from "react-native-safe-area-context";
-import { NavigationContainer, DefaultTheme } from "@react-navigation/native";
+import {
+    NavigationContainer,
+    DefaultTheme,
+    useNavigationContainerRef,
+} from "@react-navigation/native";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
-import Svg, { Path, Rect } from "react-native-svg";
+import Svg, { Path, Polygon, Rect } from "react-native-svg";
 
 import { assertConfig, type ConfigError } from "@/config/api";
 import { resolveOperatorHandle } from "@/services/IdentityService";
@@ -14,7 +18,9 @@ import { CriticalConfigScreen } from "@/screens/CriticalConfigScreen";
 import { OperatorProvisioningScreen } from "@/screens/OperatorProvisioningScreen";
 import { DashboardScreen } from "@/screens/DashboardScreen";
 import { ExecutionScreen } from "@/screens/ExecutionScreen";
+import { ChainFlowScreen } from "@/screens/ChainFlowScreen";
 import { AuditInsightsScreen } from "@/screens/AuditInsightsScreen";
+import { ProfileScreen } from "@/screens/ProfileScreen";
 import type { RootTabParamList } from "@/navigation/types";
 import { T } from "@/lib/theme";
 import { usePulse } from "@/lib/animations";
@@ -32,11 +38,11 @@ const NAV_THEME = {
     dark: true,
     colors: {
         ...DefaultTheme.colors,
-        background: T.bgBase,
-        card: T.bgSurface,
-        text: T.tx1,
-        border: T.bdDim,
-        primary: T.emerald,
+        background: T.bgBaseV2,
+        card: T.bgSurfaceV2,
+        text: T.tx1V2,
+        border: T.bdDimV2,
+        primary: T.teal,
         notification: T.amber,
     },
 };
@@ -60,17 +66,29 @@ function ExecutionIcon({ color }: { color: string }): React.ReactElement {
     return (
         <Svg width={ICON_SIZE} height={ICON_SIZE} viewBox="0 0 24 24" fill="none">
             <Path
-                d="M5 7l5 5-5 5"
+                d="M12 2.5a9.5 9.5 0 1 0 0 19 9.5 9.5 0 0 0 0-19Z"
                 stroke={color}
-                strokeWidth={2.2}
-                strokeLinecap="round"
-                strokeLinejoin="round"
+                strokeWidth={1.8}
             />
-            <Path
-                d="M13 17h7"
+            <Path d="M10 8.5l5 3.5-5 3.5V8.5Z" fill={color} />
+        </Svg>
+    );
+}
+
+function ChainFlowIcon({ color }: { color: string }): React.ReactElement {
+    return (
+        <Svg width={ICON_SIZE} height={ICON_SIZE} viewBox="0 0 24 24" fill="none">
+            <Polygon
+                points="12,2 21,7 21,17 12,22 3,17 3,7"
                 stroke={color}
-                strokeWidth={2.2}
-                strokeLinecap="round"
+                strokeWidth={1.8}
+                strokeLinejoin="round"
+                fill="none"
+            />
+            <Polygon
+                points="12,7 17,9.5 17,14.5 12,17 7,14.5 7,9.5"
+                fill={color}
+                opacity={0.5}
             />
         </Svg>
     );
@@ -79,27 +97,31 @@ function ExecutionIcon({ color }: { color: string }): React.ReactElement {
 function AuditIcon({ color }: { color: string }): React.ReactElement {
     return (
         <Svg width={ICON_SIZE} height={ICON_SIZE} viewBox="0 0 24 24" fill="none">
+            <Rect x="4" y="13" width="3.5" height="7" rx="0.5" fill={color} />
+            <Rect x="10.25" y="9" width="3.5" height="11" rx="0.5" fill={color} />
+            <Rect x="16.5" y="5" width="3.5" height="15" rx="0.5" fill={color} />
+        </Svg>
+    );
+}
+
+function ProfileIcon({ color }: { color: string }): React.ReactElement {
+    return (
+        <Svg width={ICON_SIZE} height={ICON_SIZE} viewBox="0 0 24 24" fill="none">
             <Path
-                d="M12 3 4 6v5c0 4.5 3.5 8.5 8 10 4.5-1.5 8-5.5 8-10V6l-8-3Z"
+                d="M12 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8Z"
                 stroke={color}
-                strokeWidth={2}
-                strokeLinejoin="round"
+                strokeWidth={1.8}
             />
             <Path
-                d="m8.5 12 2.5 2.5 4.5-5"
+                d="M4 21a8 8 0 0 1 16 0"
                 stroke={color}
-                strokeWidth={2}
+                strokeWidth={1.8}
                 strokeLinecap="round"
-                strokeLinejoin="round"
             />
         </Svg>
     );
 }
 
-/**
- * Execution tab icon with an amber pulse badge that appears when the active
- * pipeline is awaiting HITL approval.
- */
 function ExecutionTabIcon({ color }: { color: string }): React.ReactElement {
     const { derivedStatus } = usePipelineContext();
     const showBadge = derivedStatus === "HITL_PENDING";
@@ -111,10 +133,101 @@ function ExecutionTabIcon({ color }: { color: string }): React.ReactElement {
     return (
         <View style={styles.tabIconWrap}>
             <ExecutionIcon color={color} />
-            {showBadge ? (
-                <Animated.View style={[styles.pendingBadge, { opacity }]} />
-            ) : null}
+            {showBadge ? <Animated.View style={[styles.pendingBadge, { opacity }]} /> : null}
         </View>
+    );
+}
+
+// ── Tabs component (inside Provider so it can read pipeline state) ──
+
+function Tabs({ operatorHandle }: { operatorHandle: string }): React.ReactElement {
+    const pipeline = usePipelineContext();
+    const navigationRef = useNavigationContainerRef<RootTabParamList>();
+    const lastNavStatus = useRef<string | null>(null);
+
+    useEffect(() => {
+        const status = pipeline.derivedStatus;
+        if (status !== "POLLING_COMPLETED" && status !== "REJECTED") {
+            lastNavStatus.current = null;
+            return;
+        }
+        if (lastNavStatus.current === status) return;
+        lastNavStatus.current = status;
+        const t = setTimeout(() => {
+            if (navigationRef.isReady()) {
+                navigationRef.navigate("ChainFlow" as never);
+            }
+        }, 800);
+        return () => clearTimeout(t);
+    }, [pipeline.derivedStatus, navigationRef]);
+
+    return (
+        <NavigationContainer ref={navigationRef} theme={NAV_THEME}>
+            <Tab.Navigator
+                screenOptions={{
+                    headerShown: false,
+                    tabBarStyle: {
+                        backgroundColor: T.bgSurfaceV2,
+                        borderTopColor: T.bdDimV2,
+                        height: 72,
+                        paddingBottom: 16,
+                        paddingTop: 6,
+                    },
+                    tabBarActiveTintColor: T.teal,
+                    tabBarInactiveTintColor: T.tx3V2,
+                    tabBarLabelStyle: {
+                        fontSize: 10,
+                        fontWeight: "600",
+                        letterSpacing: 0.2,
+                    },
+                }}
+            >
+                <Tab.Screen
+                    name="Dashboard"
+                    options={{
+                        title: "Dashboard",
+                        tabBarIcon: ({ color }) => <DashboardIcon color={color} />,
+                    }}
+                >
+                    {() => <DashboardScreen operatorHandle={operatorHandle} />}
+                </Tab.Screen>
+                <Tab.Screen
+                    name="Execution"
+                    options={{
+                        title: "Execution",
+                        tabBarIcon: ({ color }) => <ExecutionTabIcon color={color} />,
+                    }}
+                >
+                    {() => <ExecutionScreen operatorHandle={operatorHandle} />}
+                </Tab.Screen>
+                <Tab.Screen
+                    name="ChainFlow"
+                    options={{
+                        title: "ChainFlow",
+                        tabBarIcon: ({ color }) => <ChainFlowIcon color={color} />,
+                    }}
+                >
+                    {() => <ChainFlowScreen operatorHandle={operatorHandle} />}
+                </Tab.Screen>
+                <Tab.Screen
+                    name="Audit"
+                    component={AuditInsightsScreen}
+                    options={{
+                        title: "Audit",
+                        tabBarIcon: ({ color }) => <AuditIcon color={color} />,
+                    }}
+                />
+                <Tab.Screen
+                    name="Profile"
+                    options={{
+                        title: "Profile",
+                        tabBarIcon: ({ color }) => <ProfileIcon color={color} />,
+                    }}
+                >
+                    {() => <ProfileScreen operatorHandle={operatorHandle} />}
+                </Tab.Screen>
+            </Tab.Navigator>
+        </NavigationContainer>
     );
 }
 
@@ -139,7 +252,11 @@ export default function App(): React.ReactElement {
             }
             const handle = await resolveOperatorHandle();
             if (cancelled) return;
-            setBoot(handle ? { phase: "ready", operatorHandle: handle } : { phase: "provisioning" });
+            setBoot(
+                handle
+                    ? { phase: "ready", operatorHandle: handle }
+                    : { phase: "provisioning" },
+            );
         };
         void bootstrap();
         return () => {
@@ -162,7 +279,7 @@ export default function App(): React.ReactElement {
                 <View style={styles.loading}>
                     <StatusBar style="light" />
                     <Text style={styles.bootEyebrow}>SYSTEM BOOTSTRAP</Text>
-                    <ActivityIndicator color={T.emerald} />
+                    <ActivityIndicator color={T.teal} />
                     <Text style={styles.loadingText}>Bootstrapping…</Text>
                 </View>
             </SafeAreaProvider>
@@ -174,7 +291,9 @@ export default function App(): React.ReactElement {
             <SafeAreaProvider>
                 <StatusBar style="light" />
                 <OperatorProvisioningScreen
-                    onProvisioned={(handle) => setBoot({ phase: "ready", operatorHandle: handle })}
+                    onProvisioned={(handle) =>
+                        setBoot({ phase: "ready", operatorHandle: handle })
+                    }
                 />
             </SafeAreaProvider>
         );
@@ -184,60 +303,7 @@ export default function App(): React.ReactElement {
         <SafeAreaProvider>
             <StatusBar style="light" />
             <PipelineProvider>
-                <NavigationContainer theme={NAV_THEME}>
-                    <Tab.Navigator
-                        screenOptions={{
-                            headerStyle: { backgroundColor: T.bgSurface },
-                            headerTintColor: T.tx1,
-                            headerTitleStyle: {
-                                fontFamily: T.fontMono,
-                                fontWeight: "700",
-                                letterSpacing: 0.6,
-                            },
-                            tabBarStyle: {
-                                backgroundColor: T.bgSurface,
-                                borderTopColor: T.bdDim,
-                                height: 68,
-                                paddingBottom: 14,
-                            },
-                            tabBarActiveTintColor: T.emerald,
-                            tabBarInactiveTintColor: T.tx3,
-                            tabBarLabelStyle: {
-                                fontFamily: T.fontMono,
-                                fontSize: 9,
-                                fontWeight: "700",
-                                letterSpacing: 0.8,
-                            },
-                        }}
-                    >
-                        <Tab.Screen
-                            name="Dashboard"
-                            options={{
-                                title: "Dashboard",
-                                tabBarIcon: ({ color }) => <DashboardIcon color={color} />,
-                            }}
-                        >
-                            {() => <DashboardScreen operatorHandle={boot.operatorHandle} />}
-                        </Tab.Screen>
-                        <Tab.Screen
-                            name="Execution"
-                            options={{
-                                title: "Execution",
-                                tabBarIcon: ({ color }) => <ExecutionTabIcon color={color} />,
-                            }}
-                        >
-                            {() => <ExecutionScreen operatorHandle={boot.operatorHandle} />}
-                        </Tab.Screen>
-                        <Tab.Screen
-                            name="Audit"
-                            component={AuditInsightsScreen}
-                            options={{
-                                title: "Audit & Insights",
-                                tabBarIcon: ({ color }) => <AuditIcon color={color} />,
-                            }}
-                        />
-                    </Tab.Navigator>
-                </NavigationContainer>
+                <Tabs operatorHandle={boot.operatorHandle} />
             </PipelineProvider>
         </SafeAreaProvider>
     );
@@ -246,20 +312,19 @@ export default function App(): React.ReactElement {
 const styles = StyleSheet.create({
     loading: {
         flex: 1,
-        backgroundColor: T.bgBase,
+        backgroundColor: T.bgBaseV2,
         alignItems: "center",
         justifyContent: "center",
     },
     bootEyebrow: {
-        color: T.tx3,
-        fontFamily: T.fontMono,
+        color: T.tx3V2,
         fontSize: 9,
         letterSpacing: 1.2,
         marginBottom: 14,
+        fontWeight: "700",
     },
     loadingText: {
-        color: T.tx3,
-        fontFamily: T.fontMono,
+        color: T.tx3V2,
         fontSize: 12,
         marginTop: 12,
     },

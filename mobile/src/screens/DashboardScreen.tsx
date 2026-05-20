@@ -12,13 +12,14 @@ import {
     TextInput,
     View,
 } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
+import { LinearGradient } from "expo-linear-gradient";
 import { useNavigation } from "@react-navigation/native";
 import type { BottomTabNavigationProp } from "@react-navigation/bottom-tabs";
 
 import { usePipelineContext } from "@/context/PipelineContext";
-import { DashboardMetrics } from "@/components/DashboardMetrics";
-import { StagedSourceCard } from "@/components/StagedSourceCard";
-import { StatusBadge } from "@/components/StatusBadge";
+import { GradientBorderCard } from "@/components/GradientBorderCard";
+import { PillBadge } from "@/components/PillBadge";
 import {
     IngestionError,
     addTextSnippet,
@@ -30,7 +31,7 @@ import {
 import type { RootTabParamList } from "@/navigation/types";
 import { T } from "@/lib/theme";
 
-type Tab = "file" | "url" | "text";
+type Tab = "FILE" | "URL" | "TEXT";
 
 interface Props {
     operatorHandle: string;
@@ -40,14 +41,13 @@ export function DashboardScreen({ operatorHandle }: Props): React.ReactElement {
     const pipeline = usePipelineContext();
     const navigation = useNavigation<BottomTabNavigationProp<RootTabParamList>>();
 
-    const [demoMode, setDemoMode] = useState(false);
-    const [tab, setTab] = useState<Tab>("file");
+    const [tab, setTab] = useState<Tab>("FILE");
     const [queue, setQueue] = useState<StagedSource[]>([]);
     const [urlDraft, setUrlDraft] = useState("");
     const [textDraft, setTextDraft] = useState("");
+    const [promptDraft, setPromptDraft] = useState("");
+    const [demoMode, setDemoMode] = useState(false);
     const [dismissedMsg, setDismissedMsg] = useState<string | null>(null);
-    const [urlFocused, setUrlFocused] = useState(false);
-    const [textFocused, setTextFocused] = useState(false);
 
     const visibleError =
         pipeline.lastError && pipeline.lastError.message !== dismissedMsg
@@ -77,62 +77,88 @@ export function DashboardScreen({ operatorHandle }: Props): React.ReactElement {
             setQueue((q) => [...q, addTextSnippet(textDraft)]);
             setTextDraft("");
         } catch (err: unknown) {
-            Alert.alert("Invalid snippet", err instanceof IngestionError ? err.message : String(err));
+            Alert.alert(
+                "Invalid snippet",
+                err instanceof IngestionError ? err.message : String(err),
+            );
         }
     };
 
     const remove = (id: string): void => setQueue((q) => q.filter((s) => s.id !== id));
 
-    const launchStaged = async (): Promise<void> => {
+    const launch = async (): Promise<void> => {
+        if (demoMode) {
+            const id = await pipeline.startDemo();
+            if (id) navigation.navigate("Execution");
+            return;
+        }
         if (queue.length === 0) return;
         const id = await pipeline.start(toRawSources(queue));
         if (id) {
             setQueue([]);
+            setPromptDraft("");
             navigation.navigate("Execution");
         }
     };
 
-    const launchDemo = async (): Promise<void> => {
-        const id = await pipeline.startDemo();
-        if (id) navigation.navigate("Execution");
-    };
+    const launchDisabled =
+        pipeline.isStarting || (!demoMode && queue.length === 0);
+
+    const headerInitial = (operatorHandle || "?").charAt(0).toUpperCase();
 
     return (
-        <KeyboardAvoidingView
-            style={styles.root}
-            behavior={Platform.OS === "ios" ? "padding" : undefined}
-        >
-            <ScrollView
-                style={styles.scroll}
-                contentContainerStyle={styles.scrollContent}
-                keyboardShouldPersistTaps="handled"
+        <SafeAreaView edges={["top"]} style={styles.safe}>
+            <KeyboardAvoidingView
+                style={styles.root}
+                behavior={Platform.OS === "ios" ? "padding" : undefined}
             >
-                {/* ── Header ───────────────────────────── */}
-                <View style={styles.header}>
-                    <View style={styles.headerCol}>
-                        <Text style={styles.eyebrow}>OPERATOR</Text>
-                        <Text style={styles.operator} numberOfLines={1}>
-                            {operatorHandle}
+                <ScrollView
+                    style={styles.scroll}
+                    contentContainerStyle={styles.scrollContent}
+                    keyboardShouldPersistTaps="handled"
+                >
+                    {/* ── App header row ─────────────────────── */}
+                    <View style={styles.appHeader}>
+                        <Pressable style={styles.headerIconBtn} hitSlop={8}>
+                            <Text style={styles.headerIconGlyph}>≡</Text>
+                        </Pressable>
+                        <View style={styles.headerLogoRow}>
+                            <Text style={styles.headerLogoBolt}>⚡</Text>
+                            <Text style={styles.headerLogo}>ChainFlow</Text>
+                        </View>
+                        <View style={styles.headerRight}>
+                            <Pressable style={styles.headerIconBtn} hitSlop={8}>
+                                <Text style={styles.headerIconGlyph}>🕐</Text>
+                            </Pressable>
+                            <View style={styles.headerAvatar}>
+                                <Text style={styles.headerAvatarText}>{headerInitial}</Text>
+                            </View>
+                        </View>
+                    </View>
+
+                    {/* ── Greeting ───────────────────────────── */}
+                    <View style={styles.greetingBlock}>
+                        <Text style={styles.greeting}>Hello, {operatorHandle}</Text>
+                        <Text style={styles.greetingSub}>
+                            What workflow shall we orchestrate today?
                         </Text>
                     </View>
+
+                    {/* ── Active pipeline pill ───────────────── */}
                     {pipeline.pipelineId ? (
-                        <View style={styles.headerCol}>
-                            <Text style={styles.eyebrow}>ACTIVE PIPELINE</Text>
-                            <View style={styles.activeRow}>
-                                <StatusBadge status={pipeline.derivedStatus} />
-                            </View>
-                            <Text style={styles.pipelineId} numberOfLines={1}>
+                        <View style={styles.activePipelineRow}>
+                            <PillBadge
+                                label={pipeline.derivedStatus}
+                                color={statusColor(pipeline.derivedStatus)}
+                                dot
+                            />
+                            <Text style={styles.activePipelineId} numberOfLines={1}>
                                 {pipeline.pipelineId}
                             </Text>
                         </View>
                     ) : null}
-                </View>
 
-                <DashboardMetrics receipts={pipeline.ledgerReceipts} />
-
-                <View style={styles.stagingSection}>
-                    <Text style={styles.sectionHeading}>LAUNCH PIPELINE</Text>
-
+                    {/* ── Error banner ───────────────────────── */}
                     {visibleError ? (
                         <View style={styles.errorBox}>
                             <Text style={styles.errorIcon}>⚠</Text>
@@ -150,121 +176,97 @@ export function DashboardScreen({ operatorHandle }: Props): React.ReactElement {
                         </View>
                     ) : null}
 
-                    <View style={styles.demoBox}>
+                    {/* ── Pipeline Configuration section ─────── */}
+                    <Text style={styles.sectionEyebrow}>PIPELINE CONFIGURATION</Text>
+
+                    <View style={styles.tabRow}>
+                        {(["FILE", "URL", "TEXT"] as Tab[]).map((t) => {
+                            const active = tab === t;
+                            return (
+                                <Pressable
+                                    key={t}
+                                    style={[styles.tabBtn, active && styles.tabBtnActive]}
+                                    onPress={() => setTab(t)}
+                                >
+                                    <Text
+                                        style={[styles.tabText, active && styles.tabTextActive]}
+                                    >
+                                        {t}
+                                    </Text>
+                                </Pressable>
+                            );
+                        })}
+                    </View>
+
+                    {/* ── Tab body ───────────────────────────── */}
+                    <View style={styles.tabBody}>
+                        {tab === "FILE" ? (
+                            <Pressable style={styles.dropZone} onPress={addFile}>
+                                <Text style={styles.dropArrow}>⬆</Text>
+                                <Text style={styles.dropTitle}>Pick a file</Text>
+                                <Text style={styles.dropSubtitle}>PDF / CSV / TXT / JSON</Text>
+                            </Pressable>
+                        ) : tab === "URL" ? (
+                            <View style={styles.row}>
+                                <TextInput
+                                    style={styles.input}
+                                    value={urlDraft}
+                                    onChangeText={setUrlDraft}
+                                    placeholder="https://…"
+                                    placeholderTextColor={T.tx3V2}
+                                    autoCapitalize="none"
+                                    autoCorrect={false}
+                                />
+                                <Pressable style={styles.addBtn} onPress={addUrlEntry}>
+                                    <Text style={styles.addBtnText}>ADD</Text>
+                                </Pressable>
+                            </View>
+                        ) : (
+                            <View style={styles.col}>
+                                <TextInput
+                                    style={[styles.input, styles.inputMulti]}
+                                    value={textDraft}
+                                    onChangeText={setTextDraft}
+                                    placeholder="Paste a text snippet…"
+                                    placeholderTextColor={T.tx3V2}
+                                    multiline
+                                />
+                                <Pressable style={styles.addBtn} onPress={addTextEntry}>
+                                    <Text style={styles.addBtnText}>ADD SNIPPET</Text>
+                                </Pressable>
+                            </View>
+                        )}
+                    </View>
+
+                    {/* ── Demo toggle ────────────────────────── */}
+                    <View style={styles.demoRow}>
                         <View style={styles.demoTextCol}>
                             <Text style={styles.demoTitle}>Diagnostic / Demo Mode</Text>
                             <Text style={styles.demoBody}>
-                                Submit empty payload — backend uses disk-fallback ingestion.
+                                Skip ingestion — backend uses disk-fallback payload.
                             </Text>
                         </View>
                         <Switch
                             value={demoMode}
                             onValueChange={setDemoMode}
                             disabled={pipeline.isStarting}
-                            trackColor={{ true: T.emerald, false: T.bdBright }}
-                            thumbColor={T.bgBase}
+                            trackColor={{ true: T.teal, false: T.bdBrightV2 }}
+                            thumbColor={T.bgBaseV2}
                         />
                     </View>
 
-                    {demoMode ? (
-                        <Pressable
-                            style={[
-                                styles.btn,
-                                styles.btnDemo,
-                                pipeline.isStarting && styles.btnDisabled,
-                            ]}
-                            onPress={launchDemo}
-                            disabled={pipeline.isStarting}
-                        >
-                            {pipeline.isStarting ? (
-                                <ActivityIndicator color={T.bgBase} />
-                            ) : (
-                                <Text style={styles.btnText}>
-                                    Launch demo run (disk fallback)
-                                </Text>
-                            )}
-                        </Pressable>
-                    ) : (
+                    {/* ── Staged queue ───────────────────────── */}
+                    {!demoMode ? (
                         <>
-                            <View style={styles.tabs}>
-                                {(["file", "url", "text"] as Tab[]).map((t) => {
-                                    const active = tab === t;
-                                    return (
-                                        <Pressable
-                                            key={t}
-                                            style={[styles.tab, active && styles.tabActive]}
-                                            onPress={() => setTab(t)}
-                                        >
-                                            <Text
-                                                style={[
-                                                    styles.tabText,
-                                                    active && styles.tabTextActive,
-                                                ]}
-                                            >
-                                                {t.toUpperCase()}
-                                            </Text>
-                                        </Pressable>
-                                    );
-                                })}
-                            </View>
-
-                            <View style={styles.tabBody}>
-                                {tab === "file" ? (
-                                    <Pressable style={styles.pickerBtn} onPress={addFile}>
-                                        <Text style={styles.pickerBtnText}>
-                                            Pick a file (PDF / CSV / TXT / JSON)
-                                        </Text>
-                                    </Pressable>
-                                ) : tab === "url" ? (
-                                    <View style={styles.row}>
-                                        <TextInput
-                                            style={[
-                                                styles.input,
-                                                urlFocused && styles.inputFocused,
-                                            ]}
-                                            value={urlDraft}
-                                            onChangeText={setUrlDraft}
-                                            placeholder="https://…"
-                                            placeholderTextColor={T.tx3}
-                                            autoCapitalize="none"
-                                            autoCorrect={false}
-                                            onFocus={() => setUrlFocused(true)}
-                                            onBlur={() => setUrlFocused(false)}
-                                        />
-                                        <Pressable style={styles.addBtn} onPress={addUrlEntry}>
-                                            <Text style={styles.addBtnText}>ADD</Text>
-                                        </Pressable>
-                                    </View>
-                                ) : (
-                                    <View style={styles.col}>
-                                        <TextInput
-                                            style={[
-                                                styles.input,
-                                                styles.inputMulti,
-                                                textFocused && styles.inputFocused,
-                                            ]}
-                                            value={textDraft}
-                                            onChangeText={setTextDraft}
-                                            placeholder="Paste a text snippet…"
-                                            placeholderTextColor={T.tx3}
-                                            multiline
-                                            onFocus={() => setTextFocused(true)}
-                                            onBlur={() => setTextFocused(false)}
-                                        />
-                                        <Pressable style={styles.addBtn} onPress={addTextEntry}>
-                                            <Text style={styles.addBtnText}>ADD</Text>
-                                        </Pressable>
-                                    </View>
-                                )}
-                            </View>
-
-                            <Text style={styles.queueLabel}>QUEUE · {queue.length}</Text>
+                            <Text style={styles.queueLabel}>
+                                STAGED SOURCES · {queue.length}
+                            </Text>
                             {queue.length === 0 ? (
                                 <Text style={styles.queueEmpty}>No sources staged yet.</Text>
                             ) : (
-                                <View style={styles.queue}>
+                                <View>
                                     {queue.map((s) => (
-                                        <StagedSourceCard
+                                        <QueueItem
                                             key={s.id}
                                             source={s}
                                             onRemove={() => remove(s.id)}
@@ -272,87 +274,223 @@ export function DashboardScreen({ operatorHandle }: Props): React.ReactElement {
                                     ))}
                                 </View>
                             )}
-
-                            <Pressable
-                                style={[
-                                    styles.btn,
-                                    styles.btnLaunch,
-                                    (queue.length === 0 || pipeline.isStarting) &&
-                                        styles.btnDisabled,
-                                ]}
-                                onPress={launchStaged}
-                                disabled={queue.length === 0 || pipeline.isStarting}
-                            >
-                                {pipeline.isStarting ? (
-                                    <ActivityIndicator color={T.bgBase} />
-                                ) : (
-                                    <Text style={styles.btnText}>Launch Pipeline</Text>
-                                )}
-                            </Pressable>
                         </>
-                    )}
-                </View>
-            </ScrollView>
-        </KeyboardAvoidingView>
+                    ) : null}
+
+                    {/* ── Prompt input bar with gradient border ─ */}
+                    <View style={styles.promptWrap}>
+                        <GradientBorderCard
+                            colors={T.gradBlue}
+                            radius={28}
+                            thickness={1.5}
+                            innerStyle={styles.promptInner}
+                        >
+                            <View style={styles.promptRow}>
+                                <View style={styles.promptBadge}>
+                                    <Text style={styles.promptBadgeText}>
+                                        {demoMode ? "DEMO" : tab}
+                                    </Text>
+                                </View>
+                                <TextInput
+                                    style={styles.promptInput}
+                                    value={promptDraft}
+                                    onChangeText={setPromptDraft}
+                                    placeholder="Describe your workflow intent…"
+                                    placeholderTextColor={T.tx3V2}
+                                />
+                                <Pressable style={styles.promptIconBtn} hitSlop={6}>
+                                    <Text style={styles.promptIconGlyph}>🎙</Text>
+                                </Pressable>
+                                <Pressable style={styles.promptIconBtn} hitSlop={6}>
+                                    <Text style={styles.promptIconGlyph}>＋</Text>
+                                </Pressable>
+                            </View>
+                        </GradientBorderCard>
+                    </View>
+
+                    {/* ── Launch Pipeline CTA ────────────────── */}
+                    <Pressable
+                        onPress={launch}
+                        disabled={launchDisabled}
+                        style={[styles.launchOuter, launchDisabled && styles.launchDisabled]}
+                    >
+                        <LinearGradient
+                            colors={T.gradCta as readonly [string, string, string]}
+                            start={{ x: 0, y: 0 }}
+                            end={{ x: 1, y: 0 }}
+                            style={styles.launchInner}
+                        >
+                            {pipeline.isStarting ? (
+                                <ActivityIndicator color="#fff" />
+                            ) : (
+                                <Text style={styles.launchText}>Launch Pipeline ⚡</Text>
+                            )}
+                        </LinearGradient>
+                    </Pressable>
+
+                    <Text style={styles.statusItalic}>
+                        Awaiting active payload for full diagnostic ingestion…
+                    </Text>
+                </ScrollView>
+            </KeyboardAvoidingView>
+        </SafeAreaView>
     );
 }
 
+// ──────────────────────────────────────────────────────────
+// Queue item — inline so it picks up v2 theme
+// ──────────────────────────────────────────────────────────
+function QueueItem({
+    source,
+    onRemove,
+}: {
+    source: StagedSource;
+    onRemove: () => void;
+}): React.ReactElement {
+    return (
+        <View style={styles.queueCard}>
+            <View style={styles.queueBody}>
+                <View style={styles.queueHeaderRow}>
+                    <View style={styles.queueTypePill}>
+                        <Text style={styles.queueTypeText}>
+                            {source.sourceType.toUpperCase()}
+                        </Text>
+                    </View>
+                    <Text style={styles.queueSize}>{formatBytes(source.sizeBytes)}</Text>
+                </View>
+                <Text style={styles.queueName} numberOfLines={1}>
+                    {source.displayName}
+                </Text>
+                <Text style={styles.queueId}>{source.id}</Text>
+            </View>
+            <Pressable onPress={onRemove} style={styles.queueRemove} hitSlop={8}>
+                <Text style={styles.queueRemoveText}>✕</Text>
+            </Pressable>
+        </View>
+    );
+}
+
+function formatBytes(n: number): string {
+    if (n < 1024) return `${n} B`;
+    if (n < 1024 * 1024) return `${(n / 1024).toFixed(1)} KB`;
+    return `${(n / 1024 / 1024).toFixed(2)} MB`;
+}
+
+function statusColor(s: string): string {
+    switch (s) {
+        case "EXECUTING":
+            return T.teal;
+        case "POLLING_COMPLETED":
+            return T.green;
+        case "HITL_PENDING":
+            return T.amber;
+        case "REJECTED":
+            return T.violet;
+        case "FAILED":
+            return T.crimson;
+        case "PROCESSING":
+            return T.blue;
+        default:
+            return T.tx2V2;
+    }
+}
+
 const styles = StyleSheet.create({
-    root: { flex: 1, backgroundColor: T.bgBase },
+    safe: { flex: 1, backgroundColor: T.bgBaseV2 },
+    root: { flex: 1, backgroundColor: T.bgBaseV2 },
     scroll: { flex: 1 },
-    scrollContent: { paddingBottom: 24 },
+    scrollContent: { paddingHorizontal: 18, paddingBottom: 40 },
 
-    // ── Header ──
-    header: {
+    // ── App header ──
+    appHeader: {
         flexDirection: "row",
+        alignItems: "center",
         justifyContent: "space-between",
-        gap: 12,
-        backgroundColor: T.bgSurface,
-        borderBottomWidth: 1,
-        borderBottomColor: T.bdDim,
-        paddingHorizontal: 14,
-        paddingVertical: 12,
+        paddingTop: 6,
+        paddingBottom: 14,
     },
-    headerCol: { flex: 1 },
-    eyebrow: {
-        color: T.tx3,
-        fontFamily: T.fontMono,
-        fontSize: 9,
-        textTransform: "uppercase",
-        letterSpacing: 1.0,
+    headerIconBtn: {
+        width: 36,
+        height: 36,
+        borderRadius: 18,
+        backgroundColor: T.bgSurfaceV2,
+        borderWidth: 1,
+        borderColor: T.bdDimV2,
+        alignItems: "center",
+        justifyContent: "center",
     },
-    operator: {
-        color: T.tx1,
-        fontFamily: T.fontMono,
+    headerIconGlyph: {
+        color: T.tx2V2,
+        fontSize: 16,
+    },
+    headerLogoRow: {
+        flexDirection: "row",
+        alignItems: "center",
+        gap: 6,
+    },
+    headerLogoBolt: {
+        color: T.teal,
+        fontSize: 16,
+    },
+    headerLogo: {
+        color: T.tx1V2,
+        fontSize: 16,
+        fontWeight: "800",
+        letterSpacing: -0.3,
+    },
+    headerRight: {
+        flexDirection: "row",
+        alignItems: "center",
+        gap: 8,
+    },
+    headerAvatar: {
+        width: 36,
+        height: 36,
+        borderRadius: 18,
+        backgroundColor: T.tealDim,
+        borderWidth: 1,
+        borderColor: T.tealBd,
+        alignItems: "center",
+        justifyContent: "center",
+    },
+    headerAvatarText: {
+        color: T.teal,
+        fontSize: 14,
+        fontWeight: "800",
+    },
+
+    // ── Greeting ──
+    greetingBlock: {
+        marginBottom: 18,
+    },
+    greeting: {
+        color: T.tx1V2,
+        fontSize: 30,
+        fontWeight: "800",
+        letterSpacing: -0.5,
+    },
+    greetingSub: {
+        color: T.tx2V2,
         fontSize: 13,
-        fontWeight: "700",
-        marginTop: 2,
-    },
-    activeRow: { marginTop: 4 },
-    pipelineId: {
-        color: T.tx3,
-        fontFamily: T.fontMono,
-        fontSize: 9,
-        marginTop: 3,
+        marginTop: 6,
+        lineHeight: 18,
     },
 
-    // ── Staging ──
-    stagingSection: {
-        paddingHorizontal: 12,
-        paddingTop: 8,
-        paddingBottom: 4,
+    // ── Active pipeline ──
+    activePipelineRow: {
+        flexDirection: "row",
+        alignItems: "center",
+        gap: 8,
+        marginBottom: 14,
     },
-    sectionHeading: {
-        color: T.tx3,
+    activePipelineId: {
+        color: T.tx3V2,
         fontFamily: T.fontMono,
-        fontSize: 9,
-        fontWeight: "700",
-        letterSpacing: 1.2,
-        textTransform: "uppercase",
-        marginBottom: 10,
+        fontSize: 11,
+        flexShrink: 1,
     },
 
-    // ── Error box ──
+    // ── Error ──
     errorBox: {
         flexDirection: "row",
         alignItems: "center",
@@ -363,28 +501,23 @@ const styles = StyleSheet.create({
         borderRadius: T.rMd,
         paddingHorizontal: 12,
         paddingVertical: 10,
-        marginBottom: 10,
+        marginBottom: 14,
     },
     errorIcon: {
         color: T.crimson,
         fontSize: 16,
-        fontFamily: T.fontMono,
         fontWeight: "700",
     },
-    errorTextCol: {
-        flex: 1,
-    },
+    errorTextCol: { flex: 1 },
     errorTitle: {
         color: T.crimson,
-        fontFamily: T.fontMono,
         fontSize: 10,
-        fontWeight: "700",
+        fontWeight: "800",
         letterSpacing: 0.6,
         marginBottom: 2,
     },
     errorBody: {
         color: T.crimson,
-        fontFamily: T.fontMono,
         fontSize: 11,
     },
     errorDismiss: {
@@ -399,152 +532,293 @@ const styles = StyleSheet.create({
         fontWeight: "700",
     },
 
-    // ── Demo box ──
-    demoBox: {
-        flexDirection: "row",
-        alignItems: "center",
-        backgroundColor: T.bgSurface,
-        borderWidth: 1,
-        borderColor: T.bdDim,
-        borderRadius: T.rMd,
-        paddingHorizontal: 12,
-        paddingVertical: 10,
-        marginBottom: 12,
-    },
-    demoTextCol: { flex: 1, paddingRight: 12 },
-    demoTitle: {
-        color: T.amber,
-        fontFamily: T.fontMono,
-        fontSize: 11,
-        fontWeight: "700",
-    },
-    demoBody: {
-        color: T.tx3,
-        fontFamily: T.fontMono,
+    // ── Section eyebrow ──
+    sectionEyebrow: {
+        color: T.tx3V2,
         fontSize: 10,
-        marginTop: 2,
+        fontWeight: "700",
+        letterSpacing: 1.2,
+        textTransform: "uppercase",
+        marginBottom: 10,
     },
 
-    // ── Source tabs ──
-    tabs: {
+    // ── Tab row ──
+    tabRow: {
         flexDirection: "row",
-        gap: 4,
-        marginBottom: 8,
+        gap: 8,
+        marginBottom: 12,
     },
-    tab: {
+    tabBtn: {
         flex: 1,
-        paddingVertical: 8,
-        backgroundColor: T.bgSurface,
+        paddingVertical: 10,
         alignItems: "center",
         borderBottomWidth: 2,
-        borderBottomColor: "transparent",
+        borderBottomColor: T.bdDimV2,
         minHeight: 44,
         justifyContent: "center",
     },
-    tabActive: {
-        backgroundColor: T.bgElevated,
+    tabBtnActive: {
         borderBottomColor: T.blue,
     },
     tabText: {
-        color: T.tx3,
-        fontFamily: T.fontMono,
-        fontSize: 10,
+        color: T.tx3V2,
+        fontSize: 11,
         fontWeight: "700",
-        letterSpacing: 0.6,
+        letterSpacing: 0.8,
     },
     tabTextActive: {
-        color: T.tx1,
+        color: T.tx1V2,
     },
-    tabBody: { marginBottom: 12 },
+    tabBody: {
+        marginBottom: 14,
+    },
 
-    // ── File picker + inputs ──
-    pickerBtn: {
-        backgroundColor: T.bgSurface,
+    // ── Drop zone ──
+    dropZone: {
+        backgroundColor: T.bgSurfaceV2,
         borderWidth: 1,
         borderStyle: "dashed",
-        borderColor: T.bdBright,
-        borderRadius: T.rMd,
-        padding: 14,
+        borderColor: T.bdBrightV2,
+        borderRadius: T.rLg,
+        paddingVertical: 30,
+        paddingHorizontal: 14,
         alignItems: "center",
     },
-    pickerBtnText: {
-        color: T.blue,
-        fontFamily: T.fontMono,
-        fontSize: 11,
-        fontWeight: "600",
+    dropArrow: {
+        color: T.teal,
+        fontSize: 28,
+        marginBottom: 8,
     },
-    row: { flexDirection: "row", gap: 6 },
-    col: { gap: 6 },
+    dropTitle: {
+        color: T.tx1V2,
+        fontSize: 14,
+        fontWeight: "700",
+    },
+    dropSubtitle: {
+        color: T.tx3V2,
+        fontSize: 11,
+        marginTop: 4,
+        letterSpacing: 0.4,
+    },
+
+    // ── Inputs ──
+    row: { flexDirection: "row", gap: 8 },
+    col: { gap: 8 },
     input: {
         flex: 1,
         backgroundColor: T.bgInput,
         borderWidth: 1,
-        borderColor: T.bdDefault,
-        borderRadius: T.rSm,
-        color: T.tx1,
-        fontFamily: T.fontMono,
-        fontSize: 11,
-        paddingHorizontal: 10,
-        paddingVertical: 9,
+        borderColor: T.bdDefaultV2,
+        borderRadius: T.rMd,
+        color: T.tx1V2,
+        fontSize: 13,
+        paddingHorizontal: 12,
+        paddingVertical: 10,
+        minHeight: 44,
     },
-    inputFocused: {
-        borderColor: T.blue,
+    inputMulti: {
+        minHeight: 90,
+        textAlignVertical: "top",
     },
-    inputMulti: { minHeight: 80, textAlignVertical: "top" },
     addBtn: {
-        backgroundColor: T.bgElevated,
+        backgroundColor: T.bgElevatedV2,
         borderWidth: 1,
-        borderColor: T.bdBright,
-        borderRadius: T.rSm,
-        paddingHorizontal: 14,
-        paddingVertical: 9,
+        borderColor: T.bdBrightV2,
+        borderRadius: T.rMd,
+        paddingHorizontal: 16,
+        paddingVertical: 10,
         justifyContent: "center",
         alignItems: "center",
         minHeight: 44,
     },
     addBtnText: {
-        color: T.tx1,
-        fontFamily: T.fontMono,
+        color: T.tx1V2,
         fontSize: 11,
-        fontWeight: "700",
+        fontWeight: "800",
         letterSpacing: 0.6,
+    },
+
+    // ── Demo toggle ──
+    demoRow: {
+        flexDirection: "row",
+        alignItems: "center",
+        backgroundColor: T.bgSurfaceV2,
+        borderWidth: 1,
+        borderColor: T.bdDimV2,
+        borderRadius: T.rMd,
+        paddingHorizontal: 12,
+        paddingVertical: 10,
+        marginBottom: 14,
+    },
+    demoTextCol: { flex: 1, paddingRight: 10 },
+    demoTitle: {
+        color: T.amber,
+        fontSize: 12,
+        fontWeight: "800",
+    },
+    demoBody: {
+        color: T.tx3V2,
+        fontSize: 11,
+        marginTop: 2,
+        lineHeight: 15,
     },
 
     // ── Queue ──
     queueLabel: {
-        color: T.tx3,
-        fontFamily: T.fontMono,
-        fontSize: 9,
+        color: T.tx3V2,
+        fontSize: 10,
+        fontWeight: "700",
+        letterSpacing: 1.0,
         textTransform: "uppercase",
-        letterSpacing: 0.6,
         marginBottom: 6,
     },
-    queue: {},
     queueEmpty: {
-        color: T.tx3,
-        fontFamily: T.fontMono,
+        color: T.tx3V2,
         fontSize: 11,
         textAlign: "center",
-        paddingVertical: 12,
+        paddingVertical: 8,
+        fontStyle: "italic",
     },
-
-    // ── Launch buttons ──
-    btn: {
+    queueCard: {
+        flexDirection: "row",
+        alignItems: "center",
+        gap: 10,
+        backgroundColor: T.bgSurfaceV2,
         borderRadius: T.rMd,
-        paddingVertical: 14,
+        borderWidth: 1,
+        borderColor: T.bdDimV2,
+        paddingHorizontal: 12,
+        paddingVertical: 10,
+        marginBottom: 6,
+    },
+    queueBody: { flex: 1 },
+    queueHeaderRow: {
+        flexDirection: "row",
+        justifyContent: "space-between",
+        alignItems: "center",
+        marginBottom: 4,
+    },
+    queueTypePill: {
+        backgroundColor: T.blueDim,
+        borderWidth: 1,
+        borderColor: T.blueBd,
+        borderRadius: T.rFull,
+        paddingHorizontal: 8,
+        paddingVertical: 1,
+    },
+    queueTypeText: {
+        color: T.blue,
+        fontSize: 9,
+        fontWeight: "800",
+        letterSpacing: 0.5,
+    },
+    queueSize: {
+        color: T.tx3V2,
+        fontFamily: T.fontMono,
+        fontSize: 10,
+    },
+    queueName: {
+        color: T.tx1V2,
+        fontSize: 12.5,
+        fontWeight: "600",
+    },
+    queueId: {
+        color: T.tx3V2,
+        fontFamily: T.fontMono,
+        fontSize: 9,
+        marginTop: 2,
+    },
+    queueRemove: {
+        width: 32,
+        height: 32,
+        borderRadius: 16,
+        backgroundColor: T.crimsonDim,
+        borderWidth: 1,
+        borderColor: T.crimsonBd,
         alignItems: "center",
         justifyContent: "center",
-        marginTop: 8,
-        minHeight: 44,
     },
-    btnLaunch: { backgroundColor: T.emerald },
-    btnDemo: { backgroundColor: T.amber },
-    btnDisabled: { opacity: 0.35 },
-    btnText: {
-        color: T.bgBase,
-        fontFamily: T.fontMono,
-        fontWeight: "700",
+    queueRemoveText: {
+        color: T.crimson,
+        fontSize: 14,
+        fontWeight: "800",
+    },
+
+    // ── Prompt bar ──
+    promptWrap: {
+        marginTop: 18,
+        marginBottom: 14,
+    },
+    promptInner: {
+        backgroundColor: T.bgSurfaceV2,
+        borderRadius: 26.5,
+        paddingHorizontal: 10,
+        paddingVertical: 6,
+    },
+    promptRow: {
+        flexDirection: "row",
+        alignItems: "center",
+        gap: 6,
+    },
+    promptBadge: {
+        backgroundColor: T.tealDim,
+        borderWidth: 1,
+        borderColor: T.tealBd,
+        borderRadius: T.rFull,
+        paddingHorizontal: 10,
+        paddingVertical: 4,
+    },
+    promptBadgeText: {
+        color: T.teal,
+        fontSize: 10,
+        fontWeight: "800",
+        letterSpacing: 0.6,
+    },
+    promptInput: {
+        flex: 1,
+        color: T.tx1V2,
         fontSize: 13,
+        paddingVertical: 6,
+        paddingHorizontal: 4,
+        minHeight: 38,
+    },
+    promptIconBtn: {
+        width: 32,
+        height: 32,
+        borderRadius: 16,
+        alignItems: "center",
+        justifyContent: "center",
+    },
+    promptIconGlyph: {
+        fontSize: 14,
+    },
+
+    // ── Launch CTA ──
+    launchOuter: {
+        borderRadius: T.rLg,
+        overflow: "hidden",
+    },
+    launchInner: {
+        paddingVertical: 16,
+        alignItems: "center",
+        justifyContent: "center",
+        minHeight: 52,
+    },
+    launchDisabled: {
+        opacity: 0.45,
+    },
+    launchText: {
+        color: "#fff",
+        fontSize: 16,
+        fontWeight: "800",
         letterSpacing: 0.4,
+    },
+
+    statusItalic: {
+        color: T.tx3V2,
+        fontStyle: "italic",
+        fontSize: 11,
+        textAlign: "center",
+        marginTop: 14,
     },
 });

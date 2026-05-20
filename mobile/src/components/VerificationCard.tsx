@@ -2,21 +2,43 @@ import React, { useState } from "react";
 import { Animated, Pressable, StyleSheet, Text, View } from "react-native";
 import * as Clipboard from "expo-clipboard";
 import type { FinalizedStatus, LedgerReceipt } from "@/types/execution";
+import { PillBadge } from "./PillBadge";
+import { GradientBorderCard } from "./GradientBorderCard";
 import { T } from "@/lib/theme";
 import { usePulse } from "@/lib/animations";
 
 interface StatusColor {
-    bd: string;
+    pillColor: string;
     pillBg: string;
-    pillFg: string;
-    glow: string;
+    pillBd: string;
+    gradient: readonly [string, string];
 }
 
 const STATUS_COLOR: Record<FinalizedStatus, StatusColor> = {
-    APPROVED_PASSED: { bd: T.emeraldBd, pillBg: T.emeraldDim, pillFg: T.emerald, glow: T.emerald },
-    APPROVED_PARTIAL: { bd: T.amberBd, pillBg: T.amberDim, pillFg: T.amber, glow: T.amber },
-    APPROVED_FAILED: { bd: T.crimsonBd, pillBg: T.crimsonDim, pillFg: T.crimson, glow: T.crimson },
-    REJECTED: { bd: T.violetBd, pillBg: T.violetDim, pillFg: T.violet, glow: T.violet },
+    APPROVED_PASSED: {
+        pillColor: T.green,
+        pillBg: T.greenDim,
+        pillBd: T.greenBd,
+        gradient: ["#18c864", "#0ea855"] as const,
+    },
+    APPROVED_PARTIAL: {
+        pillColor: T.amber,
+        pillBg: T.amberDim,
+        pillBd: T.amberBd,
+        gradient: ["#f0a020", "#a06010"] as const,
+    },
+    APPROVED_FAILED: {
+        pillColor: T.crimson,
+        pillBg: T.crimsonDim,
+        pillBd: T.crimsonBd,
+        gradient: ["#e83040", "#b02030"] as const,
+    },
+    REJECTED: {
+        pillColor: T.violet,
+        pillBg: T.violetDim,
+        pillBd: T.violetBd,
+        gradient: ["#9060f0", "#5030a0"] as const,
+    },
 };
 
 interface Props {
@@ -43,30 +65,24 @@ export function VerificationCard({ receipt }: Props): React.ReactElement {
     };
 
     return (
-        <View
-            style={[
-                styles.card,
-                {
-                    borderColor: cfg.bd,
-                    shadowColor: cfg.glow,
-                },
-            ]}
+        <GradientBorderCard
+            colors={cfg.gradient}
+            radius={T.rLg}
+            thickness={1}
+            style={styles.outer}
+            innerStyle={styles.inner}
         >
             <View style={styles.headerRow}>
                 <View style={styles.headerLeft}>
                     <Animated.View style={[styles.verifiedDot, { opacity: dotOpacity }]} />
                     <Text style={styles.heading}>LEDGER VERIFIED</Text>
                 </View>
-                <View
-                    style={[
-                        styles.statusPill,
-                        { backgroundColor: cfg.pillBg, borderColor: cfg.bd },
-                    ]}
-                >
-                    <Text style={[styles.statusText, { color: cfg.pillFg }]}>
-                        {receipt.finalized_status.replace(/_/g, " ")}
-                    </Text>
-                </View>
+                <PillBadge
+                    label={receipt.finalized_status.replace(/_/g, " ")}
+                    color={cfg.pillColor}
+                    bg={cfg.pillBg}
+                    border={cfg.pillBd}
+                />
             </View>
 
             <Text style={styles.pipelineId} numberOfLines={1}>
@@ -94,14 +110,12 @@ export function VerificationCard({ receipt }: Props): React.ReactElement {
                     onPress={copy}
                     hitSlop={6}
                 >
-                    <Text
-                        style={[styles.copyBtnText, copied && styles.copyBtnTextDone]}
-                    >
+                    <Text style={[styles.copyBtnText, copied && styles.copyBtnTextDone]}>
                         {copied ? "✓ COPIED" : "COPY HASH"}
                     </Text>
                 </Pressable>
             </View>
-        </View>
+        </GradientBorderCard>
     );
 }
 
@@ -123,16 +137,12 @@ function formatTime(iso: string): string {
 }
 
 const styles = StyleSheet.create({
-    card: {
-        backgroundColor: T.bgSurface,
-        borderRadius: T.rLg,
-        borderWidth: 1,
-        padding: 14,
+    outer: {
         marginBottom: 10,
-        shadowOffset: { width: 0, height: 4 },
-        shadowOpacity: 0.18,
-        shadowRadius: 12,
-        elevation: 4,
+    },
+    inner: {
+        backgroundColor: T.bgSurfaceV2,
+        padding: 14,
     },
     headerRow: {
         flexDirection: "row",
@@ -150,44 +160,29 @@ const styles = StyleSheet.create({
         width: 8,
         height: 8,
         borderRadius: 4,
-        backgroundColor: T.emerald,
+        backgroundColor: T.teal,
     },
     heading: {
-        color: T.emerald,
-        fontFamily: T.fontMono,
+        color: T.teal,
         fontSize: 10,
-        fontWeight: "700",
+        fontWeight: "800",
         letterSpacing: 0.6,
     },
-    statusPill: {
-        paddingHorizontal: 10,
-        paddingVertical: 3,
-        borderRadius: T.rFull,
-        borderWidth: 1,
-    },
-    statusText: {
-        fontFamily: T.fontMono,
-        fontSize: 10,
-        fontWeight: "700",
-        letterSpacing: 0.5,
-    },
     pipelineId: {
-        color: T.blue,
-        fontFamily: T.fontMono,
-        fontSize: 13,
-        fontWeight: "700",
-        marginTop: 10,
+        color: T.tx1V2,
+        fontSize: 16,
+        fontWeight: "800",
+        marginTop: 12,
     },
     auditId: {
-        color: T.tx3,
+        color: T.tx3V2,
         fontFamily: T.fontMono,
-        fontSize: 9,
+        fontSize: 10,
         marginTop: 2,
     },
     hashLabel: {
-        color: T.tx3,
-        fontFamily: T.fontMono,
-        fontSize: 9,
+        color: T.tx3V2,
+        fontSize: 10,
         fontWeight: "700",
         textTransform: "uppercase",
         letterSpacing: 0.8,
@@ -195,17 +190,17 @@ const styles = StyleSheet.create({
         marginBottom: 4,
     },
     hashBox: {
-        backgroundColor: T.bgBase,
+        backgroundColor: T.bgInput,
         borderRadius: T.rSm,
         borderWidth: 1,
-        borderColor: T.bdDim,
+        borderColor: T.bdDimV2,
         paddingHorizontal: 10,
         paddingVertical: 8,
     },
     hashText: {
-        color: T.emerald,
+        color: T.teal,
         fontFamily: T.fontMono,
-        fontSize: 9,
+        fontSize: 10,
         lineHeight: 16,
     },
     footerRow: {
@@ -224,15 +219,15 @@ const styles = StyleSheet.create({
         marginTop: 2,
     },
     metaLabel: {
-        color: T.tx3,
+        color: T.tx3V2,
     },
     metaValue: {
-        color: T.tx2,
+        color: T.tx2V2,
     },
     copyBtn: {
-        backgroundColor: T.bgElevated,
+        backgroundColor: T.bgElevatedV2,
         borderWidth: 1,
-        borderColor: T.bdBright,
+        borderColor: T.bdBrightV2,
         borderRadius: T.rSm,
         paddingHorizontal: 12,
         paddingVertical: 6,
@@ -241,17 +236,16 @@ const styles = StyleSheet.create({
         alignItems: "center",
     },
     copyBtnDone: {
-        backgroundColor: T.emerald,
-        borderColor: T.emeraldBd,
+        backgroundColor: T.teal,
+        borderColor: T.tealBd,
     },
     copyBtnText: {
-        color: T.tx2,
-        fontFamily: T.fontMono,
+        color: T.tx2V2,
         fontSize: 10,
-        fontWeight: "700",
+        fontWeight: "800",
         letterSpacing: 0.6,
     },
     copyBtnTextDone: {
-        color: T.bgBase,
+        color: T.bgBaseV2,
     },
 });
