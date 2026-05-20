@@ -1,0 +1,165 @@
+{
+  "tool_calls": [
+    {
+      "tool": "llm_complete",
+      "provider": "gemini-free",
+      "input_summary": "Analyze this text and return a quality assessment as JSON.\n\nTEXT:\nTransport strike in Karachi enters day 3, severely disrupting supply chains across t",
+      "output_summary": "{\n  \"has_citations\": false,\n  \"has_numerical_data\": true,\n  \"has_coherent_structure\": false\n}",
+      "latency_ms": 1464
+    },
+    {
+      "tool": "llm_complete",
+      "provider": "gemini-free",
+      "input_summary": "Analyze this text and return a quality assessment as JSON.\n\nTEXT:\n[2026-05-15T10:15:00Z] SKU-1234 shows only 45 units remaining. Cannot fulfill bulk o",
+      "output_summary": "{\n  \"has_citations\": true,\n  \"has_numerical_data\": true,\n  \"has_coherent_structure\": true\n}",
+      "latency_ms": 1633
+    },
+    {
+      "tool": "llm_complete",
+      "provider": "gemini-free",
+      "input_summary": "Analyze this text and return a quality assessment as JSON.\n\nTEXT:\nTabular dataset with 5 rows and 5 columns: date, product_sku, orders, demand_change_",
+      "output_summary": "{\n  \"has_citations\": false,\n  \"has_numerical_data\": true,\n  \"has_coherent_structure\": true\n}",
+      "latency_ms": 1650
+    },
+    {
+      "tool": "llm_complete",
+      "provider": "gemini-free",
+      "input_summary": "Analyze this text and return a quality assessment as JSON.\n\nTEXT:\nWAREHOUSE INVENTORY REPORT\nDate: 2026-05-15T09:00:00Z\nFacility: Warehouse A, Karachi",
+      "output_summary": "{\n  \"has_citations\": true,\n  \"has_numerical_data\": true,\n  \"has_coherent_structure\": true\n}",
+      "latency_ms": 1691
+    },
+    {
+      "tool": "llm_complete",
+      "provider": "gemini-free",
+      "input_summary": "Analyze this text and return a quality assessment as JSON.\n\nTEXT:\nJSON document with 4 top-level fields.\nfrom is supplier@xyzlogistics.com.\ndate is 20",
+      "output_summary": "{\n  \"has_citations\": true,\n  \"has_numerical_data\": true,\n  \"has_coherent_structure\": true\n}",
+      "latency_ms": 1728
+    },
+    {
+      "tool": "generate_embedding",
+      "provider": "gemini-free",
+      "input_summary": "WAREHOUSE INVENTORY REPORT\nDate: 2026-05-15T09:00:00Z\nFacility: Warehouse A, Karachi\nProduct: SKU-12",
+      "output_summary": "3072-dim vector",
+      "latency_ms": 573
+    },
+    {
+      "tool": "generate_embedding",
+      "provider": "gemini-free",
+      "input_summary": "Tabular dataset with 5 rows and 5 columns: date, product_sku, orders, demand_change_pct, revenue_pkr",
+      "output_summary": "3072-dim vector",
+      "latency_ms": 695
+    },
+    {
+      "tool": "generate_embedding",
+      "provider": "gemini-free",
+      "input_summary": "JSON document with 4 top-level fields.\nfrom is supplier@xyzlogistics.com.\ndate is 2026-05-15T08:30:0",
+      "output_summary": "3072-dim vector",
+      "latency_ms": 590
+    },
+    {
+      "tool": "generate_embedding",
+      "provider": "gemini-free",
+      "input_summary": "Transport strike in Karachi enters day 3, severely disrupting supply chains across the region. Logis",
+      "output_summary": "3072-dim vector",
+      "latency_ms": 569
+    },
+    {
+      "tool": "generate_embedding",
+      "provider": "gemini-free",
+      "input_summary": "[2026-05-15T10:15:00Z] SKU-1234 shows only 45 units remaining. Cannot fulfill bulk order of 200 unit",
+      "output_summary": "3072-dim vector",
+      "latency_ms": 524
+    },
+    {
+      "tool": "llm_complete",
+      "provider": "gemini-free",
+      "input_summary": "Extract all factual claims from the following text.\nFor each claim, identify:\n- The claim statement\n- The topic (e.g., \"inventory_level\", \"system_stat",
+      "output_summary": "{\n  \"claims\": [\n    {\n      \"claim\": \"Logistics firms report 100% route blockage on main arterial roads\",\n      \"topic\": \"system_status\",\n      \"type\"",
+      "latency_ms": 994
+    },
+    {
+      "tool": "llm_complete",
+      "provider": "gemini-free",
+      "input_summary": "Extract all factual claims from the following text.\nFor each claim, identify:\n- The claim statement\n- The topic (e.g., \"inventory_level\", \"system_stat",
+      "output_summary": "{\n  \"claims\": [\n    {\n      \"claim\": \"The current date is 2026-05-15T09:00:00Z\",\n      \"topic\": \"report_date\",\n      \"type\": \"temporal\",\n      \"value\"",
+      "latency_ms": 1432
+    },
+    {
+      "tool": "llm_complete",
+      "provider": "gemini-free",
+      "input_summary": "Extract all factual claims from the following text.\nFor each claim, identify:\n- The claim statement\n- The topic (e.g., \"inventory_level\", \"system_stat",
+      "output_summary": "{\n  \"claims\": [\n    {\n      \"claim\": \"The JSON document has 4 top-level fields\",\n      \"topic\": \"document_structure\",\n      \"type\": \"numeric\",\n      \"",
+      "latency_ms": 1463
+    },
+    {
+      "tool": "llm_complete",
+      "provider": "gemini-free",
+      "input_summary": "Extract all factual claims from the following text.\nFor each claim, identify:\n- The claim statement\n- The topic (e.g., \"inventory_level\", \"system_stat",
+      "output_summary": "{\n  \"claims\": [\n    {\n      \"claim\": \"SKU-1234 shows only 45 units remaining\",\n      \"topic\": \"inventory_level\",\n      \"type\": \"numeric\",\n      \"value",
+      "latency_ms": 1508
+    },
+    {
+      "tool": "llm_complete",
+      "provider": "gemini-free",
+      "input_summary": "Extract all factual claims from the following text.\nFor each claim, identify:\n- The claim statement\n- The topic (e.g., \"inventory_level\", \"system_stat",
+      "output_summary": "{\n  \"claims\": [\n    {\n      \"claim\": \"The tabular dataset has 5 rows and 5 columns\",\n      \"topic\": \"dataset_size\",\n      \"type\": \"numeric\",\n      \"va",
+      "latency_ms": 2753
+    },
+    {
+      "tool": "llm_complete",
+      "provider": "gemini-free",
+      "input_summary": "Given the time series metric \"demand_change_pct\" with 5 data points from 2026-05-11T00:00:00.000Z to 2026-05-15T00:00:00.000Z, describe the time windo",
+      "output_summary": "last 5 days",
+      "latency_ms": 587
+    },
+    {
+      "tool": "llm_complete",
+      "provider": "gemini-free",
+      "input_summary": "Given the time series metric \"revenue_pkr\" with 5 data points from 2026-05-11T00:00:00.000Z to 2026-05-15T00:00:00.000Z, describe the time window in a",
+      "output_summary": "last 5 days",
+      "latency_ms": 617
+    },
+    {
+      "tool": "llm_complete",
+      "provider": "gemini-free",
+      "input_summary": "Given the time series metric \"orders\" with 5 data points from 2026-05-11T00:00:00.000Z to 2026-05-15T00:00:00.000Z, describe the time window in a shor",
+      "output_summary": "last 5 days",
+      "latency_ms": 695
+    },
+    {
+      "tool": "generate_embedding",
+      "provider": "gemini-free",
+      "input_summary": "Are there supplier delays, transport disruptions, or logistics constraints?",
+      "output_summary": "3072-dim vector",
+      "latency_ms": 410
+    },
+    {
+      "tool": "generate_embedding",
+      "provider": "gemini-free",
+      "input_summary": "What is the current inventory shortage, stock level and out-of-stock risk?",
+      "output_summary": "3072-dim vector",
+      "latency_ms": 420
+    },
+    {
+      "tool": "generate_embedding",
+      "provider": "gemini-free",
+      "input_summary": "What is the demand trajectory — sales spike, seasonal surge, or forecast change?",
+      "output_summary": "3072-dim vector",
+      "latency_ms": 438
+    },
+    {
+      "tool": "generate_embedding",
+      "provider": "gemini-free",
+      "input_summary": "What is the budgetary impact — costs, revenue at risk, or compliance exposure?",
+      "output_summary": "3072-dim vector",
+      "latency_ms": 448
+    },
+    {
+      "tool": "generate_embedding",
+      "provider": "gemini-free",
+      "input_summary": "Are there contradictions, anomalies, or data-quality issues across sources?",
+      "output_summary": "3072-dim vector",
+      "latency_ms": 1113
+    }
+  ]
+}

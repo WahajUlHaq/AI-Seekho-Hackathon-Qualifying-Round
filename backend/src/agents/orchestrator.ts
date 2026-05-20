@@ -1,6 +1,8 @@
 import { v4 as uuidv4 } from "uuid";
 import { traceCollector, PipelineTrace } from "../tracing/collector";
-
+import * as fs from "fs";
+import * as path from "path";
+import { exportTrace } from "../tracing/exporter";
 import { MultiSourceIngestionAgent, RawSourceInput, NormalizedSource } from "./multi-source-ingestion.agent";
 import { CredibilityScorerAgent, CredibilityScore } from "./credibility-scorer.agent";
 import { NoiseFilterAgent, FilteredSources } from "./noise-filter.agent";
@@ -76,6 +78,38 @@ const TASK_PLAN = [
     "Task 12: Handle failures with retry/fallback/rollback (Module 12)",
     "Task 13: Visualize before/after state and metrics (Module 13)",
 ];
+
+async function saveTraceToArtifacts(trace: PipelineTrace) {
+    try {
+        const exported = exportTrace(trace);
+        const dir = path.join(process.cwd(), "submission", "artifacts");
+        
+        // Ensure directory tree exists physically
+        if (!fs.existsSync(dir)) {
+            fs.mkdirSync(dir, { recursive: true });
+        }
+
+        // Map data segments directly to the 7 Rubric Artifact titles
+        const files = {
+            "artifact-1-workplan.json": { workplan: exported.workplan },
+            "artifact-2-task-plan.json": { task_plan: exported.task_plan },
+            "artifact-3-decision-trace.json": { reasoning_steps: exported.reasoning_steps },
+            "artifact-4-tool-calls.json": { tool_calls: exported.tool_calls },
+            "artifact-5-action-execution.json": { action_execution: exported.action_execution },
+            "artifact-6-recovery-trace.json": { recovery_steps: exported.recovery_steps },
+            "artifact-7-final-outcome.json": exported // Contains the structural metadata summary
+        };
+
+        // Write every file synchronously to ensure they commit to disk before process finishes
+        for (const [filename, data] of Object.entries(files)) {
+            fs.writeFileSync(path.join(dir, filename), JSON.stringify(data, null, 2), "utf8");
+        }
+        
+        console.log(`\n\x1b[32m✅ [Antigravity] Successfully saved 7 Rubric Artifacts to ${dir}\x1b[0m\n`);
+    } catch (ioError) {
+        console.error("❌ Failed writing trace artifacts to disk:", ioError);
+    }
+}
 
 export class PipelineOrchestrator {
     private ingestionAgent = new MultiSourceIngestionAgent();
@@ -400,6 +434,7 @@ export class PipelineOrchestrator {
             });
 
             const trace = traceCollector.finalizePipeline(pipelineId);
+            await saveTraceToArtifacts(trace);
 
             return {
                 pipeline_id: pipelineId,
@@ -488,6 +523,7 @@ export class PipelineOrchestrator {
                 });
             }
             const trace = traceCollector.finalizePipeline(pipelineId);
+            await saveTraceToArtifacts(trace);
             throw Object.assign(err instanceof Error ? err : new Error(String(err)), { trace });
         }
     }

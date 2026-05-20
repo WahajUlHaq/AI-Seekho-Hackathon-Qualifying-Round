@@ -1,0 +1,40 @@
+{
+  "action_execution": [
+    {
+      "event_id": "df3c4dbf-46d0-4bd9-8d36-fa2be33b859a",
+      "timestamp": "2026-05-20T05:01:28.448Z",
+      "action_id": "ACT-001",
+      "status": "success",
+      "agent": "DAGExecutor",
+      "message": "Action ACT-001 (level 0): success",
+      "latency_ms": 13
+    },
+    {
+      "event_id": "fcedef16-ade9-4758-a8e8-0992d87d11a3",
+      "timestamp": "2026-05-20T05:01:28.479Z",
+      "action_id": "ACT-002",
+      "status": "success",
+      "agent": "DAGExecutor",
+      "message": "Action ACT-002 (level 1): success",
+      "latency_ms": 7
+    },
+    {
+      "event_id": "a4e89eb9-3708-4ec3-a201-12d74505788a",
+      "timestamp": "2026-05-20T05:01:28.589Z",
+      "action_id": "ACT-003",
+      "status": "success",
+      "agent": "DAGExecutor",
+      "message": "Action ACT-003 (level 2): success",
+      "latency_ms": 13
+    },
+    {
+      "event_id": "2e5da9ea-e717-475f-bb63-ca25fa6c1dbe",
+      "timestamp": "2026-05-20T05:01:28.727Z",
+      "action_id": "ACT-004",
+      "status": "success",
+      "agent": "DAGExecutor",
+      "message": "Action ACT-004 (level 3): success",
+      "latency_ms": 21
+    }
+  ]
+}

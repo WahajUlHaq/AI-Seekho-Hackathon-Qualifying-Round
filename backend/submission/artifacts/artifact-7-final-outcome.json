@@ -1,0 +1,481 @@
+{
+  "pipeline_id": "TEST-E2E-E8BA2319",
+  "environment": "development",
+  "ai_provider_used": "gemini-free",
+  "started_at": "2026-05-20T05:01:14.416Z",
+  "completed_at": "2026-05-20T05:01:28.781Z",
+  "workplan": "Ingest 5+ sources → Score credibility → Filter noise → Detect contradictions → Resolve conflicts → Analyze trends → Extract insights → Assess impact → Generate action chain → Validate constraints → Simulate execution → Recover failures → Visualize outcomes",
+  "task_plan": [
+    "Task 1: Ingest all input sources in parallel (Module 1)",
+    "Task 2: Score source credibility — recency, authority, quality (Module 2)",
+    "Task 3: Filter noise, duplicates, and stale sources (Module 3)",
+    "Task 4: Detect contradictions across sources (Module 4)",
+    "Task 5: Resolve conflicts using credibility and recency strategies (Module 7)",
+    "Task 6: Analyze temporal patterns in time-series data (Module 6)",
+    "Task 7: Extract RAG-powered insights with contradiction flagging (Module 5)",
+    "Task 8: Analyze impact under budget/time/resource constraints (Module 8)",
+    "Task 9: Generate 3-5 interconnected action chain (Module 9)",
+    "Task 10: Validate action chain against constraints (Module 10)",
+    "Task 11: Simulate action execution with failure injection (Module 11)",
+    "Task 12: Handle failures with retry/fallback/rollback (Module 12)",
+    "Task 13: Visualize before/after state and metrics (Module 13)"
+  ],
+  "reasoning_steps": [
+    {
+      "step": 1,
+      "agent": "MultiSourceIngestionAgent",
+      "reasoning": "Ingested 4/5 sources via Promise.allSettled — total words: 323, failures: 0",
+      "decision": "ingestion_complete",
+      "confidence": 0.804
+    },
+    {
+      "step": 2,
+      "agent": "CredibilityScorerAgent",
+      "reasoning": "Source SRC-004: recency=20, authority=22, quality=10 → MEDIUM",
+      "decision": "MEDIUM",
+      "confidence": 0.52
+    },
+    {
+      "step": 3,
+      "agent": "CredibilityScorerAgent",
+      "reasoning": "Source SRC-005: recency=20, authority=10, quality=30 → MEDIUM",
+      "decision": "MEDIUM",
+      "confidence": 0.6
+    },
+    {
+      "step": 4,
+      "agent": "CredibilityScorerAgent",
+      "reasoning": "Source SRC-002: recency=20, authority=30, quality=20 → HIGH",
+      "decision": "HIGH",
+      "confidence": 0.7
+    },
+    {
+      "step": 5,
+      "agent": "CredibilityScorerAgent",
+      "reasoning": "Source SRC-001: recency=20, authority=30, quality=30 → HIGH",
+      "decision": "HIGH",
+      "confidence": 0.8
+    },
+    {
+      "step": 6,
+      "agent": "CredibilityScorerAgent",
+      "reasoning": "Source SRC-003: recency=20, authority=30, quality=30 → HIGH",
+      "decision": "HIGH",
+      "confidence": 0.8
+    },
+    {
+      "step": 7,
+      "agent": "CredibilityScorerAgent",
+      "reasoning": "Scored 5 sources — HIGH: 3, MEDIUM: 2, LOW: 0",
+      "decision": "scoring_complete",
+      "confidence": 1
+    },
+    {
+      "step": 8,
+      "agent": "NoiseFilterAgent",
+      "reasoning": "CORROBORATING: SRC-001 ↔ SRC-002 sim=71.5% — keep both, mark group",
+      "decision": "corroborating_detected",
+      "confidence": 0.714669822334429
+    },
+    {
+      "step": 9,
+      "agent": "NoiseFilterAgent",
+      "reasoning": "CORROBORATING: SRC-001 ↔ SRC-003 sim=71.9% — keep both, mark group",
+      "decision": "corroborating_detected",
+      "confidence": 0.7191812450901702
+    },
+    {
+      "step": 10,
+      "agent": "NoiseFilterAgent",
+      "reasoning": "CORROBORATING: SRC-001 ↔ SRC-004 sim=69.9% — keep both, mark group",
+      "decision": "corroborating_detected",
+      "confidence": 0.6992274812287825
+    },
+    {
+      "step": 11,
+      "agent": "NoiseFilterAgent",
+      "reasoning": "CORROBORATING: SRC-001 ↔ SRC-005 sim=84.0% — keep both, mark group",
+      "decision": "corroborating_detected",
+      "confidence": 0.839674345880035
+    },
+    {
+      "step": 12,
+      "agent": "NoiseFilterAgent",
+      "reasoning": "CORROBORATING: SRC-002 ↔ SRC-003 sim=69.4% — keep both, mark group",
+      "decision": "corroborating_detected",
+      "confidence": 0.6942808416568885
+    },
+    {
+      "step": 13,
+      "agent": "NoiseFilterAgent",
+      "reasoning": "CORROBORATING: SRC-002 ↔ SRC-005 sim=72.0% — keep both, mark group",
+      "decision": "corroborating_detected",
+      "confidence": 0.7196122741238972
+    },
+    {
+      "step": 14,
+      "agent": "NoiseFilterAgent",
+      "reasoning": "CORROBORATING: SRC-003 ↔ SRC-004 sim=64.5% — keep both, mark group",
+      "decision": "corroborating_detected",
+      "confidence": 0.6448195444549485
+    },
+    {
+      "step": 15,
+      "agent": "NoiseFilterAgent",
+      "reasoning": "CORROBORATING: SRC-003 ↔ SRC-005 sim=69.7% — keep both, mark group",
+      "decision": "corroborating_detected",
+      "confidence": 0.6965183909096447
+    },
+    {
+      "step": 16,
+      "agent": "NoiseFilterAgent",
+      "reasoning": "CORROBORATING: SRC-004 ↔ SRC-005 sim=65.8% — keep both, mark group",
+      "decision": "corroborating_detected",
+      "confidence": 0.6575069688088915
+    },
+    {
+      "step": 17,
+      "agent": "NoiseFilterAgent",
+      "reasoning": "Filtering complete: kept 5/5 sources, removed 0 (stale:0, dupe:0, spam:0), corroborating groups: 4",
+      "decision": "filtering_complete",
+      "confidence": 1
+    },
+    {
+      "step": 18,
+      "agent": "ContradictionDetectorAgent",
+      "reasoning": "Detected numeric contradiction on topic 'inventory_level': \"The current stock count is 45 units\" vs \"The stock level is 500 units\"",
+      "decision": "CRITICAL",
+      "confidence": 0.95
+    },
+    {
+      "step": 19,
+      "agent": "ConflictResolutionAgent",
+      "reasoning": "Similar credibility — computing weighted average: 534.73",
+      "decision": "aggregate",
+      "confidence": 0.6
+    },
+    {
+      "step": 20,
+      "agent": "ConflictResolutionAgent",
+      "reasoning": "Resolved 1 contradictions — strategies: aggregate. Mutated 1 resolvedFacts topics. Cascading: 0.",
+      "decision": "resolution_complete",
+      "confidence": 0.6
+    },
+    {
+      "step": 21,
+      "agent": "TemporalAnalysisAgent",
+      "reasoning": "demand_change_pct: pattern=drift, change=1800.0%, direction=increasing",
+      "decision": "drift",
+      "confidence": 0.757847533632287
+    },
+    {
+      "step": 22,
+      "agent": "TemporalAnalysisAgent",
+      "reasoning": "revenue_pkr: pattern=drift, change=76.5%, direction=increasing",
+      "decision": "drift",
+      "confidence": 0.7230769230769231
+    },
+    {
+      "step": 23,
+      "agent": "TemporalAnalysisAgent",
+      "reasoning": "orders: pattern=drift, change=76.5%, direction=increasing",
+      "decision": "drift",
+      "confidence": 0.7230769230769233
+    },
+    {
+      "step": 24,
+      "agent": "TemporalAnalysisAgent",
+      "reasoning": "Temporal analysis: orders=drift, demand_change_pct=drift, revenue_pkr=drift — 0 series below min-sample guard (<3 points)",
+      "decision": "temporal_analysis_complete",
+      "confidence": 0.7346671265953778
+    },
+    {
+      "step": 25,
+      "agent": "AntigravityOrchestrator",
+      "reasoning": "Phase C routing → M5 output MUST clear AMCE BLOCK + BASE MODEL gate (Gemini 1.5 Pro via llmClient). On BLOCK, Antigravity re-prompts once with the judge's critique; second BLOCK halts Phase C.",
+      "decision": "ROUTE_M5_TO_BASE_MODEL_GATE",
+      "confidence": 1
+    },
+    {
+      "step": 26,
+      "agent": "InsightExtractionAgent",
+      "reasoning": "M5 read 1 resolvedFacts topic(s) from PipelineState before RAG retrieval — inventory_level",
+      "decision": "resolvedFacts_loaded",
+      "confidence": 1
+    },
+    {
+      "step": 27,
+      "agent": "InsightExtractionAgent",
+      "reasoning": "Multi-Query retrieval: 5 domain queries → 6 unique chunks",
+      "decision": "multi_query_retrieved",
+      "confidence": 0.9
+    },
+    {
+      "step": 28,
+      "agent": "InsightExtractionAgent",
+      "reasoning": "M5 LLM produced no usable insights — pre-judge fallback synthesized 2 insights",
+      "decision": "fallback_insights_pre_judge",
+      "confidence": 0.5
+    },
+    {
+      "step": 29,
+      "agent": "InsightExtractionAgent",
+      "reasoning": "M5 complete: 2 insights, 6 RAG chunks, 1 resolvedFacts read, 0 AMCE BLOCK events (recovered). Base-model judge: Base-model judge unavailable: 429 {\"error\":{\"message\":\"Rate limit reached for model `llama-3.3-70b-versatile` in organiz",
+      "decision": "insights_extracted",
+      "confidence": 0.825
+    },
+    {
+      "step": 30,
+      "agent": "ImpactAnalysisAgent",
+      "reasoning": "Impact analysis complete: 1 critical, 0 high. Total options surfaced: 4",
+      "decision": "impact_analysis_complete",
+      "confidence": 1
+    },
+    {
+      "step": 31,
+      "agent": "AntigravityOrchestrator",
+      "reasoning": "Phase D routing → M9 output MUST clear AMCE BLOCK + BASE MODEL gate (Gemini 1.5 Pro via llmClient) AFTER topological sort. A BLOCK on the base-model judge HALTS the pipeline before the saga ledger.",
+      "decision": "ROUTE_M9_TO_BASE_MODEL_GATE",
+      "confidence": 1
+    },
+    {
+      "step": 32,
+      "agent": "ActionChainGeneratorAgent",
+      "reasoning": "M9 used deterministic fallback chain after 2 failed LLM attempts (topology: cycles=0, orphans=0)",
+      "decision": "fallback_chain",
+      "confidence": 0.6
+    },
+    {
+      "step": 33,
+      "agent": "AntigravityOrchestrator",
+      "reasoning": "Phase E routing → M10 (Saga Constraint Validator). Cumulative reserve via the shared SagaConstraintLedger; relaxation suggestions on infeasibility.",
+      "decision": "ROUTE_M10_SAGA_LEDGER",
+      "confidence": 1
+    },
+    {
+      "step": 34,
+      "agent": "AntigravityOrchestrator",
+      "reasoning": "Phase E routing → M11 (Level-Parallel DAG Executor). State mutations strictly BETWEEN dependency levels; Promise.allSettled inside each level. forcedFailures.fail count = 0.",
+      "decision": "ROUTE_M11_DAG_EXECUTOR",
+      "confidence": 1
+    },
+    {
+      "step": 35,
+      "agent": "AntigravityOrchestrator",
+      "reasoning": "Phase F routing → M13 (Outcome Visualizer). Synthesizes state diff + timeline + residual risk + agentic-vs-heuristic baseline + cost/scalability.",
+      "decision": "ROUTE_M13_VISUALIZER",
+      "confidence": 1
+    }
+  ],
+  "tool_calls": [
+    {
+      "tool": "llm_complete",
+      "provider": "gemini-free",
+      "input_summary": "Analyze this text and return a quality assessment as JSON.\n\nTEXT:\nTransport strike in Karachi enters day 3, severely disrupting supply chains across t",
+      "output_summary": "{\n  \"has_citations\": false,\n  \"has_numerical_data\": true,\n  \"has_coherent_structure\": false\n}",
+      "latency_ms": 1464
+    },
+    {
+      "tool": "llm_complete",
+      "provider": "gemini-free",
+      "input_summary": "Analyze this text and return a quality assessment as JSON.\n\nTEXT:\n[2026-05-15T10:15:00Z] SKU-1234 shows only 45 units remaining. Cannot fulfill bulk o",
+      "output_summary": "{\n  \"has_citations\": true,\n  \"has_numerical_data\": true,\n  \"has_coherent_structure\": true\n}",
+      "latency_ms": 1633
+    },
+    {
+      "tool": "llm_complete",
+      "provider": "gemini-free",
+      "input_summary": "Analyze this text and return a quality assessment as JSON.\n\nTEXT:\nTabular dataset with 5 rows and 5 columns: date, product_sku, orders, demand_change_",
+      "output_summary": "{\n  \"has_citations\": false,\n  \"has_numerical_data\": true,\n  \"has_coherent_structure\": true\n}",
+      "latency_ms": 1650
+    },
+    {
+      "tool": "llm_complete",
+      "provider": "gemini-free",
+      "input_summary": "Analyze this text and return a quality assessment as JSON.\n\nTEXT:\nWAREHOUSE INVENTORY REPORT\nDate: 2026-05-15T09:00:00Z\nFacility: Warehouse A, Karachi",
+      "output_summary": "{\n  \"has_citations\": true,\n  \"has_numerical_data\": true,\n  \"has_coherent_structure\": true\n}",
+      "latency_ms": 1691
+    },
+    {
+      "tool": "llm_complete",
+      "provider": "gemini-free",
+      "input_summary": "Analyze this text and return a quality assessment as JSON.\n\nTEXT:\nJSON document with 4 top-level fields.\nfrom is supplier@xyzlogistics.com.\ndate is 20",
+      "output_summary": "{\n  \"has_citations\": true,\n  \"has_numerical_data\": true,\n  \"has_coherent_structure\": true\n}",
+      "latency_ms": 1728
+    },
+    {
+      "tool": "generate_embedding",
+      "provider": "gemini-free",
+      "input_summary": "WAREHOUSE INVENTORY REPORT\nDate: 2026-05-15T09:00:00Z\nFacility: Warehouse A, Karachi\nProduct: SKU-12",
+      "output_summary": "3072-dim vector",
+      "latency_ms": 573
+    },
+    {
+      "tool": "generate_embedding",
+      "provider": "gemini-free",
+      "input_summary": "Tabular dataset with 5 rows and 5 columns: date, product_sku, orders, demand_change_pct, revenue_pkr",
+      "output_summary": "3072-dim vector",
+      "latency_ms": 695
+    },
+    {
+      "tool": "generate_embedding",
+      "provider": "gemini-free",
+      "input_summary": "JSON document with 4 top-level fields.\nfrom is supplier@xyzlogistics.com.\ndate is 2026-05-15T08:30:0",
+      "output_summary": "3072-dim vector",
+      "latency_ms": 590
+    },
+    {
+      "tool": "generate_embedding",
+      "provider": "gemini-free",
+      "input_summary": "Transport strike in Karachi enters day 3, severely disrupting supply chains across the region. Logis",
+      "output_summary": "3072-dim vector",
+      "latency_ms": 569
+    },
+    {
+      "tool": "generate_embedding",
+      "provider": "gemini-free",
+      "input_summary": "[2026-05-15T10:15:00Z] SKU-1234 shows only 45 units remaining. Cannot fulfill bulk order of 200 unit",
+      "output_summary": "3072-dim vector",
+      "latency_ms": 524
+    },
+    {
+      "tool": "llm_complete",
+      "provider": "gemini-free",
+      "input_summary": "Extract all factual claims from the following text.\nFor each claim, identify:\n- The claim statement\n- The topic (e.g., \"inventory_level\", \"system_stat",
+      "output_summary": "{\n  \"claims\": [\n    {\n      \"claim\": \"Logistics firms report 100% route blockage on main arterial roads\",\n      \"topic\": \"system_status\",\n      \"type\"",
+      "latency_ms": 994
+    },
+    {
+      "tool": "llm_complete",
+      "provider": "gemini-free",
+      "input_summary": "Extract all factual claims from the following text.\nFor each claim, identify:\n- The claim statement\n- The topic (e.g., \"inventory_level\", \"system_stat",
+      "output_summary": "{\n  \"claims\": [\n    {\n      \"claim\": \"The current date is 2026-05-15T09:00:00Z\",\n      \"topic\": \"report_date\",\n      \"type\": \"temporal\",\n      \"value\"",
+      "latency_ms": 1432
+    },
+    {
+      "tool": "llm_complete",
+      "provider": "gemini-free",
+      "input_summary": "Extract all factual claims from the following text.\nFor each claim, identify:\n- The claim statement\n- The topic (e.g., \"inventory_level\", \"system_stat",
+      "output_summary": "{\n  \"claims\": [\n    {\n      \"claim\": \"The JSON document has 4 top-level fields\",\n      \"topic\": \"document_structure\",\n      \"type\": \"numeric\",\n      \"",
+      "latency_ms": 1463
+    },
+    {
+      "tool": "llm_complete",
+      "provider": "gemini-free",
+      "input_summary": "Extract all factual claims from the following text.\nFor each claim, identify:\n- The claim statement\n- The topic (e.g., \"inventory_level\", \"system_stat",
+      "output_summary": "{\n  \"claims\": [\n    {\n      \"claim\": \"SKU-1234 shows only 45 units remaining\",\n      \"topic\": \"inventory_level\",\n      \"type\": \"numeric\",\n      \"value",
+      "latency_ms": 1508
+    },
+    {
+      "tool": "llm_complete",
+      "provider": "gemini-free",
+      "input_summary": "Extract all factual claims from the following text.\nFor each claim, identify:\n- The claim statement\n- The topic (e.g., \"inventory_level\", \"system_stat",
+      "output_summary": "{\n  \"claims\": [\n    {\n      \"claim\": \"The tabular dataset has 5 rows and 5 columns\",\n      \"topic\": \"dataset_size\",\n      \"type\": \"numeric\",\n      \"va",
+      "latency_ms": 2753
+    },
+    {
+      "tool": "llm_complete",
+      "provider": "gemini-free",
+      "input_summary": "Given the time series metric \"demand_change_pct\" with 5 data points from 2026-05-11T00:00:00.000Z to 2026-05-15T00:00:00.000Z, describe the time windo",
+      "output_summary": "last 5 days",
+      "latency_ms": 587
+    },
+    {
+      "tool": "llm_complete",
+      "provider": "gemini-free",
+      "input_summary": "Given the time series metric \"revenue_pkr\" with 5 data points from 2026-05-11T00:00:00.000Z to 2026-05-15T00:00:00.000Z, describe the time window in a",
+      "output_summary": "last 5 days",
+      "latency_ms": 617
+    },
+    {
+      "tool": "llm_complete",
+      "provider": "gemini-free",
+      "input_summary": "Given the time series metric \"orders\" with 5 data points from 2026-05-11T00:00:00.000Z to 2026-05-15T00:00:00.000Z, describe the time window in a shor",
+      "output_summary": "last 5 days",
+      "latency_ms": 695
+    },
+    {
+      "tool": "generate_embedding",
+      "provider": "gemini-free",
+      "input_summary": "Are there supplier delays, transport disruptions, or logistics constraints?",
+      "output_summary": "3072-dim vector",
+      "latency_ms": 410
+    },
+    {
+      "tool": "generate_embedding",
+      "provider": "gemini-free",
+      "input_summary": "What is the current inventory shortage, stock level and out-of-stock risk?",
+      "output_summary": "3072-dim vector",
+      "latency_ms": 420
+    },
+    {
+      "tool": "generate_embedding",
+      "provider": "gemini-free",
+      "input_summary": "What is the demand trajectory — sales spike, seasonal surge, or forecast change?",
+      "output_summary": "3072-dim vector",
+      "latency_ms": 438
+    },
+    {
+      "tool": "generate_embedding",
+      "provider": "gemini-free",
+      "input_summary": "What is the budgetary impact — costs, revenue at risk, or compliance exposure?",
+      "output_summary": "3072-dim vector",
+      "latency_ms": 448
+    },
+    {
+      "tool": "generate_embedding",
+      "provider": "gemini-free",
+      "input_summary": "Are there contradictions, anomalies, or data-quality issues across sources?",
+      "output_summary": "3072-dim vector",
+      "latency_ms": 1113
+    }
+  ],
+  "action_execution": [
+    {
+      "event_id": "df3c4dbf-46d0-4bd9-8d36-fa2be33b859a",
+      "timestamp": "2026-05-20T05:01:28.448Z",
+      "action_id": "ACT-001",
+      "status": "success",
+      "agent": "DAGExecutor",
+      "message": "Action ACT-001 (level 0): success",
+      "latency_ms": 13
+    },
+    {
+      "event_id": "fcedef16-ade9-4758-a8e8-0992d87d11a3",
+      "timestamp": "2026-05-20T05:01:28.479Z",
+      "action_id": "ACT-002",
+      "status": "success",
+      "agent": "DAGExecutor",
+      "message": "Action ACT-002 (level 1): success",
+      "latency_ms": 7
+    },
+    {
+      "event_id": "a4e89eb9-3708-4ec3-a201-12d74505788a",
+      "timestamp": "2026-05-20T05:01:28.589Z",
+      "action_id": "ACT-003",
+      "status": "success",
+      "agent": "DAGExecutor",
+      "message": "Action ACT-003 (level 2): success",
+      "latency_ms": 13
+    },
+    {
+      "event_id": "2e5da9ea-e717-475f-bb63-ca25fa6c1dbe",
+      "timestamp": "2026-05-20T05:01:28.727Z",
+      "action_id": "ACT-004",
+      "status": "success",
+      "agent": "DAGExecutor",
+      "message": "Action ACT-004 (level 3): success",
+      "latency_ms": 21
+    }
+  ],
+  "recovery_steps": [],
+  "summary": {
+    "total_events": 85,
+    "total_llm_calls": 23,
+    "total_action_executions": 4,
+    "total_recoveries": 0,
+    "total_failures": 0,
+    "decisions_made": 35,
+    "duration_ms": 14365
+  }
+}
