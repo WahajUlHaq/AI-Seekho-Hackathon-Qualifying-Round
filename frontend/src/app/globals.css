@@ -84,20 +84,20 @@
 }
 
 .dark {
-  --background: oklch(0.145 0 0);
-  --foreground: oklch(0.985 0 0);
-  --card: oklch(0.205 0 0);
-  --card-foreground: oklch(0.985 0 0);
-  --popover: oklch(0.205 0 0);
-  --popover-foreground: oklch(0.985 0 0);
-  --primary: oklch(0.922 0 0);
-  --primary-foreground: oklch(0.205 0 0);
-  --secondary: oklch(0.269 0 0);
-  --secondary-foreground: oklch(0.985 0 0);
-  --muted: oklch(0.269 0 0);
-  --muted-foreground: oklch(0.708 0 0);
-  --accent: oklch(0.269 0 0);
-  --accent-foreground: oklch(0.985 0 0);
+  --background: oklch(0.07 0.006 280);
+  --foreground: oklch(0.95 0 0);
+  --card: oklch(0.11 0.006 280);
+  --card-foreground: oklch(0.95 0 0);
+  --popover: oklch(0.11 0.006 280);
+  --popover-foreground: oklch(0.95 0 0);
+  --primary: oklch(0.72 0.18 285);
+  --primary-foreground: oklch(0.10 0 0);
+  --secondary: oklch(0.18 0.006 280);
+  --secondary-foreground: oklch(0.90 0 0);
+  --muted: oklch(0.18 0.006 280);
+  --muted-foreground: oklch(0.60 0 0);
+  --accent: oklch(0.18 0.006 280);
+  --accent-foreground: oklch(0.95 0 0);
   --destructive: oklch(0.704 0.191 22.216);
   --border: oklch(1 0 0 / 10%);
   --input: oklch(1 0 0 / 15%);
@@ -128,3 +128,172 @@
     @apply font-sans;
   }
 }
+
+/* ============================================================
+   DARK GLASS THEME — BACKGROUND, ANIMATIONS & GLASS UTILITIES
+   ============================================================ */
+
+/* Deep dark body with purple/blue ambient gradient */
+html {
+  height: 100%;
+  overflow: hidden;
+  width: 100%;
+}
+
+body {
+  height: 100%;
+  background-color: #06060a;
+  background-image:
+    radial-gradient(ellipse at 15% 35%, rgba(139, 92, 246, 0.13) 0%, transparent 55%),
+    radial-gradient(ellipse at 85% 10%, rgba(59, 130, 246, 0.10) 0%, transparent 55%),
+    radial-gradient(ellipse at 50% 95%, rgba(16, 185, 129, 0.07) 0%, transparent 50%);
+  background-attachment: fixed;
+  width: 100%;
+  overflow: hidden;
+}
+
+/* ---- Keyframe Animations ---- */
+
+@keyframes fade-in-up {
+  from { opacity: 0; transform: translateY(18px); }
+  to   { opacity: 1; transform: translateY(0);    }
+}
+
+@keyframes fade-in {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+@keyframes scale-in {
+  from { opacity: 0; transform: scale(0.95); }
+  to   { opacity: 1; transform: scale(1);    }
+}
+
+@keyframes slide-in-from-right {
+  from { opacity: 0; transform: translateX(12px); }
+  to   { opacity: 1; transform: translateX(0);    }
+}
+
+@keyframes glow-pulse {
+  0%, 100% {
+    box-shadow:
+      0 0 0 1px rgba(139, 92, 246, 0.35),
+      0 0 22px rgba(139, 92, 246, 0.22),
+      0 4px 28px rgba(139, 92, 246, 0.18);
+  }
+  50% {
+    box-shadow:
+      0 0 0 1px rgba(139, 92, 246, 0.55),
+      0 0 36px rgba(139, 92, 246, 0.40),
+      0 4px 44px rgba(59, 130, 246, 0.28);
+  }
+}
+
+@keyframes orb-float-1 {
+  0%, 100% { transform: translate(  0px,   0px) scale(1.00); }
+  33%      { transform: translate( 55px, -55px) scale(1.08); }
+  66%      { transform: translate(-40px,  45px) scale(0.94); }
+}
+
+@keyframes orb-float-2 {
+  0%, 100% { transform: translate(  0px,  0px) scale(1.00); }
+  33%      { transform: translate(-50px, 40px) scale(0.92); }
+  66%      { transform: translate( 45px,-45px) scale(1.06); }
+}
+
+@keyframes shimmer-sweep {
+  0%   { background-position: -400% 0; }
+  100% { background-position:  400% 0; }
+}
+
+@keyframes typing-blink {
+  0%, 100% { opacity: 1; }
+  50%      { opacity: 0; }
+}
+
+@keyframes text-blur-in {
+  from { opacity: 0; filter: blur(12px); transform: translateY(4px); }
+  to   { opacity: 1; filter: blur(0);    transform: translateY(0);   }
+}
+
+/* ---- Animation Utility Classes ---- */
+
+.animate-fade-in-up  { animation: fade-in-up          0.55s ease-out both; }
+.animate-fade-in     { animation: fade-in              0.4s  ease-out both; }
+.animate-scale-in    { animation: scale-in             0.38s ease-out both; }
+.animate-slide-right { animation: slide-in-from-right  0.3s  ease-out both; }
+.animate-glow-pulse  { animation: glow-pulse           2.8s  ease-in-out infinite; }
+.animate-blur-in     { animation: text-blur-in         0.6s  ease-out both; }
+
+/* ---- Glass Morphism Utilities ---- */
+
+/* Light glass — for chips, pills, minor elements */
+.glass {
+  background: rgba(255, 255, 255, 0.04);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow:
+    0 4px 24px rgba(0, 0, 0, 0.50),
+    0 0 0 1px rgba(255, 255, 255, 0.04),
+    inset 0 1px 0 rgba(255, 255, 255, 0.07);
+}
+
+/* Heavy glass — for primary containers / panels */
+.glass-heavy {
+  background: rgba(255, 255, 255, 0.055);
+  backdrop-filter: blur(44px);
+  -webkit-backdrop-filter: blur(44px);
+  border: 1px solid rgba(255, 255, 255, 0.09);
+  box-shadow:
+    0 10px 56px rgba(0, 0, 0, 0.65),
+    0 28px 88px rgba(0, 0, 0, 0.40),
+    0 0 0 1px rgba(255, 255, 255, 0.05),
+    inset 0 1px 0 rgba(255, 255, 255, 0.09);
+}
+
+/* Card glass — for secondary cards / panels */
+.glass-card {
+  background: rgba(255, 255, 255, 0.034);
+  backdrop-filter: blur(28px);
+  -webkit-backdrop-filter: blur(28px);
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  box-shadow:
+    0 4px 20px rgba(0, 0, 0, 0.42),
+    0 0 0 1px rgba(255, 255, 255, 0.03),
+    inset 0 1px 0 rgba(255, 255, 255, 0.05);
+}
+
+/* Shimmer loading bar — with subtle crosshatch texture */
+.shimmer {
+  background:
+    linear-gradient(
+      90deg,
+      rgba(255, 255, 255, 0.04) 25%,
+      rgba(255, 255, 255, 0.10) 50%,
+      rgba(255, 255, 255, 0.04) 75%
+    ),
+    repeating-linear-gradient(
+      0deg,
+      transparent,
+      transparent 11px,
+      rgba(255, 255, 255, 0.028) 11px,
+      rgba(255, 255, 255, 0.028) 12px
+    ),
+    repeating-linear-gradient(
+      90deg,
+      transparent,
+      transparent 11px,
+      rgba(255, 255, 255, 0.028) 11px,
+      rgba(255, 255, 255, 0.028) 12px
+    ),
+    rgba(255, 255, 255, 0.03);
+  background-size: 400% 100%, 12px 12px, 12px 12px, auto;
+  animation: shimmer-sweep 4.5s ease infinite;
+}
+
+/* Scrollbar — dark themed */
+::-webkit-scrollbar        { width: 5px; height: 5px; }
+::-webkit-scrollbar-track  { background: transparent; }
+::-webkit-scrollbar-thumb  { background: rgba(255,255,255,0.10); border-radius: 99px; }
+::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,0.18); }

@@ -69,21 +69,27 @@ export function SourceDropzone({ file, onFileChange }: Props) {
         onDragLeave={handleDragLeave}
         onDrop={handleDrop}
         className={cn(
-          "flex cursor-pointer flex-col items-center justify-center gap-3 rounded-xl border-2 border-dashed p-10 text-center transition-colors duration-200",
+          "flex cursor-pointer items-center gap-3 rounded-xl border border-dashed px-4 py-3 transition-all duration-250",
           isDragging
-            ? "animate-pulse border-primary bg-primary/5 text-primary"
-            : "border-muted-foreground/40 bg-card text-muted-foreground hover:border-primary/60 hover:text-foreground"
+            ? "border-purple-500/60 text-purple-300"
+            : "border-white/[0.12] text-zinc-500 hover:border-purple-500/40 hover:text-zinc-300"
         )}
+        style={
+          isDragging
+            ? {
+                background: "rgba(139,92,246,0.10)",
+                boxShadow: "0 0 32px rgba(139,92,246,0.18), inset 0 0 24px rgba(139,92,246,0.06)",
+              }
+            : { background: "rgba(255,255,255,0.03)" }
+        }
       >
-        <UploadCloud className="size-8" aria-hidden />
-        <div className="space-y-1">
-          <p className="text-sm font-medium">
-            {isDragging ? "Drop the file to stage it" : "Drag and drop a file here, or click to browse"}
-          </p>
-          <p className="text-xs text-muted-foreground">
-            Accepted: {ACCEPTED_EXTENSIONS.join(", ")}
-          </p>
-        </div>
+        <UploadCloud className="size-4 shrink-0" aria-hidden />
+        <span className="text-sm">
+          {isDragging ? "Drop to stage" : "Drag & drop or click to browse"}
+        </span>
+        <span className="ml-auto text-xs text-zinc-600 shrink-0">
+          {ACCEPTED_EXTENSIONS.join(" · ")}
+        </span>
         <input
           ref={inputRef}
           id={inputId}
@@ -95,13 +101,19 @@ export function SourceDropzone({ file, onFileChange }: Props) {
       </label>
 
       {file ? (
-        <div className="flex items-center justify-between gap-3 rounded-lg border border-border bg-card px-3 py-2 text-sm">
+        <div
+          className="flex items-center justify-between gap-3 rounded-lg px-3 py-2 text-sm"
+          style={{
+            background: "rgba(255,255,255,0.06)",
+            border: "1px solid rgba(255,255,255,0.10)",
+          }}
+        >
           <div className="flex min-w-0 items-center gap-2">
-            <FileText className="size-4 shrink-0 text-muted-foreground" aria-hidden />
-            <span className="truncate font-medium" title={file.name}>
+            <FileText className="size-4 shrink-0 text-blue-400" aria-hidden />
+            <span className="truncate font-medium text-zinc-300" title={file.name}>
               {file.name}
             </span>
-            <span className="shrink-0 text-xs text-muted-foreground">{formatBytes(file.size)}</span>
+            <span className="shrink-0 text-xs text-zinc-500">{formatBytes(file.size)}</span>
           </div>
           <Button
             type="button"
@@ -109,6 +121,7 @@ export function SourceDropzone({ file, onFileChange }: Props) {
             size="icon-xs"
             aria-label="Clear selected file"
             onClick={() => onFileChange(null)}
+            className="text-zinc-500 hover:text-red-400 hover:bg-transparent transition-colors"
           >
             <X className="size-3" />
           </Button>

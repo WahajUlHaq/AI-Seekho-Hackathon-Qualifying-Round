@@ -155,7 +155,7 @@ export function ComplianceAuditCard({ pipelineId, enabled }: { pipelineId: strin
               <div className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
                 Event summary
               </div>
-              <div className="mt-1.5 grid grid-cols-2 gap-2 sm:grid-cols-5">
+              <div className="mt-2 grid grid-cols-1 gap-1.5">
                 {CANONICAL_EVENT_KEYS.map((key) => (
                   <CounterTile
                     key={key}
@@ -169,7 +169,7 @@ export function ComplianceAuditCard({ pipelineId, enabled }: { pipelineId: strin
                   <summary className="cursor-pointer text-[11px] text-muted-foreground hover:text-foreground">
                     {extraEventKeys.length} more event counter{extraEventKeys.length === 1 ? "" : "s"}
                   </summary>
-                  <div className="mt-2 grid grid-cols-2 gap-2 sm:grid-cols-5">
+                  <div className="mt-2 grid grid-cols-1 gap-1.5">
                     {extraEventKeys.map((key) => (
                       <CounterTile key={key} label={key} value={data.event_summary[key] ?? 0} />
                     ))}
@@ -205,9 +205,15 @@ function Stat({ label, value, mono }: { label: string; value: string; mono?: boo
 
 function CounterTile({ label, value }: { label: string; value: number }) {
   return (
-    <div className="rounded-md border bg-card p-2 text-center">
-      <div className="font-mono text-base font-semibold">{value}</div>
-      <div className="text-[9px] uppercase tracking-wider text-muted-foreground">{label}</div>
+    <div
+      className="flex items-center justify-between rounded-lg px-4 py-2.5 w-full"
+      style={{
+        background: "rgba(255,255,255,0.04)",
+        border: "1px solid rgba(255,255,255,0.08)",
+      }}
+    >
+      <span className="font-mono text-sm text-zinc-400 tracking-wide">{label}</span>
+      <span className="font-mono text-lg font-bold text-white tabular-nums">{value}</span>
     </div>
   );
 }
