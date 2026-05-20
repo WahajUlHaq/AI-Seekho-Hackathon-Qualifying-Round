@@ -8,6 +8,7 @@ import { AuditorAgent } from "../agents/auditor.agent";
 import type { ForecastPoint, PipelineAnalytics, RawSource } from "../agents/analytics.types";
 import { PipelineAnalyticsSchema } from "../docs/contracts/analytics.contracts";
 import { processFullPipelineUpToHITL } from "../services/pipeline-orchestrator";
+import { pipelineApprovalStore } from "../stores/pipeline-approval.store";
 
 export const pipelineRoutes = Router();
 
@@ -210,6 +211,42 @@ pipelineRoutes.post("/run", (req: Request, res: Response) => {
     void processFullPipelineUpToHITL(pipelineId, rawSourcesForIngestion).catch((err) => {
         console.error(`[Pipeline ${pipelineId}] processFullPipelineUpToHITL unhandled rejection:`, err);
     });
+});
+
+// GET /api/pipeline
+pipelineRoutes.get("/", (req: Request, res: Response) => {
+    const traces = traceCollector.getAll();
+    const history = traces.map((t) => {
+        const approvalRecord = pipelineApprovalStore.get(t.pipeline_id);
+        let status = "RUNNING";
+        if (approvalRecord) {
+            if (approvalRecord.state === "COMPLETED") {
+                status = "COMPLETED";
+            } else if (approvalRecord.state === "REJECTED") {
+                status = "REJECTED";
+            } else if (approvalRecord.state === "PENDING") {
+                status = "PENDING";
+            } else if (approvalRecord.state === "EXECUTING") {
+                status = "EXECUTING";
+            }
+        } else {
+            const hasFailure = t.events.some(e => e.event_type === "failure" || e.event_type === "ingestion_error");
+            if (hasFailure) {
+                status = "FAILED";
+            } else if (t.completed_at) {
+                status = "COMPLETED";
+            }
+        }
+
+        return {
+            pipeline_id: t.pipeline_id,
+            status,
+            events: t.events,
+            action_execution: t.action_execution || [],
+        };
+    });
+
+    res.json(history);
 });
 
 // GET /api/pipeline/:id
