@@ -53,6 +53,12 @@ export interface InsightExtractionOutput extends AgentOutput {
     risks: RiskItem[];
     opportunities: OpportunityItem[];
     persistentConflicts: ConflictSummary[];
+    /**
+     * Truncated raw-source excerpt (~1500 chars max) carried downstream so the
+     * strategic-recommender can anchor its rationale on verbatim entities,
+     * identifiers, and values from the original documents.
+     */
+    source_excerpt: string;
 }
 
 function makeId(prefix: string, len = 8): string {
@@ -145,6 +151,9 @@ export class InsightExtractionAgent extends BaseAgent<
         // Step D: synthesize insights
         const insights = await this.synthesize(pipeline_id, context, investigation_paths);
 
+        // Step E: capture truncated source excerpt for downstream anchoring
+        const source_excerpt = this.buildSourceExcerpt(sources);
+
         return {
             pipeline_id,
             agent_name: this.agentName,
@@ -153,8 +162,30 @@ export class InsightExtractionAgent extends BaseAgent<
             extracted_at: new Date().toISOString(),
             chunks_indexed: this.vectorStore.count(),
             sources_used: sources.length,
+            source_excerpt,
             ...insights,
         };
+    }
+
+    /**
+     * Build a ~1500-char excerpt of raw source content, ordered by credibility
+     * score (highest first). Used downstream by the strategic-recommender to
+     * anchor rationale on verbatim entities and identifiers.
+     */
+    private buildSourceExcerpt(sources: SourceDocument[]): string {
+        const MAX = 1500;
+        const ranked = [...sources].sort(
+            (a, b) => (b.credibility_score?.total ?? 0) - (a.credibility_score?.total ?? 0),
+        );
+        let out = "";
+        for (const doc of ranked) {
+            const header = `[${doc.source_id} • ${doc.source_type}]\n`;
+            const remaining = MAX - out.length - header.length;
+            if (remaining <= 200) break;
+            out += header + doc.content.slice(0, remaining) + "\n\n";
+            if (out.length >= MAX) break;
+        }
+        return out.slice(0, MAX);
     }
 
     private chunkText(doc: SourceDocument): VectorChunk[] {
@@ -214,7 +245,8 @@ Reply with ONLY valid JSON matching this exact shape:
 Requirements:
 - At least 1 entry in each array
 - Risk severity must be exactly one of: LOW, MEDIUM, HIGH, CRITICAL
-- Confidence must be a number between 0 and 1`;
+- Confidence must be a number between 0 and 1
+- Each "description" MUST cite at least one concrete identifier, name, number, or date that appears in the Context — do NOT write abstract descriptions, anchor to specifics from the retrieved chunks.`;
 
         try {
             const response = await this.llmComplete(pipelineId, prompt, false, "insight_synthesis");
@@ -234,7 +266,7 @@ Requirements:
 
         return {
             trends:              [{ title: "Synthesis error", description: "LLM synthesis failed — manual review required", confidence: 0 }],
-            risks:               [{ title: "Synthesis unavailable", description: "Could not extract risks automatically", severity: "MEDIUM" }],
+            risks:               [{ title: "Synthesis unavailable", description: "Could not extract risks automatically", severity: "MEDIUM" as const }],
             opportunities:       [{ title: "Synthesis unavailable", description: "Could not extract opportunities automatically" }],
             persistentConflicts: investigationPaths.map(p => ({ topic: p.topic, summary: p.recommended_steps.join("; ") })),
         };

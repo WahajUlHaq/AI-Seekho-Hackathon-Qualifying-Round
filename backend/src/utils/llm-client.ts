@@ -7,9 +7,27 @@ dotenv.config({ path: path.resolve(process.cwd(), envFile) });
 
 import { GoogleGenerativeAI } from "@google/generative-ai";
 import Groq from "groq-sdk";
+import { retryWithBackoff } from "./retry";
 
 type AppEnv = "development" | "staging" | "production";
 const APP_ENV = (process.env.APP_ENV || "development") as AppEnv;
+
+// ── Resilient backoff ─────────────────────────────────────────────────────
+// Transient = retryable: 429 rate limit, 5xx server, quota (not billing-hard-stop),
+// "overloaded", timeouts, ECONNRESET. Non-transient = throw immediately so the
+// outer provider cascade can fall through to the next provider.
+
+function isTransientLLMError(err: any): boolean {
+    const code = err?.code ?? err?.status ?? err?.response?.status;
+    const msg = (err?.message || "").toLowerCase();
+    if (code === 429 || code === 500 || code === 502 || code === 503 || code === 504) return true;
+    if (msg.includes("quota") && !msg.includes("billing disabled")) return true;
+    if (msg.includes("overloaded") || msg.includes("timeout") || msg.includes("etimedout")) return true;
+    if (msg.includes("econnreset") || msg.includes("socket hang up")) return true;
+    return false;
+}
+
+const LLM_BACKOFF = { maxAttempts: 3, baseMs: 800, multiplier: 2, jitter: 0.2 };
 
 // Provider configuration per environment
 const PROVIDER_CONFIG = {
@@ -111,7 +129,7 @@ export class LLMClient {
         const account = VERTEX_ACCOUNTS[this.currentVertexAccount];
 
         if (!account || account.spent >= account.limit) {
-            // Rotate to next Vertex account
+            // Rotate to next Vertex account (fast path — no backoff delay)
             this.currentVertexAccount++;
             if (this.currentVertexAccount >= VERTEX_ACCOUNTS.length) {
                 console.warn("[LLMClient] All Vertex accounts exhausted — falling back to free Gemini");
@@ -125,8 +143,21 @@ export class LLMClient {
             // (Full Vertex AI SDK setup depends on GCP auth — adjust with Person B/C on Day 6)
             const genAI = new GoogleGenerativeAI(account.keyPath!);
             const geminiModel = genAI.getGenerativeModel({ model });
-            const result = await geminiModel.generateContent(prompt);
-            return result.response.text();
+            return await retryWithBackoff(
+                async () => {
+                    const result = await geminiModel.generateContent(prompt);
+                    return result.response.text();
+                },
+                {
+                    ...LLM_BACKOFF,
+                    // Quota/billing on Vertex → rotate account instead of backoff.
+                    shouldRetry: (e: any) =>
+                        isTransientLLMError(e) &&
+                        !(e?.code === 429 || /quota|billing/i.test(e?.message || "")),
+                    onRetry: (attempt, _err, delayMs) =>
+                        console.warn(`[LLMClient] vertex backoff #${attempt} for ${delayMs}ms`),
+                },
+            );
         } catch (error: any) {
             if (error.code === 429 || error.message?.includes("quota") || error.message?.includes("billing")) {
                 console.warn(`[LLMClient] Vertex account ${this.currentVertexAccount} quota hit — rotating`);
@@ -139,17 +170,37 @@ export class LLMClient {
 
     private async callFreeGemini(prompt: string, model: string): Promise<string> {
         const geminiModel = this.gemini.getGenerativeModel({ model });
-        const result = await geminiModel.generateContent(prompt);
-        return result.response.text();
+        return await retryWithBackoff(
+            async () => {
+                const result = await geminiModel.generateContent(prompt);
+                return result.response.text();
+            },
+            {
+                ...LLM_BACKOFF,
+                shouldRetry: isTransientLLMError,
+                onRetry: (attempt, _err, delayMs) =>
+                    console.warn(`[LLMClient] gemini-free backoff #${attempt} for ${delayMs}ms`),
+            },
+        );
     }
 
     private async callGroq(prompt: string): Promise<string> {
-        const completion = await this.groq.chat.completions.create({
-            model: process.env.FALLBACK_MODEL || "llama-3.3-70b-versatile",
-            messages: [{ role: "user", content: prompt }],
-            temperature: 0.7,
-        });
-        return completion.choices[0].message.content || "";
+        return await retryWithBackoff(
+            async () => {
+                const completion = await this.groq.chat.completions.create({
+                    model: process.env.FALLBACK_MODEL || "llama-3.3-70b-versatile",
+                    messages: [{ role: "user", content: prompt }],
+                    temperature: 0.7,
+                });
+                return completion.choices[0].message.content || "";
+            },
+            {
+                ...LLM_BACKOFF,
+                shouldRetry: isTransientLLMError,
+                onRetry: (attempt, _err, delayMs) =>
+                    console.warn(`[LLMClient] groq backoff #${attempt} for ${delayMs}ms`),
+            },
+        );
     }
 
     async generateEmbedding(text: string): Promise<number[]> {

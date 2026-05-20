@@ -27,8 +27,9 @@ import { pipelineExecutionStore } from "../stores/pipeline-execution.store";
 
 function makeAgents() {
     const vectorStore = new InMemoryVectorStore();
+    const feedFile = process.env.EXPO_DEMO_FEED || "realtime-feed.json";
     const feedAdapter = new MockRealtimeFeedAdapter(
-        path.resolve(__dirname, "../../test-data/realtime-feed.json")
+        path.resolve(__dirname, "../../test-data", feedFile)
     );
 
     return {
