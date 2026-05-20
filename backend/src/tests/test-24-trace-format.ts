@@ -6,10 +6,11 @@ import * as fs from "fs";
 import { v4 as uuidv4 } from "uuid";
 import { contractRegistry } from "../contracts/registry";
 import { PipelineOrchestrator } from "../agents/orchestrator";
-import { exportTrace } from "../tracing/exporter";
+import { antigravityFileLogger, RUBRIC_CATEGORIES } from "../tracing/file-logger";
+import { formatTrace, REQUIRED_RUBRIC_KEYS } from "../tracing/trace-formatter";
 
 async function test() {
-    console.log("=== TEST 5.2: Trace Exporter Format (for judges) ===");
+    console.log("=== TEST 5.2: Final Submission Trace Format (Phase 4 V2) ===");
 
     await contractRegistry.loadAll(path.resolve(process.cwd(), "src/contracts/definitions"));
 
@@ -17,66 +18,85 @@ async function test() {
         fs.readFileSync(path.resolve(process.cwd(), "test-data/inventory-shortage-scenario.json"), "utf8")
     );
 
+    // V2 Phase 4 — formatter must produce a reproducible submission JSON, so
+    // we start from a clean log.
+    antigravityFileLogger.truncate();
+
     const pipelineId = `TEST-TRACE-${uuidv4().slice(0, 8).toUpperCase()}`;
 
     try {
         const orchestrator = new PipelineOrchestrator();
-        const result = await orchestrator.run(
+        await orchestrator.run(
             { sources: testData.sources, constraints: testData.constraints },
             pipelineId
         );
 
-        const rawTrace = result.trace;
-        const exported = exportTrace(rawTrace);
+        // Run the V2 Phase 4 trace formatter against the freshly produced
+        // `backend/logs/antigravity_trace.log` and persist the unified array
+        // at `docs/submission/antigravity_trace_final.json`.
+        const formatted = formatTrace();
 
-        // Required fields judges will look for
-        const requiredFields = [
-            "pipeline_id",
-            "environment",
-            "ai_provider_used",
-            "workplan",
-            "task_plan",
-            "reasoning_steps",
-            "tool_calls",
-            "action_execution",
-            "recovery_steps",
-        ];
-
-        console.log("Checking required trace fields:");
-        let allPresent = true;
-        for (const field of requiredFields) {
-            const present = (exported as any)[field] !== undefined && (exported as any)[field] !== null;
-            console.log(`  ${present ? "✅" : "❌"} ${field}: ${present ? "present" : "MISSING"}`);
-            if (!present) allPresent = false;
+        const fileExists = fs.existsSync(formatted.output_path);
+        const onDiskRaw = fileExists ? fs.readFileSync(formatted.output_path, "utf-8") : "";
+        let onDiskParsed: unknown = null;
+        try {
+            onDiskParsed = JSON.parse(onDiskRaw);
+        } catch {
+            onDiskParsed = null;
         }
 
-        const deepChecks: Record<string, boolean> = {
-            "environment is 'development'": exported.environment === "development",
-            "ai_provider_used is populated": !!(exported.ai_provider_used),
-            "task_plan has ≥10 entries (one per module)":
-                Array.isArray(exported.task_plan) && exported.task_plan.length >= 10,
-            "reasoning_steps has agent names":
-                Array.isArray(exported.reasoning_steps) &&
-                exported.reasoning_steps.some((s: any) => s.agent),
-            "tool_calls includes provider info":
-                Array.isArray(exported.tool_calls) &&
-                exported.tool_calls.some((t: any) => t.provider),
-            "action_execution includes statuses":
-                Array.isArray(exported.action_execution) &&
-                exported.action_execution.some((a: any) => a.status),
-            "summary is present": !!(exported.summary),
+        const isArray = Array.isArray(onDiskParsed);
+        const arr = isArray ? (onDiskParsed as Array<Record<string, unknown>>) : [];
+
+        // Every entry must carry the 5 rubric keys at the top level.
+        const rubricKeyCoverage = arr.every((e) =>
+            REQUIRED_RUBRIC_KEYS.every((k) => e[k] !== undefined)
+        );
+
+        // Every entry must carry the metadata fields the auditor reads.
+        const metadataKeys = ["timestamp", "step", "tool_called", "reasoning", "status", "rubric_category"];
+        const metadataCoverage = arr.every((e) => metadataKeys.every((k) => e[k] !== undefined));
+
+        // All 5 rubric categories must appear at least once.
+        const categoriesPresent = new Set(arr.map((e) => e.rubric_category));
+        const allCategoriesPresent = RUBRIC_CATEGORIES.every((c) => categoriesPresent.has(c));
+
+        // V2 Phase 3/4 data-lineage properties must appear on at least one entry.
+        const lineageCoverage = arr.some(
+            (e) => (e as any).data_lineage && (e as any).data_lineage.from && (e as any).data_lineage.to
+        );
+
+        // Final flush marker should NOT be present on a successful run; on a
+        // panic we'd expect PIPELINE_HALT_PANIC. Just confirm no malformed entries.
+        const malformedEntries = formatted.validation.missing_keys_per_entry;
+
+        const checks: Record<string, boolean> = {
+            "Submission file written":
+                fileExists && formatted.output_path.endsWith(path.join("docs", "submission", "antigravity_trace_final.json")),
+            "Output is a JSON array (wrapper [])": isArray,
+            "Array is non-empty": arr.length > 0,
+            "Every entry has all 5 rubric keys": rubricKeyCoverage,
+            "Every entry has core metadata fields": metadataCoverage,
+            "All 5 rubric categories represented": allCategoriesPresent,
+            "Data lineage properties present (from/to)": lineageCoverage,
+            "No malformed entries": malformedEntries.length === 0,
+            "entry_count matches on-disk array length": formatted.entry_count === arr.length,
         };
 
-        for (const [name, passed] of Object.entries(deepChecks)) {
+        console.log("Submission path :", formatted.output_path);
+        console.log("Source log path :", formatted.log_path);
+        console.log("Entry count     :", formatted.entry_count);
+        console.log("Rubric breakdown:", JSON.stringify(formatted.rubric_breakdown));
+        console.log();
+
+        for (const [name, passed] of Object.entries(checks)) {
             console.log(`  ${passed ? "✅" : "❌"} ${name}`);
         }
 
-        console.log("\nSummary:", JSON.stringify(exported.summary, null, 2));
-
-        const allPassed = allPresent && Object.values(deepChecks).every(Boolean);
+        const allPassed = Object.values(checks).every(Boolean);
         console.log(allPassed
-            ? "\n✅ PASS — Trace format matches judge requirements"
-            : "\n❌ FAIL — Fix trace exporter"
+            ? "\n✅ PASS — Final trace JSON array matches the hackathon rubric structure"
+            : "\n❌ FAIL — Trace formatter output does not satisfy the rubric"
         );
     } catch (error: any) {
         console.log("❌ FAIL:", error.message);

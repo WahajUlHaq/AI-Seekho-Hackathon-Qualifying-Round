@@ -1,0 +1,3140 @@
+[
+  {
+    "timestamp": "2026-05-19T23:53:27.620Z",
+    "step": "agent_start:MultiSourceIngestionAgent",
+    "tool_called": "MultiSourceIngestionAgent",
+    "reasoning": "MultiSourceIngestionAgent started",
+    "status": "SUCCESS",
+    "rollback_action": "none",
+    "latency_ms": 0,
+    "cost": 0,
+    "rubric_category": "task_execution",
+    "workplan_formulation": {
+      "status": "INITIALIZED",
+      "plan": "Antigravity pipeline — task_execution"
+    },
+    "task_execution": "MultiSourceIngestionAgent:agent_start:MultiSourceIngestionAgent",
+    "tool_calls": [
+      "MultiSourceIngestionAgent"
+    ],
+    "constraint_evaluation": {
+      "amce_contract": null,
+      "result": "SUCCESS"
+    },
+    "failure_recovery": {
+      "rollback_triggered": false,
+      "strategy": "none"
+    }
+  },
+  {
+    "timestamp": "2026-05-19T23:53:27.769Z",
+    "step": "decision:MultiSourceIngestionAgent",
+    "tool_called": "MultiSourceIngestionAgent",
+    "reasoning": "Ingested 4/5 sources via Promise.allSettled — total words: 323, failures: 0",
+    "status": "SUCCESS",
+    "rollback_action": "none",
+    "latency_ms": 0,
+    "cost": 0,
+    "rubric_category": "workplan_formulation",
+    "workplan_formulation": {
+      "status": "INITIALIZED",
+      "plan": "Antigravity pipeline — workplan_formulation"
+    },
+    "task_execution": "MultiSourceIngestionAgent:decision:MultiSourceIngestionAgent",
+    "tool_calls": [
+      "MultiSourceIngestionAgent"
+    ],
+    "constraint_evaluation": {
+      "amce_contract": null,
+      "result": "SUCCESS"
+    },
+    "failure_recovery": {
+      "rollback_triggered": false,
+      "strategy": "none"
+    }
+  },
+  {
+    "timestamp": "2026-05-19T23:53:27.774Z",
+    "step": "AMCE_M1_StructuralValidation",
+    "tool_called": "ZodValidator",
+    "reasoning": "M1 output passed Zod structural validation (ALERT_ONLY mode)",
+    "status": "SUCCESS",
+    "rollback_action": "none",
+    "latency_ms": 152,
+    "cost": 0,
+    "rubric_category": "constraint_evaluation",
+    "workplan_formulation": {
+      "status": "INITIALIZED",
+      "plan": "Antigravity pipeline — constraint_evaluation"
+    },
+    "task_execution": "ZodValidator:AMCE_M1_StructuralValidation",
+    "tool_calls": [
+      "ZodValidator"
+    ],
+    "constraint_evaluation": {
+      "amce_contract": null,
+      "result": "SUCCESS"
+    },
+    "failure_recovery": {
+      "rollback_triggered": false,
+      "strategy": "none"
+    }
+  },
+  {
+    "timestamp": "2026-05-19T23:53:27.775Z",
+    "step": "contract_gate:MultiSourceIngestionAgent",
+    "tool_called": "MultiSourceIngestionAgent",
+    "reasoning": "Contract gate: PASS (attempt 1/2)",
+    "status": "SUCCESS",
+    "rollback_action": "none",
+    "latency_ms": 0,
+    "cost": 0,
+    "rubric_category": "constraint_evaluation",
+    "workplan_formulation": {
+      "status": "INITIALIZED",
+      "plan": "Antigravity pipeline — constraint_evaluation"
+    },
+    "task_execution": "MultiSourceIngestionAgent:contract_gate:MultiSourceIngestionAgent",
+    "tool_calls": [
+      "MultiSourceIngestionAgent"
+    ],
+    "constraint_evaluation": {
+      "amce_contract": null,
+      "result": "SUCCESS"
+    },
+    "failure_recovery": {
+      "rollback_triggered": false,
+      "strategy": "none"
+    }
+  },
+  {
+    "timestamp": "2026-05-19T23:53:27.776Z",
+    "step": "agent_complete:MultiSourceIngestionAgent",
+    "tool_called": "MultiSourceIngestionAgent",
+    "reasoning": "MultiSourceIngestionAgent completed",
+    "status": "SUCCESS",
+    "rollback_action": "none",
+    "latency_ms": 0,
+    "cost": 0,
+    "rubric_category": "task_execution",
+    "workplan_formulation": {
+      "status": "INITIALIZED",
+      "plan": "Antigravity pipeline — task_execution"
+    },
+    "task_execution": "MultiSourceIngestionAgent:agent_complete:MultiSourceIngestionAgent",
+    "tool_calls": [
+      "MultiSourceIngestionAgent"
+    ],
+    "constraint_evaluation": {
+      "amce_contract": null,
+      "result": "SUCCESS"
+    },
+    "failure_recovery": {
+      "rollback_triggered": false,
+      "strategy": "none"
+    }
+  },
+  {
+    "timestamp": "2026-05-19T23:53:27.777Z",
+    "step": "agent_start:CredibilityScorerAgent",
+    "tool_called": "CredibilityScorerAgent",
+    "reasoning": "CredibilityScorerAgent started",
+    "status": "SUCCESS",
+    "rollback_action": "none",
+    "latency_ms": 0,
+    "cost": 0,
+    "rubric_category": "task_execution",
+    "workplan_formulation": {
+      "status": "INITIALIZED",
+      "plan": "Antigravity pipeline — task_execution"
+    },
+    "task_execution": "CredibilityScorerAgent:agent_start:CredibilityScorerAgent",
+    "tool_calls": [
+      "CredibilityScorerAgent"
+    ],
+    "constraint_evaluation": {
+      "amce_contract": null,
+      "result": "SUCCESS"
+    },
+    "failure_recovery": {
+      "rollback_triggered": false,
+      "strategy": "none"
+    }
+  },
+  {
+    "timestamp": "2026-05-19T23:53:28.374Z",
+    "step": "decision:CredibilityScorerAgent",
+    "tool_called": "CredibilityScorerAgent",
+    "reasoning": "Source SRC-005: recency=20, authority=10, quality=20 → MEDIUM",
+    "status": "SUCCESS",
+    "rollback_action": "none",
+    "latency_ms": 0,
+    "cost": 0,
+    "rubric_category": "workplan_formulation",
+    "workplan_formulation": {
+      "status": "INITIALIZED",
+      "plan": "Antigravity pipeline — workplan_formulation"
+    },
+    "task_execution": "CredibilityScorerAgent:decision:CredibilityScorerAgent",
+    "tool_calls": [
+      "CredibilityScorerAgent"
+    ],
+    "constraint_evaluation": {
+      "amce_contract": null,
+      "result": "SUCCESS"
+    },
+    "failure_recovery": {
+      "rollback_triggered": false,
+      "strategy": "none"
+    }
+  },
+  {
+    "timestamp": "2026-05-19T23:53:28.378Z",
+    "step": "decision:CredibilityScorerAgent",
+    "tool_called": "CredibilityScorerAgent",
+    "reasoning": "Source SRC-004: recency=20, authority=22, quality=20 → MEDIUM",
+    "status": "SUCCESS",
+    "rollback_action": "none",
+    "latency_ms": 0,
+    "cost": 0,
+    "rubric_category": "workplan_formulation",
+    "workplan_formulation": {
+      "status": "INITIALIZED",
+      "plan": "Antigravity pipeline — workplan_formulation"
+    },
+    "task_execution": "CredibilityScorerAgent:decision:CredibilityScorerAgent",
+    "tool_calls": [
+      "CredibilityScorerAgent"
+    ],
+    "constraint_evaluation": {
+      "amce_contract": null,
+      "result": "SUCCESS"
+    },
+    "failure_recovery": {
+      "rollback_triggered": false,
+      "strategy": "none"
+    }
+  },
+  {
+    "timestamp": "2026-05-19T23:53:28.381Z",
+    "step": "decision:CredibilityScorerAgent",
+    "tool_called": "CredibilityScorerAgent",
+    "reasoning": "Source SRC-003: recency=20, authority=30, quality=30 → HIGH",
+    "status": "SUCCESS",
+    "rollback_action": "none",
+    "latency_ms": 0,
+    "cost": 0,
+    "rubric_category": "workplan_formulation",
+    "workplan_formulation": {
+      "status": "INITIALIZED",
+      "plan": "Antigravity pipeline — workplan_formulation"
+    },
+    "task_execution": "CredibilityScorerAgent:decision:CredibilityScorerAgent",
+    "tool_calls": [
+      "CredibilityScorerAgent"
+    ],
+    "constraint_evaluation": {
+      "amce_contract": null,
+      "result": "SUCCESS"
+    },
+    "failure_recovery": {
+      "rollback_triggered": false,
+      "strategy": "none"
+    }
+  },
+  {
+    "timestamp": "2026-05-19T23:53:28.817Z",
+    "step": "decision:CredibilityScorerAgent",
+    "tool_called": "CredibilityScorerAgent",
+    "reasoning": "Source SRC-002: recency=20, authority=30, quality=20 → HIGH",
+    "status": "SUCCESS",
+    "rollback_action": "none",
+    "latency_ms": 0,
+    "cost": 0,
+    "rubric_category": "workplan_formulation",
+    "workplan_formulation": {
+      "status": "INITIALIZED",
+      "plan": "Antigravity pipeline — workplan_formulation"
+    },
+    "task_execution": "CredibilityScorerAgent:decision:CredibilityScorerAgent",
+    "tool_calls": [
+      "CredibilityScorerAgent"
+    ],
+    "constraint_evaluation": {
+      "amce_contract": null,
+      "result": "SUCCESS"
+    },
+    "failure_recovery": {
+      "rollback_triggered": false,
+      "strategy": "none"
+    }
+  },
+  {
+    "timestamp": "2026-05-19T23:53:28.833Z",
+    "step": "decision:CredibilityScorerAgent",
+    "tool_called": "CredibilityScorerAgent",
+    "reasoning": "Source SRC-001: recency=20, authority=30, quality=30 → HIGH",
+    "status": "SUCCESS",
+    "rollback_action": "none",
+    "latency_ms": 0,
+    "cost": 0,
+    "rubric_category": "workplan_formulation",
+    "workplan_formulation": {
+      "status": "INITIALIZED",
+      "plan": "Antigravity pipeline — workplan_formulation"
+    },
+    "task_execution": "CredibilityScorerAgent:decision:CredibilityScorerAgent",
+    "tool_calls": [
+      "CredibilityScorerAgent"
+    ],
+    "constraint_evaluation": {
+      "amce_contract": null,
+      "result": "SUCCESS"
+    },
+    "failure_recovery": {
+      "rollback_triggered": false,
+      "strategy": "none"
+    }
+  },
+  {
+    "timestamp": "2026-05-19T23:53:28.834Z",
+    "step": "decision:CredibilityScorerAgent",
+    "tool_called": "CredibilityScorerAgent",
+    "reasoning": "Scored 5 sources — HIGH: 3, MEDIUM: 2, LOW: 0",
+    "status": "SUCCESS",
+    "rollback_action": "none",
+    "latency_ms": 0,
+    "cost": 0,
+    "rubric_category": "workplan_formulation",
+    "workplan_formulation": {
+      "status": "INITIALIZED",
+      "plan": "Antigravity pipeline — workplan_formulation"
+    },
+    "task_execution": "CredibilityScorerAgent:decision:CredibilityScorerAgent",
+    "tool_calls": [
+      "CredibilityScorerAgent"
+    ],
+    "constraint_evaluation": {
+      "amce_contract": null,
+      "result": "SUCCESS"
+    },
+    "failure_recovery": {
+      "rollback_triggered": false,
+      "strategy": "none"
+    }
+  },
+  {
+    "timestamp": "2026-05-19T23:53:28.851Z",
+    "step": "AMCE_M2_StructuralValidation",
+    "tool_called": "ZodValidator",
+    "reasoning": "M2 output passed Zod structural validation (ALERT_ONLY mode)",
+    "status": "SUCCESS",
+    "rollback_action": "none",
+    "latency_ms": 1073,
+    "cost": 0,
+    "rubric_category": "constraint_evaluation",
+    "workplan_formulation": {
+      "status": "INITIALIZED",
+      "plan": "Antigravity pipeline — constraint_evaluation"
+    },
+    "task_execution": "ZodValidator:AMCE_M2_StructuralValidation",
+    "tool_calls": [
+      "ZodValidator"
+    ],
+    "constraint_evaluation": {
+      "amce_contract": null,
+      "result": "SUCCESS"
+    },
+    "failure_recovery": {
+      "rollback_triggered": false,
+      "strategy": "none"
+    }
+  },
+  {
+    "timestamp": "2026-05-19T23:53:28.852Z",
+    "step": "agent_complete:CredibilityScorerAgent",
+    "tool_called": "CredibilityScorerAgent",
+    "reasoning": "CredibilityScorerAgent completed",
+    "status": "SUCCESS",
+    "rollback_action": "none",
+    "latency_ms": 0,
+    "cost": 0,
+    "rubric_category": "task_execution",
+    "workplan_formulation": {
+      "status": "INITIALIZED",
+      "plan": "Antigravity pipeline — task_execution"
+    },
+    "task_execution": "CredibilityScorerAgent:agent_complete:CredibilityScorerAgent",
+    "tool_calls": [
+      "CredibilityScorerAgent"
+    ],
+    "constraint_evaluation": {
+      "amce_contract": null,
+      "result": "SUCCESS"
+    },
+    "failure_recovery": {
+      "rollback_triggered": false,
+      "strategy": "none"
+    }
+  },
+  {
+    "timestamp": "2026-05-19T23:53:28.867Z",
+    "step": "agent_start:NoiseFilterAgent",
+    "tool_called": "NoiseFilterAgent",
+    "reasoning": "NoiseFilterAgent started",
+    "status": "SUCCESS",
+    "rollback_action": "none",
+    "latency_ms": 0,
+    "cost": 0,
+    "rubric_category": "task_execution",
+    "workplan_formulation": {
+      "status": "INITIALIZED",
+      "plan": "Antigravity pipeline — task_execution"
+    },
+    "task_execution": "NoiseFilterAgent:agent_start:NoiseFilterAgent",
+    "tool_calls": [
+      "NoiseFilterAgent"
+    ],
+    "constraint_evaluation": {
+      "amce_contract": null,
+      "result": "SUCCESS"
+    },
+    "failure_recovery": {
+      "rollback_triggered": false,
+      "strategy": "none"
+    }
+  },
+  {
+    "timestamp": "2026-05-19T23:53:29.279Z",
+    "step": "llm_call:NoiseFilterAgent",
+    "tool_called": "NoiseFilterAgent",
+    "reasoning": "Embedding generation",
+    "status": "SUCCESS",
+    "rollback_action": "none",
+    "latency_ms": 410,
+    "cost": 0,
+    "rubric_category": "tool_calls",
+    "workplan_formulation": {
+      "status": "INITIALIZED",
+      "plan": "Antigravity pipeline — tool_calls"
+    },
+    "task_execution": "NoiseFilterAgent:llm_call:NoiseFilterAgent",
+    "tool_calls": [
+      "NoiseFilterAgent"
+    ],
+    "constraint_evaluation": {
+      "amce_contract": null,
+      "result": "SUCCESS"
+    },
+    "failure_recovery": {
+      "rollback_triggered": false,
+      "strategy": "none"
+    }
+  },
+  {
+    "timestamp": "2026-05-19T23:53:29.934Z",
+    "step": "llm_call:NoiseFilterAgent",
+    "tool_called": "NoiseFilterAgent",
+    "reasoning": "Embedding generation",
+    "status": "SUCCESS",
+    "rollback_action": "none",
+    "latency_ms": 654,
+    "cost": 0,
+    "rubric_category": "tool_calls",
+    "workplan_formulation": {
+      "status": "INITIALIZED",
+      "plan": "Antigravity pipeline — tool_calls"
+    },
+    "task_execution": "NoiseFilterAgent:llm_call:NoiseFilterAgent",
+    "tool_calls": [
+      "NoiseFilterAgent"
+    ],
+    "constraint_evaluation": {
+      "amce_contract": null,
+      "result": "SUCCESS"
+    },
+    "failure_recovery": {
+      "rollback_triggered": false,
+      "strategy": "none"
+    }
+  },
+  {
+    "timestamp": "2026-05-19T23:53:30.455Z",
+    "step": "llm_call:NoiseFilterAgent",
+    "tool_called": "NoiseFilterAgent",
+    "reasoning": "Embedding generation",
+    "status": "SUCCESS",
+    "rollback_action": "none",
+    "latency_ms": 520,
+    "cost": 0,
+    "rubric_category": "tool_calls",
+    "workplan_formulation": {
+      "status": "INITIALIZED",
+      "plan": "Antigravity pipeline — tool_calls"
+    },
+    "task_execution": "NoiseFilterAgent:llm_call:NoiseFilterAgent",
+    "tool_calls": [
+      "NoiseFilterAgent"
+    ],
+    "constraint_evaluation": {
+      "amce_contract": null,
+      "result": "SUCCESS"
+    },
+    "failure_recovery": {
+      "rollback_triggered": false,
+      "strategy": "none"
+    }
+  },
+  {
+    "timestamp": "2026-05-19T23:53:30.882Z",
+    "step": "llm_call:NoiseFilterAgent",
+    "tool_called": "NoiseFilterAgent",
+    "reasoning": "Embedding generation",
+    "status": "SUCCESS",
+    "rollback_action": "none",
+    "latency_ms": 426,
+    "cost": 0,
+    "rubric_category": "tool_calls",
+    "workplan_formulation": {
+      "status": "INITIALIZED",
+      "plan": "Antigravity pipeline — tool_calls"
+    },
+    "task_execution": "NoiseFilterAgent:llm_call:NoiseFilterAgent",
+    "tool_calls": [
+      "NoiseFilterAgent"
+    ],
+    "constraint_evaluation": {
+      "amce_contract": null,
+      "result": "SUCCESS"
+    },
+    "failure_recovery": {
+      "rollback_triggered": false,
+      "strategy": "none"
+    }
+  },
+  {
+    "timestamp": "2026-05-19T23:53:31.497Z",
+    "step": "llm_call:NoiseFilterAgent",
+    "tool_called": "NoiseFilterAgent",
+    "reasoning": "Embedding generation",
+    "status": "SUCCESS",
+    "rollback_action": "none",
+    "latency_ms": 614,
+    "cost": 0,
+    "rubric_category": "tool_calls",
+    "workplan_formulation": {
+      "status": "INITIALIZED",
+      "plan": "Antigravity pipeline — tool_calls"
+    },
+    "task_execution": "NoiseFilterAgent:llm_call:NoiseFilterAgent",
+    "tool_calls": [
+      "NoiseFilterAgent"
+    ],
+    "constraint_evaluation": {
+      "amce_contract": null,
+      "result": "SUCCESS"
+    },
+    "failure_recovery": {
+      "rollback_triggered": false,
+      "strategy": "none"
+    }
+  },
+  {
+    "timestamp": "2026-05-19T23:53:31.499Z",
+    "step": "decision:NoiseFilterAgent",
+    "tool_called": "NoiseFilterAgent",
+    "reasoning": "CORROBORATING: SRC-001 ↔ SRC-002 sim=71.5% — keep both, mark group",
+    "status": "SUCCESS",
+    "rollback_action": "none",
+    "latency_ms": 0,
+    "cost": 0,
+    "rubric_category": "workplan_formulation",
+    "workplan_formulation": {
+      "status": "INITIALIZED",
+      "plan": "Antigravity pipeline — workplan_formulation"
+    },
+    "task_execution": "NoiseFilterAgent:decision:NoiseFilterAgent",
+    "tool_calls": [
+      "NoiseFilterAgent"
+    ],
+    "constraint_evaluation": {
+      "amce_contract": null,
+      "result": "SUCCESS"
+    },
+    "failure_recovery": {
+      "rollback_triggered": false,
+      "strategy": "none"
+    }
+  },
+  {
+    "timestamp": "2026-05-19T23:53:31.500Z",
+    "step": "decision:NoiseFilterAgent",
+    "tool_called": "NoiseFilterAgent",
+    "reasoning": "CORROBORATING: SRC-001 ↔ SRC-003 sim=71.9% — keep both, mark group",
+    "status": "SUCCESS",
+    "rollback_action": "none",
+    "latency_ms": 0,
+    "cost": 0,
+    "rubric_category": "workplan_formulation",
+    "workplan_formulation": {
+      "status": "INITIALIZED",
+      "plan": "Antigravity pipeline — workplan_formulation"
+    },
+    "task_execution": "NoiseFilterAgent:decision:NoiseFilterAgent",
+    "tool_calls": [
+      "NoiseFilterAgent"
+    ],
+    "constraint_evaluation": {
+      "amce_contract": null,
+      "result": "SUCCESS"
+    },
+    "failure_recovery": {
+      "rollback_triggered": false,
+      "strategy": "none"
+    }
+  },
+  {
+    "timestamp": "2026-05-19T23:53:31.500Z",
+    "step": "decision:NoiseFilterAgent",
+    "tool_called": "NoiseFilterAgent",
+    "reasoning": "CORROBORATING: SRC-001 ↔ SRC-004 sim=69.9% — keep both, mark group",
+    "status": "SUCCESS",
+    "rollback_action": "none",
+    "latency_ms": 0,
+    "cost": 0,
+    "rubric_category": "workplan_formulation",
+    "workplan_formulation": {
+      "status": "INITIALIZED",
+      "plan": "Antigravity pipeline — workplan_formulation"
+    },
+    "task_execution": "NoiseFilterAgent:decision:NoiseFilterAgent",
+    "tool_calls": [
+      "NoiseFilterAgent"
+    ],
+    "constraint_evaluation": {
+      "amce_contract": null,
+      "result": "SUCCESS"
+    },
+    "failure_recovery": {
+      "rollback_triggered": false,
+      "strategy": "none"
+    }
+  },
+  {
+    "timestamp": "2026-05-19T23:53:31.501Z",
+    "step": "decision:NoiseFilterAgent",
+    "tool_called": "NoiseFilterAgent",
+    "reasoning": "CORROBORATING: SRC-001 ↔ SRC-005 sim=84.0% — keep both, mark group",
+    "status": "SUCCESS",
+    "rollback_action": "none",
+    "latency_ms": 0,
+    "cost": 0,
+    "rubric_category": "workplan_formulation",
+    "workplan_formulation": {
+      "status": "INITIALIZED",
+      "plan": "Antigravity pipeline — workplan_formulation"
+    },
+    "task_execution": "NoiseFilterAgent:decision:NoiseFilterAgent",
+    "tool_calls": [
+      "NoiseFilterAgent"
+    ],
+    "constraint_evaluation": {
+      "amce_contract": null,
+      "result": "SUCCESS"
+    },
+    "failure_recovery": {
+      "rollback_triggered": false,
+      "strategy": "none"
+    }
+  },
+  {
+    "timestamp": "2026-05-19T23:53:31.501Z",
+    "step": "decision:NoiseFilterAgent",
+    "tool_called": "NoiseFilterAgent",
+    "reasoning": "CORROBORATING: SRC-002 ↔ SRC-003 sim=69.4% — keep both, mark group",
+    "status": "SUCCESS",
+    "rollback_action": "none",
+    "latency_ms": 0,
+    "cost": 0,
+    "rubric_category": "workplan_formulation",
+    "workplan_formulation": {
+      "status": "INITIALIZED",
+      "plan": "Antigravity pipeline — workplan_formulation"
+    },
+    "task_execution": "NoiseFilterAgent:decision:NoiseFilterAgent",
+    "tool_calls": [
+      "NoiseFilterAgent"
+    ],
+    "constraint_evaluation": {
+      "amce_contract": null,
+      "result": "SUCCESS"
+    },
+    "failure_recovery": {
+      "rollback_triggered": false,
+      "strategy": "none"
+    }
+  },
+  {
+    "timestamp": "2026-05-19T23:53:31.502Z",
+    "step": "decision:NoiseFilterAgent",
+    "tool_called": "NoiseFilterAgent",
+    "reasoning": "CORROBORATING: SRC-002 ↔ SRC-005 sim=72.0% — keep both, mark group",
+    "status": "SUCCESS",
+    "rollback_action": "none",
+    "latency_ms": 0,
+    "cost": 0,
+    "rubric_category": "workplan_formulation",
+    "workplan_formulation": {
+      "status": "INITIALIZED",
+      "plan": "Antigravity pipeline — workplan_formulation"
+    },
+    "task_execution": "NoiseFilterAgent:decision:NoiseFilterAgent",
+    "tool_calls": [
+      "NoiseFilterAgent"
+    ],
+    "constraint_evaluation": {
+      "amce_contract": null,
+      "result": "SUCCESS"
+    },
+    "failure_recovery": {
+      "rollback_triggered": false,
+      "strategy": "none"
+    }
+  },
+  {
+    "timestamp": "2026-05-19T23:53:31.502Z",
+    "step": "decision:NoiseFilterAgent",
+    "tool_called": "NoiseFilterAgent",
+    "reasoning": "CORROBORATING: SRC-003 ↔ SRC-004 sim=64.5% — keep both, mark group",
+    "status": "SUCCESS",
+    "rollback_action": "none",
+    "latency_ms": 0,
+    "cost": 0,
+    "rubric_category": "workplan_formulation",
+    "workplan_formulation": {
+      "status": "INITIALIZED",
+      "plan": "Antigravity pipeline — workplan_formulation"
+    },
+    "task_execution": "NoiseFilterAgent:decision:NoiseFilterAgent",
+    "tool_calls": [
+      "NoiseFilterAgent"
+    ],
+    "constraint_evaluation": {
+      "amce_contract": null,
+      "result": "SUCCESS"
+    },
+    "failure_recovery": {
+      "rollback_triggered": false,
+      "strategy": "none"
+    }
+  },
+  {
+    "timestamp": "2026-05-19T23:53:31.503Z",
+    "step": "decision:NoiseFilterAgent",
+    "tool_called": "NoiseFilterAgent",
+    "reasoning": "CORROBORATING: SRC-003 ↔ SRC-005 sim=69.7% — keep both, mark group",
+    "status": "SUCCESS",
+    "rollback_action": "none",
+    "latency_ms": 0,
+    "cost": 0,
+    "rubric_category": "workplan_formulation",
+    "workplan_formulation": {
+      "status": "INITIALIZED",
+      "plan": "Antigravity pipeline — workplan_formulation"
+    },
+    "task_execution": "NoiseFilterAgent:decision:NoiseFilterAgent",
+    "tool_calls": [
+      "NoiseFilterAgent"
+    ],
+    "constraint_evaluation": {
+      "amce_contract": null,
+      "result": "SUCCESS"
+    },
+    "failure_recovery": {
+      "rollback_triggered": false,
+      "strategy": "none"
+    }
+  },
+  {
+    "timestamp": "2026-05-19T23:53:31.503Z",
+    "step": "decision:NoiseFilterAgent",
+    "tool_called": "NoiseFilterAgent",
+    "reasoning": "CORROBORATING: SRC-004 ↔ SRC-005 sim=65.8% — keep both, mark group",
+    "status": "SUCCESS",
+    "rollback_action": "none",
+    "latency_ms": 0,
+    "cost": 0,
+    "rubric_category": "workplan_formulation",
+    "workplan_formulation": {
+      "status": "INITIALIZED",
+      "plan": "Antigravity pipeline — workplan_formulation"
+    },
+    "task_execution": "NoiseFilterAgent:decision:NoiseFilterAgent",
+    "tool_calls": [
+      "NoiseFilterAgent"
+    ],
+    "constraint_evaluation": {
+      "amce_contract": null,
+      "result": "SUCCESS"
+    },
+    "failure_recovery": {
+      "rollback_triggered": false,
+      "strategy": "none"
+    }
+  },
+  {
+    "timestamp": "2026-05-19T23:53:31.504Z",
+    "step": "decision:NoiseFilterAgent",
+    "tool_called": "NoiseFilterAgent",
+    "reasoning": "Filtering complete: kept 5/5 sources, removed 0 (stale:0, dupe:0, spam:0), corroborating groups: 4",
+    "status": "SUCCESS",
+    "rollback_action": "none",
+    "latency_ms": 0,
+    "cost": 0,
+    "rubric_category": "workplan_formulation",
+    "workplan_formulation": {
+      "status": "INITIALIZED",
+      "plan": "Antigravity pipeline — workplan_formulation"
+    },
+    "task_execution": "NoiseFilterAgent:decision:NoiseFilterAgent",
+    "tool_calls": [
+      "NoiseFilterAgent"
+    ],
+    "constraint_evaluation": {
+      "amce_contract": null,
+      "result": "SUCCESS"
+    },
+    "failure_recovery": {
+      "rollback_triggered": false,
+      "strategy": "none"
+    }
+  },
+  {
+    "timestamp": "2026-05-19T23:53:31.506Z",
+    "step": "AMCE_M3_StructuralValidation",
+    "tool_called": "ZodValidator",
+    "reasoning": "M3 output passed Zod structural validation (ALERT_ONLY mode)",
+    "status": "SUCCESS",
+    "rollback_action": "none",
+    "latency_ms": 2638,
+    "cost": 0,
+    "rubric_category": "constraint_evaluation",
+    "workplan_formulation": {
+      "status": "INITIALIZED",
+      "plan": "Antigravity pipeline — constraint_evaluation"
+    },
+    "task_execution": "ZodValidator:AMCE_M3_StructuralValidation",
+    "tool_calls": [
+      "ZodValidator"
+    ],
+    "constraint_evaluation": {
+      "amce_contract": null,
+      "result": "SUCCESS"
+    },
+    "failure_recovery": {
+      "rollback_triggered": false,
+      "strategy": "none"
+    }
+  },
+  {
+    "timestamp": "2026-05-19T23:53:31.507Z",
+    "step": "agent_complete:NoiseFilterAgent",
+    "tool_called": "NoiseFilterAgent",
+    "reasoning": "NoiseFilterAgent completed",
+    "status": "SUCCESS",
+    "rollback_action": "none",
+    "latency_ms": 0,
+    "cost": 0,
+    "rubric_category": "task_execution",
+    "workplan_formulation": {
+      "status": "INITIALIZED",
+      "plan": "Antigravity pipeline — task_execution"
+    },
+    "task_execution": "NoiseFilterAgent:agent_complete:NoiseFilterAgent",
+    "tool_calls": [
+      "NoiseFilterAgent"
+    ],
+    "constraint_evaluation": {
+      "amce_contract": null,
+      "result": "SUCCESS"
+    },
+    "failure_recovery": {
+      "rollback_triggered": false,
+      "strategy": "none"
+    }
+  },
+  {
+    "timestamp": "2026-05-19T23:53:31.507Z",
+    "step": "agent_start:ContradictionDetectorAgent",
+    "tool_called": "ContradictionDetectorAgent",
+    "reasoning": "ContradictionDetectorAgent started",
+    "status": "SUCCESS",
+    "rollback_action": "none",
+    "latency_ms": 0,
+    "cost": 0,
+    "rubric_category": "task_execution",
+    "workplan_formulation": {
+      "status": "INITIALIZED",
+      "plan": "Antigravity pipeline — task_execution"
+    },
+    "task_execution": "ContradictionDetectorAgent:agent_start:ContradictionDetectorAgent",
+    "tool_calls": [
+      "ContradictionDetectorAgent"
+    ],
+    "constraint_evaluation": {
+      "amce_contract": null,
+      "result": "SUCCESS"
+    },
+    "failure_recovery": {
+      "rollback_triggered": false,
+      "strategy": "none"
+    }
+  },
+  {
+    "timestamp": "2026-05-19T23:53:31.847Z",
+    "step": "decision:ContradictionDetectorAgent",
+    "tool_called": "ContradictionDetectorAgent",
+    "reasoning": "Detected numeric contradiction on topic 'inventory_level': \"Count: 45\" vs \"Stock is out of stock (0 units)\"",
+    "status": "SUCCESS",
+    "rollback_action": "none",
+    "latency_ms": 0,
+    "cost": 0,
+    "rubric_category": "workplan_formulation",
+    "workplan_formulation": {
+      "status": "INITIALIZED",
+      "plan": "Antigravity pipeline — workplan_formulation"
+    },
+    "task_execution": "ContradictionDetectorAgent:decision:ContradictionDetectorAgent",
+    "tool_calls": [
+      "ContradictionDetectorAgent"
+    ],
+    "constraint_evaluation": {
+      "amce_contract": null,
+      "result": "SUCCESS"
+    },
+    "failure_recovery": {
+      "rollback_triggered": false,
+      "strategy": "none"
+    }
+  },
+  {
+    "timestamp": "2026-05-19T23:53:31.848Z",
+    "step": "decision:ContradictionDetectorAgent",
+    "tool_called": "ContradictionDetectorAgent",
+    "reasoning": "Detected implicit contradiction on topic 'inventory_level': \"Count: 45\" vs \"Stock is out of stock (0 units)\"",
+    "status": "SUCCESS",
+    "rollback_action": "none",
+    "latency_ms": 0,
+    "cost": 0,
+    "rubric_category": "workplan_formulation",
+    "workplan_formulation": {
+      "status": "INITIALIZED",
+      "plan": "Antigravity pipeline — workplan_formulation"
+    },
+    "task_execution": "ContradictionDetectorAgent:decision:ContradictionDetectorAgent",
+    "tool_calls": [
+      "ContradictionDetectorAgent"
+    ],
+    "constraint_evaluation": {
+      "amce_contract": null,
+      "result": "SUCCESS"
+    },
+    "failure_recovery": {
+      "rollback_triggered": false,
+      "strategy": "none"
+    }
+  },
+  {
+    "timestamp": "2026-05-19T23:53:31.852Z",
+    "step": "AMCE_M4_StructuralValidation",
+    "tool_called": "ZodValidator",
+    "reasoning": "M4 output passed Zod structural validation (QUARANTINE mode) — 2 contradictions",
+    "status": "SUCCESS",
+    "rollback_action": "none",
+    "latency_ms": 344,
+    "cost": 0,
+    "rubric_category": "constraint_evaluation",
+    "workplan_formulation": {
+      "status": "INITIALIZED",
+      "plan": "Antigravity pipeline — constraint_evaluation"
+    },
+    "task_execution": "ZodValidator:AMCE_M4_StructuralValidation",
+    "tool_calls": [
+      "ZodValidator"
+    ],
+    "constraint_evaluation": {
+      "amce_contract": null,
+      "result": "SUCCESS"
+    },
+    "failure_recovery": {
+      "rollback_triggered": false,
+      "strategy": "none"
+    }
+  },
+  {
+    "timestamp": "2026-05-19T23:53:31.853Z",
+    "step": "contract_gate:ContradictionDetectorAgent",
+    "tool_called": "ContradictionDetectorAgent",
+    "reasoning": "Contract gate: REJECT (attempt 1/2)",
+    "status": "SUCCESS",
+    "rollback_action": "none",
+    "latency_ms": 0,
+    "cost": 0,
+    "rubric_category": "constraint_evaluation",
+    "workplan_formulation": {
+      "status": "INITIALIZED",
+      "plan": "Antigravity pipeline — constraint_evaluation"
+    },
+    "task_execution": "ContradictionDetectorAgent:contract_gate:ContradictionDetectorAgent",
+    "tool_calls": [
+      "ContradictionDetectorAgent"
+    ],
+    "constraint_evaluation": {
+      "amce_contract": null,
+      "result": "SUCCESS"
+    },
+    "failure_recovery": {
+      "rollback_triggered": false,
+      "strategy": "none"
+    }
+  },
+  {
+    "timestamp": "2026-05-19T23:53:31.857Z",
+    "step": "recovery:ContradictionDetectorAgent",
+    "tool_called": "ContradictionDetectorAgent",
+    "reasoning": "Retrying after contract rejection (attempt 2/2) — switching to base model",
+    "status": "ROLLED_BACK",
+    "rollback_action": "Retrying after contract rejection (attempt 2/2) — switching to base model",
+    "latency_ms": 0,
+    "cost": 0,
+    "rubric_category": "failure_recovery",
+    "workplan_formulation": {
+      "status": "INITIALIZED",
+      "plan": "Antigravity pipeline — failure_recovery"
+    },
+    "task_execution": "ContradictionDetectorAgent:recovery:ContradictionDetectorAgent",
+    "tool_calls": [
+      "ContradictionDetectorAgent"
+    ],
+    "constraint_evaluation": {
+      "amce_contract": null,
+      "result": "ROLLED_BACK"
+    },
+    "failure_recovery": {
+      "rollback_triggered": true,
+      "strategy": "Retrying after contract rejection (attempt 2/2) — switching to base model"
+    }
+  },
+  {
+    "timestamp": "2026-05-19T23:53:32.318Z",
+    "step": "decision:ContradictionDetectorAgent",
+    "tool_called": "ContradictionDetectorAgent",
+    "reasoning": "Detected numeric contradiction on topic 'inventory_level': \"Count: 45\" vs \"Stock is out of stock (0 units)\"",
+    "status": "SUCCESS",
+    "rollback_action": "none",
+    "latency_ms": 0,
+    "cost": 0,
+    "rubric_category": "workplan_formulation",
+    "workplan_formulation": {
+      "status": "INITIALIZED",
+      "plan": "Antigravity pipeline — workplan_formulation"
+    },
+    "task_execution": "ContradictionDetectorAgent:decision:ContradictionDetectorAgent",
+    "tool_calls": [
+      "ContradictionDetectorAgent"
+    ],
+    "constraint_evaluation": {
+      "amce_contract": null,
+      "result": "SUCCESS"
+    },
+    "failure_recovery": {
+      "rollback_triggered": false,
+      "strategy": "none"
+    }
+  },
+  {
+    "timestamp": "2026-05-19T23:53:32.319Z",
+    "step": "decision:ContradictionDetectorAgent",
+    "tool_called": "ContradictionDetectorAgent",
+    "reasoning": "Detected implicit contradiction on topic 'inventory_level': \"Count: 45\" vs \"Stock is out of stock (0 units)\"",
+    "status": "SUCCESS",
+    "rollback_action": "none",
+    "latency_ms": 0,
+    "cost": 0,
+    "rubric_category": "workplan_formulation",
+    "workplan_formulation": {
+      "status": "INITIALIZED",
+      "plan": "Antigravity pipeline — workplan_formulation"
+    },
+    "task_execution": "ContradictionDetectorAgent:decision:ContradictionDetectorAgent",
+    "tool_calls": [
+      "ContradictionDetectorAgent"
+    ],
+    "constraint_evaluation": {
+      "amce_contract": null,
+      "result": "SUCCESS"
+    },
+    "failure_recovery": {
+      "rollback_triggered": false,
+      "strategy": "none"
+    }
+  },
+  {
+    "timestamp": "2026-05-19T23:53:32.320Z",
+    "step": "AMCE_M4_StructuralValidation",
+    "tool_called": "ZodValidator",
+    "reasoning": "M4 output passed Zod structural validation (QUARANTINE mode) — 2 contradictions",
+    "status": "SUCCESS",
+    "rollback_action": "none",
+    "latency_ms": 462,
+    "cost": 0,
+    "rubric_category": "constraint_evaluation",
+    "workplan_formulation": {
+      "status": "INITIALIZED",
+      "plan": "Antigravity pipeline — constraint_evaluation"
+    },
+    "task_execution": "ZodValidator:AMCE_M4_StructuralValidation",
+    "tool_calls": [
+      "ZodValidator"
+    ],
+    "constraint_evaluation": {
+      "amce_contract": null,
+      "result": "SUCCESS"
+    },
+    "failure_recovery": {
+      "rollback_triggered": false,
+      "strategy": "none"
+    }
+  },
+  {
+    "timestamp": "2026-05-19T23:53:32.321Z",
+    "step": "contract_gate:ContradictionDetectorAgent",
+    "tool_called": "ContradictionDetectorAgent",
+    "reasoning": "Contract gate: REJECT (attempt 2/2)",
+    "status": "SUCCESS",
+    "rollback_action": "none",
+    "latency_ms": 0,
+    "cost": 0,
+    "rubric_category": "constraint_evaluation",
+    "workplan_formulation": {
+      "status": "INITIALIZED",
+      "plan": "Antigravity pipeline — constraint_evaluation"
+    },
+    "task_execution": "ContradictionDetectorAgent:contract_gate:ContradictionDetectorAgent",
+    "tool_calls": [
+      "ContradictionDetectorAgent"
+    ],
+    "constraint_evaluation": {
+      "amce_contract": null,
+      "result": "SUCCESS"
+    },
+    "failure_recovery": {
+      "rollback_triggered": false,
+      "strategy": "none"
+    }
+  },
+  {
+    "timestamp": "2026-05-19T23:53:32.321Z",
+    "step": "agent_complete:ContradictionDetectorAgent",
+    "tool_called": "ContradictionDetectorAgent",
+    "reasoning": "ContradictionDetectorAgent completed",
+    "status": "SUCCESS",
+    "rollback_action": "none",
+    "latency_ms": 0,
+    "cost": 0,
+    "rubric_category": "task_execution",
+    "workplan_formulation": {
+      "status": "INITIALIZED",
+      "plan": "Antigravity pipeline — task_execution"
+    },
+    "task_execution": "ContradictionDetectorAgent:agent_complete:ContradictionDetectorAgent",
+    "tool_calls": [
+      "ContradictionDetectorAgent"
+    ],
+    "constraint_evaluation": {
+      "amce_contract": null,
+      "result": "SUCCESS"
+    },
+    "failure_recovery": {
+      "rollback_triggered": false,
+      "strategy": "none"
+    }
+  },
+  {
+    "timestamp": "2026-05-19T23:53:32.322Z",
+    "step": "agent_start:ConflictResolutionAgent",
+    "tool_called": "ConflictResolutionAgent",
+    "reasoning": "ConflictResolutionAgent started",
+    "status": "SUCCESS",
+    "rollback_action": "none",
+    "latency_ms": 0,
+    "cost": 0,
+    "rubric_category": "task_execution",
+    "workplan_formulation": {
+      "status": "INITIALIZED",
+      "plan": "Antigravity pipeline — task_execution"
+    },
+    "task_execution": "ConflictResolutionAgent:agent_start:ConflictResolutionAgent",
+    "tool_calls": [
+      "ConflictResolutionAgent"
+    ],
+    "constraint_evaluation": {
+      "amce_contract": null,
+      "result": "SUCCESS"
+    },
+    "failure_recovery": {
+      "rollback_triggered": false,
+      "strategy": "none"
+    }
+  },
+  {
+    "timestamp": "2026-05-19T23:53:32.323Z",
+    "step": "decision:ConflictResolutionAgent",
+    "tool_called": "ConflictResolutionAgent",
+    "reasoning": "Similar credibility — computing weighted average: 17.14",
+    "status": "SUCCESS",
+    "rollback_action": "none",
+    "latency_ms": 0,
+    "cost": 0,
+    "rubric_category": "workplan_formulation",
+    "workplan_formulation": {
+      "status": "INITIALIZED",
+      "plan": "Antigravity pipeline — workplan_formulation"
+    },
+    "task_execution": "ConflictResolutionAgent:decision:ConflictResolutionAgent",
+    "tool_calls": [
+      "ConflictResolutionAgent"
+    ],
+    "constraint_evaluation": {
+      "amce_contract": null,
+      "result": "SUCCESS"
+    },
+    "failure_recovery": {
+      "rollback_triggered": false,
+      "strategy": "none"
+    }
+  },
+  {
+    "timestamp": "2026-05-19T23:53:32.324Z",
+    "step": "decision:ConflictResolutionAgent",
+    "tool_called": "ConflictResolutionAgent",
+    "reasoning": "Equal credibility and recency on topic 'inventory_level' — escalating to human_review",
+    "status": "SUCCESS",
+    "rollback_action": "none",
+    "latency_ms": 0,
+    "cost": 0,
+    "rubric_category": "workplan_formulation",
+    "workplan_formulation": {
+      "status": "INITIALIZED",
+      "plan": "Antigravity pipeline — workplan_formulation"
+    },
+    "task_execution": "ConflictResolutionAgent:decision:ConflictResolutionAgent",
+    "tool_calls": [
+      "ConflictResolutionAgent"
+    ],
+    "constraint_evaluation": {
+      "amce_contract": null,
+      "result": "SUCCESS"
+    },
+    "failure_recovery": {
+      "rollback_triggered": false,
+      "strategy": "none"
+    }
+  },
+  {
+    "timestamp": "2026-05-19T23:53:32.325Z",
+    "step": "decision:ConflictResolutionAgent",
+    "tool_called": "ConflictResolutionAgent",
+    "reasoning": "Resolved 2 contradictions — strategies: aggregate, human_review. Mutated 1 resolvedFacts topics. Cascading: 0.",
+    "status": "SUCCESS",
+    "rollback_action": "none",
+    "latency_ms": 0,
+    "cost": 0,
+    "rubric_category": "workplan_formulation",
+    "workplan_formulation": {
+      "status": "INITIALIZED",
+      "plan": "Antigravity pipeline — workplan_formulation"
+    },
+    "task_execution": "ConflictResolutionAgent:decision:ConflictResolutionAgent",
+    "tool_calls": [
+      "ConflictResolutionAgent"
+    ],
+    "constraint_evaluation": {
+      "amce_contract": null,
+      "result": "SUCCESS"
+    },
+    "failure_recovery": {
+      "rollback_triggered": false,
+      "strategy": "none"
+    }
+  },
+  {
+    "timestamp": "2026-05-19T23:53:32.327Z",
+    "step": "AMCE_M7_StructuralValidation",
+    "tool_called": "ZodValidator",
+    "reasoning": "M7 output passed Zod structural validation (ALERT_ONLY). resolvedFacts topics: 1",
+    "status": "SUCCESS",
+    "rollback_action": "none",
+    "latency_ms": 4,
+    "cost": 0,
+    "rubric_category": "constraint_evaluation",
+    "workplan_formulation": {
+      "status": "INITIALIZED",
+      "plan": "Antigravity pipeline — constraint_evaluation"
+    },
+    "task_execution": "ZodValidator:AMCE_M7_StructuralValidation",
+    "tool_calls": [
+      "ZodValidator"
+    ],
+    "constraint_evaluation": {
+      "amce_contract": null,
+      "result": "SUCCESS"
+    },
+    "failure_recovery": {
+      "rollback_triggered": false,
+      "strategy": "none"
+    }
+  },
+  {
+    "timestamp": "2026-05-19T23:53:32.328Z",
+    "step": "agent_complete:ConflictResolutionAgent",
+    "tool_called": "ConflictResolutionAgent",
+    "reasoning": "ConflictResolutionAgent completed",
+    "status": "SUCCESS",
+    "rollback_action": "none",
+    "latency_ms": 0,
+    "cost": 0,
+    "rubric_category": "task_execution",
+    "workplan_formulation": {
+      "status": "INITIALIZED",
+      "plan": "Antigravity pipeline — task_execution"
+    },
+    "task_execution": "ConflictResolutionAgent:agent_complete:ConflictResolutionAgent",
+    "tool_calls": [
+      "ConflictResolutionAgent"
+    ],
+    "constraint_evaluation": {
+      "amce_contract": null,
+      "result": "SUCCESS"
+    },
+    "failure_recovery": {
+      "rollback_triggered": false,
+      "strategy": "none"
+    }
+  },
+  {
+    "timestamp": "2026-05-19T23:53:32.329Z",
+    "step": "agent_start:TemporalAnalysisAgent",
+    "tool_called": "TemporalAnalysisAgent",
+    "reasoning": "TemporalAnalysisAgent started",
+    "status": "SUCCESS",
+    "rollback_action": "none",
+    "latency_ms": 0,
+    "cost": 0,
+    "rubric_category": "task_execution",
+    "workplan_formulation": {
+      "status": "INITIALIZED",
+      "plan": "Antigravity pipeline — task_execution"
+    },
+    "task_execution": "TemporalAnalysisAgent:agent_start:TemporalAnalysisAgent",
+    "tool_calls": [
+      "TemporalAnalysisAgent"
+    ],
+    "constraint_evaluation": {
+      "amce_contract": null,
+      "result": "SUCCESS"
+    },
+    "failure_recovery": {
+      "rollback_triggered": false,
+      "strategy": "none"
+    }
+  },
+  {
+    "timestamp": "2026-05-19T23:53:32.664Z",
+    "step": "decision:TemporalAnalysisAgent",
+    "tool_called": "TemporalAnalysisAgent",
+    "reasoning": "demand_change_pct: pattern=drift, change=1800.0%, direction=increasing",
+    "status": "SUCCESS",
+    "rollback_action": "none",
+    "latency_ms": 0,
+    "cost": 0,
+    "rubric_category": "workplan_formulation",
+    "workplan_formulation": {
+      "status": "INITIALIZED",
+      "plan": "Antigravity pipeline — workplan_formulation"
+    },
+    "task_execution": "TemporalAnalysisAgent:decision:TemporalAnalysisAgent",
+    "tool_calls": [
+      "TemporalAnalysisAgent"
+    ],
+    "constraint_evaluation": {
+      "amce_contract": null,
+      "result": "SUCCESS"
+    },
+    "failure_recovery": {
+      "rollback_triggered": false,
+      "strategy": "none"
+    }
+  },
+  {
+    "timestamp": "2026-05-19T23:53:32.683Z",
+    "step": "decision:TemporalAnalysisAgent",
+    "tool_called": "TemporalAnalysisAgent",
+    "reasoning": "revenue_pkr: pattern=drift, change=76.5%, direction=increasing",
+    "status": "SUCCESS",
+    "rollback_action": "none",
+    "latency_ms": 0,
+    "cost": 0,
+    "rubric_category": "workplan_formulation",
+    "workplan_formulation": {
+      "status": "INITIALIZED",
+      "plan": "Antigravity pipeline — workplan_formulation"
+    },
+    "task_execution": "TemporalAnalysisAgent:decision:TemporalAnalysisAgent",
+    "tool_calls": [
+      "TemporalAnalysisAgent"
+    ],
+    "constraint_evaluation": {
+      "amce_contract": null,
+      "result": "SUCCESS"
+    },
+    "failure_recovery": {
+      "rollback_triggered": false,
+      "strategy": "none"
+    }
+  },
+  {
+    "timestamp": "2026-05-19T23:54:33.054Z",
+    "step": "llm_call:TemporalAnalysisAgent",
+    "tool_called": "TemporalAnalysisAgent",
+    "reasoning": "LLM call: time_window_description",
+    "status": "SUCCESS",
+    "rollback_action": "none",
+    "latency_ms": 60724,
+    "cost": 0,
+    "rubric_category": "tool_calls",
+    "workplan_formulation": {
+      "status": "INITIALIZED",
+      "plan": "Antigravity pipeline — tool_calls"
+    },
+    "task_execution": "TemporalAnalysisAgent:llm_call:TemporalAnalysisAgent",
+    "tool_calls": [
+      "TemporalAnalysisAgent"
+    ],
+    "constraint_evaluation": {
+      "amce_contract": null,
+      "result": "SUCCESS"
+    },
+    "failure_recovery": {
+      "rollback_triggered": false,
+      "strategy": "none"
+    }
+  },
+  {
+    "timestamp": "2026-05-19T23:54:33.055Z",
+    "step": "decision:TemporalAnalysisAgent",
+    "tool_called": "TemporalAnalysisAgent",
+    "reasoning": "orders: pattern=drift, change=76.5%, direction=increasing",
+    "status": "SUCCESS",
+    "rollback_action": "none",
+    "latency_ms": 0,
+    "cost": 0,
+    "rubric_category": "workplan_formulation",
+    "workplan_formulation": {
+      "status": "INITIALIZED",
+      "plan": "Antigravity pipeline — workplan_formulation"
+    },
+    "task_execution": "TemporalAnalysisAgent:decision:TemporalAnalysisAgent",
+    "tool_calls": [
+      "TemporalAnalysisAgent"
+    ],
+    "constraint_evaluation": {
+      "amce_contract": null,
+      "result": "SUCCESS"
+    },
+    "failure_recovery": {
+      "rollback_triggered": false,
+      "strategy": "none"
+    }
+  },
+  {
+    "timestamp": "2026-05-19T23:54:33.056Z",
+    "step": "decision:TemporalAnalysisAgent",
+    "tool_called": "TemporalAnalysisAgent",
+    "reasoning": "Temporal analysis: orders=drift, demand_change_pct=drift, revenue_pkr=drift — 0 series below min-sample guard (<3 points)",
+    "status": "SUCCESS",
+    "rollback_action": "none",
+    "latency_ms": 0,
+    "cost": 0,
+    "rubric_category": "workplan_formulation",
+    "workplan_formulation": {
+      "status": "INITIALIZED",
+      "plan": "Antigravity pipeline — workplan_formulation"
+    },
+    "task_execution": "TemporalAnalysisAgent:decision:TemporalAnalysisAgent",
+    "tool_calls": [
+      "TemporalAnalysisAgent"
+    ],
+    "constraint_evaluation": {
+      "amce_contract": null,
+      "result": "SUCCESS"
+    },
+    "failure_recovery": {
+      "rollback_triggered": false,
+      "strategy": "none"
+    }
+  },
+  {
+    "timestamp": "2026-05-19T23:54:33.058Z",
+    "step": "AMCE_M6_StructuralValidation",
+    "tool_called": "ZodValidator",
+    "reasoning": "M6 output passed Zod structural schema (ALERT_ONLY). Patterns: 3, insufficient_data: 0",
+    "status": "SUCCESS",
+    "rollback_action": "none",
+    "latency_ms": 60728,
+    "cost": 0,
+    "rubric_category": "constraint_evaluation",
+    "workplan_formulation": {
+      "status": "INITIALIZED",
+      "plan": "Antigravity pipeline — constraint_evaluation"
+    },
+    "task_execution": "ZodValidator:AMCE_M6_StructuralValidation",
+    "tool_calls": [
+      "ZodValidator"
+    ],
+    "constraint_evaluation": {
+      "amce_contract": null,
+      "result": "SUCCESS"
+    },
+    "failure_recovery": {
+      "rollback_triggered": false,
+      "strategy": "none"
+    }
+  },
+  {
+    "timestamp": "2026-05-19T23:54:33.059Z",
+    "step": "agent_complete:TemporalAnalysisAgent",
+    "tool_called": "TemporalAnalysisAgent",
+    "reasoning": "TemporalAnalysisAgent completed",
+    "status": "SUCCESS",
+    "rollback_action": "none",
+    "latency_ms": 0,
+    "cost": 0,
+    "rubric_category": "task_execution",
+    "workplan_formulation": {
+      "status": "INITIALIZED",
+      "plan": "Antigravity pipeline — task_execution"
+    },
+    "task_execution": "TemporalAnalysisAgent:agent_complete:TemporalAnalysisAgent",
+    "tool_calls": [
+      "TemporalAnalysisAgent"
+    ],
+    "constraint_evaluation": {
+      "amce_contract": null,
+      "result": "SUCCESS"
+    },
+    "failure_recovery": {
+      "rollback_triggered": false,
+      "strategy": "none"
+    }
+  },
+  {
+    "timestamp": "2026-05-19T23:54:33.060Z",
+    "step": "decision:AntigravityOrchestrator",
+    "tool_called": "AntigravityOrchestrator",
+    "reasoning": "Phase C routing → M5 output MUST clear AMCE BLOCK + BASE MODEL gate (Gemini 1.5 Pro via llmClient). On BLOCK, Antigravity re-prompts once with the judge's critique; second BLOCK halts Phase C.",
+    "status": "SUCCESS",
+    "rollback_action": "none",
+    "latency_ms": 0,
+    "cost": 0,
+    "rubric_category": "workplan_formulation",
+    "workplan_formulation": {
+      "status": "INITIALIZED",
+      "plan": "Antigravity pipeline — workplan_formulation"
+    },
+    "task_execution": "AntigravityOrchestrator:decision:AntigravityOrchestrator",
+    "tool_calls": [
+      "AntigravityOrchestrator"
+    ],
+    "constraint_evaluation": {
+      "amce_contract": null,
+      "result": "SUCCESS"
+    },
+    "failure_recovery": {
+      "rollback_triggered": false,
+      "strategy": "none"
+    }
+  },
+  {
+    "timestamp": "2026-05-19T23:54:33.060Z",
+    "step": "agent_start:InsightExtractionAgent",
+    "tool_called": "InsightExtractionAgent",
+    "reasoning": "InsightExtractionAgent started",
+    "status": "SUCCESS",
+    "rollback_action": "none",
+    "latency_ms": 0,
+    "cost": 0,
+    "rubric_category": "task_execution",
+    "workplan_formulation": {
+      "status": "INITIALIZED",
+      "plan": "Antigravity pipeline — task_execution"
+    },
+    "task_execution": "InsightExtractionAgent:agent_start:InsightExtractionAgent",
+    "tool_calls": [
+      "InsightExtractionAgent"
+    ],
+    "constraint_evaluation": {
+      "amce_contract": null,
+      "result": "SUCCESS"
+    },
+    "failure_recovery": {
+      "rollback_triggered": false,
+      "strategy": "none"
+    }
+  },
+  {
+    "timestamp": "2026-05-19T23:54:33.061Z",
+    "step": "decision:InsightExtractionAgent",
+    "tool_called": "InsightExtractionAgent",
+    "reasoning": "M5 read 1 resolvedFacts topic(s) from PipelineState before RAG retrieval — inventory_level",
+    "status": "SUCCESS",
+    "rollback_action": "none",
+    "latency_ms": 0,
+    "cost": 0,
+    "rubric_category": "workplan_formulation",
+    "workplan_formulation": {
+      "status": "INITIALIZED",
+      "plan": "Antigravity pipeline — workplan_formulation"
+    },
+    "task_execution": "InsightExtractionAgent:decision:InsightExtractionAgent",
+    "tool_calls": [
+      "InsightExtractionAgent"
+    ],
+    "constraint_evaluation": {
+      "amce_contract": null,
+      "result": "SUCCESS"
+    },
+    "failure_recovery": {
+      "rollback_triggered": false,
+      "strategy": "none"
+    }
+  },
+  {
+    "timestamp": "2026-05-19T23:54:35.312Z",
+    "step": "M5_EphemeralVectorStore_Populated",
+    "tool_called": "InsightExtractionAgent",
+    "reasoning": "Ephemeral PipelineVectorStore populated with 6 chunks from 5 filtered sources + 1 resolvedFact topics",
+    "status": "SUCCESS",
+    "rollback_action": "Store will be destroyed at end of M5 execution",
+    "latency_ms": 2251,
+    "cost": 0,
+    "rubric_category": "task_execution",
+    "workplan_formulation": {
+      "status": "INITIALIZED",
+      "plan": "Antigravity pipeline — task_execution"
+    },
+    "task_execution": "InsightExtractionAgent:M5_EphemeralVectorStore_Populated",
+    "tool_calls": [
+      "InsightExtractionAgent"
+    ],
+    "constraint_evaluation": {
+      "amce_contract": null,
+      "result": "SUCCESS"
+    },
+    "failure_recovery": {
+      "rollback_triggered": false,
+      "strategy": "none"
+    }
+  },
+  {
+    "timestamp": "2026-05-19T23:54:35.971Z",
+    "step": "llm_call:InsightExtractionAgent",
+    "tool_called": "InsightExtractionAgent",
+    "reasoning": "Embedding generation",
+    "status": "SUCCESS",
+    "rollback_action": "none",
+    "latency_ms": 657,
+    "cost": 0,
+    "rubric_category": "tool_calls",
+    "workplan_formulation": {
+      "status": "INITIALIZED",
+      "plan": "Antigravity pipeline — tool_calls"
+    },
+    "task_execution": "InsightExtractionAgent:llm_call:InsightExtractionAgent",
+    "tool_calls": [
+      "InsightExtractionAgent"
+    ],
+    "constraint_evaluation": {
+      "amce_contract": null,
+      "result": "SUCCESS"
+    },
+    "failure_recovery": {
+      "rollback_triggered": false,
+      "strategy": "none"
+    }
+  },
+  {
+    "timestamp": "2026-05-19T23:54:36.057Z",
+    "step": "llm_call:InsightExtractionAgent",
+    "tool_called": "InsightExtractionAgent",
+    "reasoning": "Embedding generation",
+    "status": "SUCCESS",
+    "rollback_action": "none",
+    "latency_ms": 744,
+    "cost": 0,
+    "rubric_category": "tool_calls",
+    "workplan_formulation": {
+      "status": "INITIALIZED",
+      "plan": "Antigravity pipeline — tool_calls"
+    },
+    "task_execution": "InsightExtractionAgent:llm_call:InsightExtractionAgent",
+    "tool_calls": [
+      "InsightExtractionAgent"
+    ],
+    "constraint_evaluation": {
+      "amce_contract": null,
+      "result": "SUCCESS"
+    },
+    "failure_recovery": {
+      "rollback_triggered": false,
+      "strategy": "none"
+    }
+  },
+  {
+    "timestamp": "2026-05-19T23:54:36.089Z",
+    "step": "llm_call:InsightExtractionAgent",
+    "tool_called": "InsightExtractionAgent",
+    "reasoning": "Embedding generation",
+    "status": "SUCCESS",
+    "rollback_action": "none",
+    "latency_ms": 775,
+    "cost": 0,
+    "rubric_category": "tool_calls",
+    "workplan_formulation": {
+      "status": "INITIALIZED",
+      "plan": "Antigravity pipeline — tool_calls"
+    },
+    "task_execution": "InsightExtractionAgent:llm_call:InsightExtractionAgent",
+    "tool_calls": [
+      "InsightExtractionAgent"
+    ],
+    "constraint_evaluation": {
+      "amce_contract": null,
+      "result": "SUCCESS"
+    },
+    "failure_recovery": {
+      "rollback_triggered": false,
+      "strategy": "none"
+    }
+  },
+  {
+    "timestamp": "2026-05-19T23:54:36.091Z",
+    "step": "llm_call:InsightExtractionAgent",
+    "tool_called": "InsightExtractionAgent",
+    "reasoning": "Embedding generation",
+    "status": "SUCCESS",
+    "rollback_action": "none",
+    "latency_ms": 778,
+    "cost": 0,
+    "rubric_category": "tool_calls",
+    "workplan_formulation": {
+      "status": "INITIALIZED",
+      "plan": "Antigravity pipeline — tool_calls"
+    },
+    "task_execution": "InsightExtractionAgent:llm_call:InsightExtractionAgent",
+    "tool_calls": [
+      "InsightExtractionAgent"
+    ],
+    "constraint_evaluation": {
+      "amce_contract": null,
+      "result": "SUCCESS"
+    },
+    "failure_recovery": {
+      "rollback_triggered": false,
+      "strategy": "none"
+    }
+  },
+  {
+    "timestamp": "2026-05-19T23:54:36.111Z",
+    "step": "llm_call:InsightExtractionAgent",
+    "tool_called": "InsightExtractionAgent",
+    "reasoning": "Embedding generation",
+    "status": "SUCCESS",
+    "rollback_action": "none",
+    "latency_ms": 798,
+    "cost": 0,
+    "rubric_category": "tool_calls",
+    "workplan_formulation": {
+      "status": "INITIALIZED",
+      "plan": "Antigravity pipeline — tool_calls"
+    },
+    "task_execution": "InsightExtractionAgent:llm_call:InsightExtractionAgent",
+    "tool_calls": [
+      "InsightExtractionAgent"
+    ],
+    "constraint_evaluation": {
+      "amce_contract": null,
+      "result": "SUCCESS"
+    },
+    "failure_recovery": {
+      "rollback_triggered": false,
+      "strategy": "none"
+    }
+  },
+  {
+    "timestamp": "2026-05-19T23:54:36.113Z",
+    "step": "decision:InsightExtractionAgent",
+    "tool_called": "InsightExtractionAgent",
+    "reasoning": "Multi-Query retrieval: 5 domain queries → 6 unique chunks",
+    "status": "SUCCESS",
+    "rollback_action": "none",
+    "latency_ms": 0,
+    "cost": 0,
+    "rubric_category": "workplan_formulation",
+    "workplan_formulation": {
+      "status": "INITIALIZED",
+      "plan": "Antigravity pipeline — workplan_formulation"
+    },
+    "task_execution": "InsightExtractionAgent:decision:InsightExtractionAgent",
+    "tool_calls": [
+      "InsightExtractionAgent"
+    ],
+    "constraint_evaluation": {
+      "amce_contract": null,
+      "result": "SUCCESS"
+    },
+    "failure_recovery": {
+      "rollback_triggered": false,
+      "strategy": "none"
+    }
+  },
+  {
+    "timestamp": "2026-05-19T23:54:36.810Z",
+    "step": "decision:InsightExtractionAgent",
+    "tool_called": "InsightExtractionAgent",
+    "reasoning": "M5 LLM produced no usable insights — pre-judge fallback synthesized 3 insights",
+    "status": "SUCCESS",
+    "rollback_action": "none",
+    "latency_ms": 0,
+    "cost": 0,
+    "rubric_category": "workplan_formulation",
+    "workplan_formulation": {
+      "status": "INITIALIZED",
+      "plan": "Antigravity pipeline — workplan_formulation"
+    },
+    "task_execution": "InsightExtractionAgent:decision:InsightExtractionAgent",
+    "tool_calls": [
+      "InsightExtractionAgent"
+    ],
+    "constraint_evaluation": {
+      "amce_contract": null,
+      "result": "SUCCESS"
+    },
+    "failure_recovery": {
+      "rollback_triggered": false,
+      "strategy": "none"
+    }
+  },
+  {
+    "timestamp": "2026-05-19T23:54:37.300Z",
+    "step": "AMCE_BLOCK_M5_InsightExtraction_BaseModelError",
+    "tool_called": "BaseModelValidator",
+    "reasoning": "Base-model judge call failed: 429 {\"error\":{\"message\":\"Rate limit reached for model `llama-3.3-70b-versatile` in organization `org_01krfpf5m5evqvvnpb1526ynb3` service tier `on_demand` on tokens per day (TPD): Limit 100000, Used 99996, Requested 914. Please try again in 13m6.24s. Need more tokens? Upgrade to Dev Tier today at https://console.groq.com/settings/billing\",\"type\":\"tokens\",\"code\":\"rate_limit_exceeded\"}}",
+    "status": "FAILED",
+    "rollback_action": "Antigravity falls open (treat as PASS with score 0.5) to avoid pipeline halt on infra outage",
+    "latency_ms": 488,
+    "cost": 0,
+    "rubric_category": "failure_recovery",
+    "workplan_formulation": {
+      "status": "INITIALIZED",
+      "plan": "Antigravity pipeline — failure_recovery"
+    },
+    "task_execution": "BaseModelValidator:AMCE_BLOCK_M5_InsightExtraction_BaseModelError",
+    "tool_calls": [
+      "BaseModelValidator"
+    ],
+    "constraint_evaluation": {
+      "amce_contract": null,
+      "result": "FAILED"
+    },
+    "failure_recovery": {
+      "rollback_triggered": true,
+      "strategy": "Antigravity falls open (treat as PASS with score 0.5) to avoid pipeline halt on infra outage"
+    }
+  },
+  {
+    "timestamp": "2026-05-19T23:54:37.302Z",
+    "step": "decision:InsightExtractionAgent",
+    "tool_called": "InsightExtractionAgent",
+    "reasoning": "M5 complete: 3 insights, 6 RAG chunks, 1 resolvedFacts read, 0 AMCE BLOCK events (recovered). Base-model judge: Base-model judge unavailable: 429 {\"error\":{\"message\":\"Rate limit reached for model `llama-3.3-70b-versatile` in organiz",
+    "status": "SUCCESS",
+    "rollback_action": "none",
+    "latency_ms": 0,
+    "cost": 0,
+    "rubric_category": "workplan_formulation",
+    "workplan_formulation": {
+      "status": "INITIALIZED",
+      "plan": "Antigravity pipeline — workplan_formulation"
+    },
+    "task_execution": "InsightExtractionAgent:decision:InsightExtractionAgent",
+    "tool_calls": [
+      "InsightExtractionAgent"
+    ],
+    "constraint_evaluation": {
+      "amce_contract": null,
+      "result": "SUCCESS"
+    },
+    "failure_recovery": {
+      "rollback_triggered": false,
+      "strategy": "none"
+    }
+  },
+  {
+    "timestamp": "2026-05-19T23:54:37.303Z",
+    "step": "M5_EphemeralVectorStore_Destroyed",
+    "tool_called": "InsightExtractionAgent",
+    "reasoning": "Ephemeral vector store for pipeline TEST-TRACE-72BD81AB destroyed. Stats: {\"pipeline_id\":\"TEST-TRACE-72BD81AB\",\"chunk_count\":0,\"embedded_at\":\"2026-05-19T23:54:35.312Z\",\"batched_calls\":2,\"destroyed\":true}",
+    "status": "SUCCESS",
+    "rollback_action": "none",
+    "latency_ms": 4242,
+    "cost": 0,
+    "rubric_category": "task_execution",
+    "workplan_formulation": {
+      "status": "INITIALIZED",
+      "plan": "Antigravity pipeline — task_execution"
+    },
+    "task_execution": "InsightExtractionAgent:M5_EphemeralVectorStore_Destroyed",
+    "tool_calls": [
+      "InsightExtractionAgent"
+    ],
+    "constraint_evaluation": {
+      "amce_contract": null,
+      "result": "SUCCESS"
+    },
+    "failure_recovery": {
+      "rollback_triggered": false,
+      "strategy": "none"
+    }
+  },
+  {
+    "timestamp": "2026-05-19T23:54:37.305Z",
+    "step": "agent_complete:InsightExtractionAgent",
+    "tool_called": "InsightExtractionAgent",
+    "reasoning": "InsightExtractionAgent completed",
+    "status": "SUCCESS",
+    "rollback_action": "none",
+    "latency_ms": 0,
+    "cost": 0,
+    "rubric_category": "task_execution",
+    "workplan_formulation": {
+      "status": "INITIALIZED",
+      "plan": "Antigravity pipeline — task_execution"
+    },
+    "task_execution": "InsightExtractionAgent:agent_complete:InsightExtractionAgent",
+    "tool_calls": [
+      "InsightExtractionAgent"
+    ],
+    "constraint_evaluation": {
+      "amce_contract": null,
+      "result": "SUCCESS"
+    },
+    "failure_recovery": {
+      "rollback_triggered": false,
+      "strategy": "none"
+    }
+  },
+  {
+    "timestamp": "2026-05-19T23:54:37.306Z",
+    "step": "contract_gate:AntigravityOrchestrator",
+    "tool_called": "AntigravityOrchestrator",
+    "reasoning": "AMCE BLOCK + BASE MODEL gate on M5: base_model_score=0.50, block_events=0. PASS on first judgement.",
+    "status": "SUCCESS",
+    "rollback_action": "none",
+    "latency_ms": 0,
+    "cost": 0,
+    "rubric_category": "constraint_evaluation",
+    "workplan_formulation": {
+      "status": "INITIALIZED",
+      "plan": "Antigravity pipeline — constraint_evaluation"
+    },
+    "task_execution": "AntigravityOrchestrator:contract_gate:AntigravityOrchestrator",
+    "tool_calls": [
+      "AntigravityOrchestrator"
+    ],
+    "constraint_evaluation": {
+      "amce_contract": null,
+      "result": "SUCCESS"
+    },
+    "failure_recovery": {
+      "rollback_triggered": false,
+      "strategy": "none"
+    }
+  },
+  {
+    "timestamp": "2026-05-19T23:54:37.307Z",
+    "step": "agent_start:ImpactAnalysisAgent",
+    "tool_called": "ImpactAnalysisAgent",
+    "reasoning": "ImpactAnalysisAgent started",
+    "status": "SUCCESS",
+    "rollback_action": "none",
+    "latency_ms": 0,
+    "cost": 0,
+    "rubric_category": "task_execution",
+    "workplan_formulation": {
+      "status": "INITIALIZED",
+      "plan": "Antigravity pipeline — task_execution"
+    },
+    "task_execution": "ImpactAnalysisAgent:agent_start:ImpactAnalysisAgent",
+    "tool_calls": [
+      "ImpactAnalysisAgent"
+    ],
+    "constraint_evaluation": {
+      "amce_contract": null,
+      "result": "SUCCESS"
+    },
+    "failure_recovery": {
+      "rollback_triggered": false,
+      "strategy": "none"
+    }
+  },
+  {
+    "timestamp": "2026-05-19T23:54:37.831Z",
+    "step": "decision:ImpactAnalysisAgent",
+    "tool_called": "ImpactAnalysisAgent",
+    "reasoning": "Impact analysis complete: 2 critical, 0 high. Total options surfaced: 6",
+    "status": "SUCCESS",
+    "rollback_action": "none",
+    "latency_ms": 0,
+    "cost": 0,
+    "rubric_category": "workplan_formulation",
+    "workplan_formulation": {
+      "status": "INITIALIZED",
+      "plan": "Antigravity pipeline — workplan_formulation"
+    },
+    "task_execution": "ImpactAnalysisAgent:decision:ImpactAnalysisAgent",
+    "tool_calls": [
+      "ImpactAnalysisAgent"
+    ],
+    "constraint_evaluation": {
+      "amce_contract": null,
+      "result": "SUCCESS"
+    },
+    "failure_recovery": {
+      "rollback_triggered": false,
+      "strategy": "none"
+    }
+  },
+  {
+    "timestamp": "2026-05-19T23:54:37.836Z",
+    "step": "AMCE_M8_StructuralValidation",
+    "tool_called": "ZodValidator",
+    "reasoning": "M8 output passed Zod structural schema (ALERT_ONLY). Analyses: 3",
+    "status": "SUCCESS",
+    "rollback_action": "none",
+    "latency_ms": 528,
+    "cost": 0,
+    "rubric_category": "constraint_evaluation",
+    "workplan_formulation": {
+      "status": "INITIALIZED",
+      "plan": "Antigravity pipeline — constraint_evaluation"
+    },
+    "task_execution": "ZodValidator:AMCE_M8_StructuralValidation",
+    "tool_calls": [
+      "ZodValidator"
+    ],
+    "constraint_evaluation": {
+      "amce_contract": null,
+      "result": "SUCCESS"
+    },
+    "failure_recovery": {
+      "rollback_triggered": false,
+      "strategy": "none"
+    }
+  },
+  {
+    "timestamp": "2026-05-19T23:54:37.838Z",
+    "step": "agent_complete:ImpactAnalysisAgent",
+    "tool_called": "ImpactAnalysisAgent",
+    "reasoning": "ImpactAnalysisAgent completed",
+    "status": "SUCCESS",
+    "rollback_action": "none",
+    "latency_ms": 0,
+    "cost": 0,
+    "rubric_category": "task_execution",
+    "workplan_formulation": {
+      "status": "INITIALIZED",
+      "plan": "Antigravity pipeline — task_execution"
+    },
+    "task_execution": "ImpactAnalysisAgent:agent_complete:ImpactAnalysisAgent",
+    "tool_calls": [
+      "ImpactAnalysisAgent"
+    ],
+    "constraint_evaluation": {
+      "amce_contract": null,
+      "result": "SUCCESS"
+    },
+    "failure_recovery": {
+      "rollback_triggered": false,
+      "strategy": "none"
+    }
+  },
+  {
+    "timestamp": "2026-05-19T23:54:37.840Z",
+    "step": "decision:AntigravityOrchestrator",
+    "tool_called": "AntigravityOrchestrator",
+    "reasoning": "Phase D routing → M9 output MUST clear AMCE BLOCK + BASE MODEL gate (Gemini 1.5 Pro via llmClient) AFTER topological sort. A BLOCK on the base-model judge HALTS the pipeline before the saga ledger.",
+    "status": "SUCCESS",
+    "rollback_action": "none",
+    "latency_ms": 0,
+    "cost": 0,
+    "rubric_category": "workplan_formulation",
+    "workplan_formulation": {
+      "status": "INITIALIZED",
+      "plan": "Antigravity pipeline — workplan_formulation"
+    },
+    "task_execution": "AntigravityOrchestrator:decision:AntigravityOrchestrator",
+    "tool_calls": [
+      "AntigravityOrchestrator"
+    ],
+    "constraint_evaluation": {
+      "amce_contract": null,
+      "result": "SUCCESS"
+    },
+    "failure_recovery": {
+      "rollback_triggered": false,
+      "strategy": "none"
+    }
+  },
+  {
+    "timestamp": "2026-05-19T23:54:37.841Z",
+    "step": "agent_start:ActionChainGeneratorAgent",
+    "tool_called": "ActionChainGeneratorAgent",
+    "reasoning": "ActionChainGeneratorAgent started",
+    "status": "SUCCESS",
+    "rollback_action": "none",
+    "latency_ms": 0,
+    "cost": 0,
+    "rubric_category": "task_execution",
+    "workplan_formulation": {
+      "status": "INITIALIZED",
+      "plan": "Antigravity pipeline — task_execution"
+    },
+    "task_execution": "ActionChainGeneratorAgent:agent_start:ActionChainGeneratorAgent",
+    "tool_calls": [
+      "ActionChainGeneratorAgent"
+    ],
+    "constraint_evaluation": {
+      "amce_contract": null,
+      "result": "SUCCESS"
+    },
+    "failure_recovery": {
+      "rollback_triggered": false,
+      "strategy": "none"
+    }
+  },
+  {
+    "timestamp": "2026-05-19T23:54:38.932Z",
+    "step": "decision:ActionChainGeneratorAgent",
+    "tool_called": "ActionChainGeneratorAgent",
+    "reasoning": "M9 used deterministic fallback chain after 2 failed LLM attempts (topology: cycles=0, orphans=0)",
+    "status": "SUCCESS",
+    "rollback_action": "none",
+    "latency_ms": 0,
+    "cost": 0,
+    "rubric_category": "workplan_formulation",
+    "workplan_formulation": {
+      "status": "INITIALIZED",
+      "plan": "Antigravity pipeline — workplan_formulation"
+    },
+    "task_execution": "ActionChainGeneratorAgent:decision:ActionChainGeneratorAgent",
+    "tool_calls": [
+      "ActionChainGeneratorAgent"
+    ],
+    "constraint_evaluation": {
+      "amce_contract": null,
+      "result": "SUCCESS"
+    },
+    "failure_recovery": {
+      "rollback_triggered": false,
+      "strategy": "none"
+    }
+  },
+  {
+    "timestamp": "2026-05-19T23:54:39.426Z",
+    "step": "AMCE_BLOCK_M9_ActionChainGenerator_BaseModelError",
+    "tool_called": "BaseModelValidator",
+    "reasoning": "Base-model judge call failed: 429 {\"error\":{\"message\":\"Rate limit reached for model `llama-3.3-70b-versatile` in organization `org_01krfpf5m5evqvvnpb1526ynb3` service tier `on_demand` on tokens per day (TPD): Limit 100000, Used 99993, Requested 738. Please try again in 10m31.584s. Need more tokens? Upgrade to Dev Tier today at https://console.groq.com/settings/billing\",\"type\":\"tokens\",\"code\":\"rate_limit_exceeded\"}}",
+    "status": "FAILED",
+    "rollback_action": "Antigravity falls open (treat as PASS with score 0.5) to avoid pipeline halt on infra outage",
+    "latency_ms": 492,
+    "cost": 0,
+    "rubric_category": "failure_recovery",
+    "workplan_formulation": {
+      "status": "INITIALIZED",
+      "plan": "Antigravity pipeline — failure_recovery"
+    },
+    "task_execution": "BaseModelValidator:AMCE_BLOCK_M9_ActionChainGenerator_BaseModelError",
+    "tool_calls": [
+      "BaseModelValidator"
+    ],
+    "constraint_evaluation": {
+      "amce_contract": null,
+      "result": "FAILED"
+    },
+    "failure_recovery": {
+      "rollback_triggered": true,
+      "strategy": "Antigravity falls open (treat as PASS with score 0.5) to avoid pipeline halt on infra outage"
+    }
+  },
+  {
+    "timestamp": "2026-05-19T23:54:39.428Z",
+    "step": "contract_gate:ActionChainGeneratorAgent",
+    "tool_called": "ActionChainGeneratorAgent",
+    "reasoning": "Contract gate: PASS (attempt 1/2)",
+    "status": "SUCCESS",
+    "rollback_action": "none",
+    "latency_ms": 0,
+    "cost": 0,
+    "rubric_category": "constraint_evaluation",
+    "workplan_formulation": {
+      "status": "INITIALIZED",
+      "plan": "Antigravity pipeline — constraint_evaluation"
+    },
+    "task_execution": "ActionChainGeneratorAgent:contract_gate:ActionChainGeneratorAgent",
+    "tool_calls": [
+      "ActionChainGeneratorAgent"
+    ],
+    "constraint_evaluation": {
+      "amce_contract": null,
+      "result": "SUCCESS"
+    },
+    "failure_recovery": {
+      "rollback_triggered": false,
+      "strategy": "none"
+    }
+  },
+  {
+    "timestamp": "2026-05-19T23:54:39.435Z",
+    "step": "agent_complete:ActionChainGeneratorAgent",
+    "tool_called": "ActionChainGeneratorAgent",
+    "reasoning": "ActionChainGeneratorAgent completed",
+    "status": "SUCCESS",
+    "rollback_action": "none",
+    "latency_ms": 0,
+    "cost": 0,
+    "rubric_category": "task_execution",
+    "workplan_formulation": {
+      "status": "INITIALIZED",
+      "plan": "Antigravity pipeline — task_execution"
+    },
+    "task_execution": "ActionChainGeneratorAgent:agent_complete:ActionChainGeneratorAgent",
+    "tool_calls": [
+      "ActionChainGeneratorAgent"
+    ],
+    "constraint_evaluation": {
+      "amce_contract": null,
+      "result": "SUCCESS"
+    },
+    "failure_recovery": {
+      "rollback_triggered": false,
+      "strategy": "none"
+    }
+  },
+  {
+    "timestamp": "2026-05-19T23:54:39.436Z",
+    "step": "contract_gate:AntigravityOrchestrator",
+    "tool_called": "AntigravityOrchestrator",
+    "reasoning": "AMCE BLOCK + BASE MODEL gate on M9: base_model_score=0.50, block_events=0, topology_passed=true, used_topology_fallback=true.",
+    "status": "SUCCESS",
+    "rollback_action": "none",
+    "latency_ms": 0,
+    "cost": 0,
+    "rubric_category": "constraint_evaluation",
+    "workplan_formulation": {
+      "status": "INITIALIZED",
+      "plan": "Antigravity pipeline — constraint_evaluation"
+    },
+    "task_execution": "AntigravityOrchestrator:contract_gate:AntigravityOrchestrator",
+    "tool_calls": [
+      "AntigravityOrchestrator"
+    ],
+    "constraint_evaluation": {
+      "amce_contract": null,
+      "result": "SUCCESS"
+    },
+    "failure_recovery": {
+      "rollback_triggered": false,
+      "strategy": "none"
+    }
+  },
+  {
+    "timestamp": "2026-05-19T23:54:39.437Z",
+    "step": "M10_SagaLedgerInit",
+    "tool_called": "SagaConstraintLedger",
+    "reasoning": "Antigravity initialized the saga ledger with budget PKR 500000. The ledger is shared across M10/M11/M12 for cumulative reserve→commit/refund tracking.",
+    "status": "SUCCESS",
+    "rollback_action": "none",
+    "latency_ms": 0,
+    "cost": 0,
+    "rubric_category": "constraint_evaluation",
+    "data_lineage": {
+      "from": "AntigravityOrchestrator",
+      "to": "SagaConstraintLedger",
+      "data_type": "LedgerInit",
+      "key_change": "budget_limit_pkr=500000"
+    },
+    "workplan_formulation": {
+      "status": "INITIALIZED",
+      "plan": "Antigravity pipeline — constraint_evaluation"
+    },
+    "task_execution": "SagaConstraintLedger:M10_SagaLedgerInit",
+    "tool_calls": [
+      "SagaConstraintLedger"
+    ],
+    "constraint_evaluation": {
+      "amce_contract": null,
+      "result": "SUCCESS"
+    },
+    "failure_recovery": {
+      "rollback_triggered": false,
+      "strategy": "none"
+    }
+  },
+  {
+    "timestamp": "2026-05-19T23:54:39.437Z",
+    "step": "decision:AntigravityOrchestrator",
+    "tool_called": "AntigravityOrchestrator",
+    "reasoning": "Phase E routing → M10 (Saga Constraint Validator). Cumulative reserve via the shared SagaConstraintLedger; relaxation suggestions on infeasibility.",
+    "status": "SUCCESS",
+    "rollback_action": "none",
+    "latency_ms": 0,
+    "cost": 0,
+    "rubric_category": "workplan_formulation",
+    "workplan_formulation": {
+      "status": "INITIALIZED",
+      "plan": "Antigravity pipeline — workplan_formulation"
+    },
+    "task_execution": "AntigravityOrchestrator:decision:AntigravityOrchestrator",
+    "tool_calls": [
+      "AntigravityOrchestrator"
+    ],
+    "constraint_evaluation": {
+      "amce_contract": null,
+      "result": "SUCCESS"
+    },
+    "failure_recovery": {
+      "rollback_triggered": false,
+      "strategy": "none"
+    }
+  },
+  {
+    "timestamp": "2026-05-19T23:54:39.438Z",
+    "step": "M10_LedgerReserve_ACT-001",
+    "tool_called": "SagaConstraintLedger",
+    "reasoning": "Reserved PKR 0 for ACT-001 (available remaining: PKR 500000)",
+    "status": "SUCCESS",
+    "rollback_action": "M12 may invoke ledger.refund() on this row if the action later fails",
+    "latency_ms": 0,
+    "cost": 0,
+    "rubric_category": "constraint_evaluation",
+    "data_lineage": {
+      "from": "M10_ConstraintValidator",
+      "to": "SagaConstraintLedger",
+      "data_type": "LedgerReserve",
+      "key_change": "available -PKR 0 → 500000"
+    },
+    "workplan_formulation": {
+      "status": "INITIALIZED",
+      "plan": "Antigravity pipeline — constraint_evaluation"
+    },
+    "task_execution": "SagaConstraintLedger:M10_LedgerReserve_ACT-001",
+    "tool_calls": [
+      "SagaConstraintLedger"
+    ],
+    "constraint_evaluation": {
+      "amce_contract": null,
+      "result": "SUCCESS"
+    },
+    "failure_recovery": {
+      "rollback_triggered": false,
+      "strategy": "none"
+    }
+  },
+  {
+    "timestamp": "2026-05-19T23:54:39.439Z",
+    "step": "M10_LedgerReserve_ACT-002",
+    "tool_called": "SagaConstraintLedger",
+    "reasoning": "Reserved PKR 0 for ACT-002 (available remaining: PKR 500000)",
+    "status": "SUCCESS",
+    "rollback_action": "M12 may invoke ledger.refund() on this row if the action later fails",
+    "latency_ms": 0,
+    "cost": 0,
+    "rubric_category": "constraint_evaluation",
+    "data_lineage": {
+      "from": "M10_ConstraintValidator",
+      "to": "SagaConstraintLedger",
+      "data_type": "LedgerReserve",
+      "key_change": "available -PKR 0 → 500000"
+    },
+    "workplan_formulation": {
+      "status": "INITIALIZED",
+      "plan": "Antigravity pipeline — constraint_evaluation"
+    },
+    "task_execution": "SagaConstraintLedger:M10_LedgerReserve_ACT-002",
+    "tool_calls": [
+      "SagaConstraintLedger"
+    ],
+    "constraint_evaluation": {
+      "amce_contract": null,
+      "result": "SUCCESS"
+    },
+    "failure_recovery": {
+      "rollback_triggered": false,
+      "strategy": "none"
+    }
+  },
+  {
+    "timestamp": "2026-05-19T23:54:39.440Z",
+    "step": "M10_LedgerReserve_ACT-003",
+    "tool_called": "SagaConstraintLedger",
+    "reasoning": "Reserved PKR 450000 for ACT-003 (available remaining: PKR 50000)",
+    "status": "SUCCESS",
+    "rollback_action": "M12 may invoke ledger.refund() on this row if the action later fails",
+    "latency_ms": 0,
+    "cost": 450000,
+    "rubric_category": "constraint_evaluation",
+    "data_lineage": {
+      "from": "M10_ConstraintValidator",
+      "to": "SagaConstraintLedger",
+      "data_type": "LedgerReserve",
+      "key_change": "available -PKR 450000 → 50000"
+    },
+    "workplan_formulation": {
+      "status": "INITIALIZED",
+      "plan": "Antigravity pipeline — constraint_evaluation"
+    },
+    "task_execution": "SagaConstraintLedger:M10_LedgerReserve_ACT-003",
+    "tool_calls": [
+      "SagaConstraintLedger"
+    ],
+    "constraint_evaluation": {
+      "amce_contract": null,
+      "result": "SUCCESS"
+    },
+    "failure_recovery": {
+      "rollback_triggered": false,
+      "strategy": "none"
+    }
+  },
+  {
+    "timestamp": "2026-05-19T23:54:39.440Z",
+    "step": "M10_LedgerReserve_ACT-004",
+    "tool_called": "SagaConstraintLedger",
+    "reasoning": "Reserved PKR 0 for ACT-004 (available remaining: PKR 50000)",
+    "status": "SUCCESS",
+    "rollback_action": "M12 may invoke ledger.refund() on this row if the action later fails",
+    "latency_ms": 0,
+    "cost": 0,
+    "rubric_category": "constraint_evaluation",
+    "data_lineage": {
+      "from": "M10_ConstraintValidator",
+      "to": "SagaConstraintLedger",
+      "data_type": "LedgerReserve",
+      "key_change": "available -PKR 0 → 50000"
+    },
+    "workplan_formulation": {
+      "status": "INITIALIZED",
+      "plan": "Antigravity pipeline — constraint_evaluation"
+    },
+    "task_execution": "SagaConstraintLedger:M10_LedgerReserve_ACT-004",
+    "tool_calls": [
+      "SagaConstraintLedger"
+    ],
+    "constraint_evaluation": {
+      "amce_contract": null,
+      "result": "SUCCESS"
+    },
+    "failure_recovery": {
+      "rollback_triggered": false,
+      "strategy": "none"
+    }
+  },
+  {
+    "timestamp": "2026-05-19T23:54:39.443Z",
+    "step": "AMCE_M10_StructuralValidation",
+    "tool_called": "ZodValidator",
+    "reasoning": "M10 output passed Zod structural schema (ALERT_ONLY). Actions=4, infeasible=0, cumulative_cost=PKR 450000",
+    "status": "SUCCESS",
+    "rollback_action": "none",
+    "latency_ms": 5,
+    "cost": 0,
+    "rubric_category": "constraint_evaluation",
+    "data_lineage": {
+      "from": "M10_ConstraintValidator",
+      "to": "M11_DAGExecutor",
+      "data_type": "ConstraintValidationOutput",
+      "key_change": "infeasible=0, available=PKR 50000"
+    },
+    "workplan_formulation": {
+      "status": "INITIALIZED",
+      "plan": "Antigravity pipeline — constraint_evaluation"
+    },
+    "task_execution": "ZodValidator:AMCE_M10_StructuralValidation",
+    "tool_calls": [
+      "ZodValidator"
+    ],
+    "constraint_evaluation": {
+      "amce_contract": null,
+      "result": "SUCCESS"
+    },
+    "failure_recovery": {
+      "rollback_triggered": false,
+      "strategy": "none"
+    }
+  },
+  {
+    "timestamp": "2026-05-19T23:54:39.444Z",
+    "step": "decision:AntigravityOrchestrator",
+    "tool_called": "AntigravityOrchestrator",
+    "reasoning": "Phase E routing → M11 (Level-Parallel DAG Executor). State mutations strictly BETWEEN dependency levels; Promise.allSettled inside each level. forcedFailures.fail count = 0.",
+    "status": "SUCCESS",
+    "rollback_action": "none",
+    "latency_ms": 0,
+    "cost": 0,
+    "rubric_category": "workplan_formulation",
+    "workplan_formulation": {
+      "status": "INITIALIZED",
+      "plan": "Antigravity pipeline — workplan_formulation"
+    },
+    "task_execution": "AntigravityOrchestrator:decision:AntigravityOrchestrator",
+    "tool_calls": [
+      "AntigravityOrchestrator"
+    ],
+    "constraint_evaluation": {
+      "amce_contract": null,
+      "result": "SUCCESS"
+    },
+    "failure_recovery": {
+      "rollback_triggered": false,
+      "strategy": "none"
+    }
+  },
+  {
+    "timestamp": "2026-05-19T23:54:39.446Z",
+    "step": "M11_Level_0_Start",
+    "tool_called": "DAGExecutor",
+    "reasoning": "Antigravity launching level 0 (1 actions in parallel via Promise.allSettled): ACT-001",
+    "status": "SUCCESS",
+    "rollback_action": "none",
+    "latency_ms": 0,
+    "cost": 0,
+    "rubric_category": "task_execution",
+    "data_lineage": {
+      "from": "M11_DAGExecutor",
+      "to": "Level_0",
+      "data_type": "LevelLaunch",
+      "key_change": "actions=1, concurrency=Promise.allSettled"
+    },
+    "workplan_formulation": {
+      "status": "INITIALIZED",
+      "plan": "Antigravity pipeline — task_execution"
+    },
+    "task_execution": "DAGExecutor:M11_Level_0_Start",
+    "tool_calls": [
+      "DAGExecutor"
+    ],
+    "constraint_evaluation": {
+      "amce_contract": null,
+      "result": "SUCCESS"
+    },
+    "failure_recovery": {
+      "rollback_triggered": false,
+      "strategy": "none"
+    }
+  },
+  {
+    "timestamp": "2026-05-19T23:54:39.462Z",
+    "step": "action_execute:DAGExecutor",
+    "tool_called": "DAGExecutor",
+    "reasoning": "Action ACT-001 (level 0): success",
+    "status": "SUCCESS",
+    "rollback_action": "none",
+    "latency_ms": 15,
+    "cost": 0,
+    "rubric_category": "task_execution",
+    "workplan_formulation": {
+      "status": "INITIALIZED",
+      "plan": "Antigravity pipeline — task_execution"
+    },
+    "task_execution": "DAGExecutor:action_execute:DAGExecutor",
+    "tool_calls": [
+      "DAGExecutor"
+    ],
+    "constraint_evaluation": {
+      "amce_contract": null,
+      "result": "SUCCESS"
+    },
+    "failure_recovery": {
+      "rollback_triggered": false,
+      "strategy": "none"
+    }
+  },
+  {
+    "timestamp": "2026-05-19T23:54:39.464Z",
+    "step": "M11_LedgerCommit_ACT-001",
+    "tool_called": "SagaConstraintLedger",
+    "reasoning": "Action ACT-001 succeeded — committing reserved PKR 0",
+    "status": "SUCCESS",
+    "rollback_action": "none",
+    "latency_ms": 0,
+    "cost": 0,
+    "rubric_category": "task_execution",
+    "data_lineage": {
+      "from": "M11_DAGExecutor",
+      "to": "SagaConstraintLedger",
+      "data_type": "LedgerCommit",
+      "key_change": "committed +PKR 0 (row LEDGER-TEST-T-0001)"
+    },
+    "workplan_formulation": {
+      "status": "INITIALIZED",
+      "plan": "Antigravity pipeline — task_execution"
+    },
+    "task_execution": "SagaConstraintLedger:M11_LedgerCommit_ACT-001",
+    "tool_calls": [
+      "SagaConstraintLedger"
+    ],
+    "constraint_evaluation": {
+      "amce_contract": null,
+      "result": "SUCCESS"
+    },
+    "failure_recovery": {
+      "rollback_triggered": false,
+      "strategy": "none"
+    }
+  },
+  {
+    "timestamp": "2026-05-19T23:54:39.465Z",
+    "step": "M11_StateTransition_ACT-001",
+    "tool_called": "StateMachine",
+    "reasoning": "State mutated between levels after ACT-001: stock_level=50→47; stock_verified=false→true",
+    "status": "SUCCESS",
+    "rollback_action": "none",
+    "latency_ms": 0,
+    "cost": 0,
+    "rubric_category": "task_execution",
+    "data_lineage": {
+      "from": "M11_Action_ACT-001",
+      "to": "PipelineState.simulationState",
+      "data_type": "StateTransition",
+      "key_change": "stock_level=50→47; stock_verified=false→true"
+    },
+    "workplan_formulation": {
+      "status": "INITIALIZED",
+      "plan": "Antigravity pipeline — task_execution"
+    },
+    "task_execution": "StateMachine:M11_StateTransition_ACT-001",
+    "tool_calls": [
+      "StateMachine"
+    ],
+    "constraint_evaluation": {
+      "amce_contract": null,
+      "result": "SUCCESS"
+    },
+    "failure_recovery": {
+      "rollback_triggered": false,
+      "strategy": "none"
+    }
+  },
+  {
+    "timestamp": "2026-05-19T23:54:39.466Z",
+    "step": "M11_Level_0_Complete",
+    "tool_called": "DAGExecutor",
+    "reasoning": "Level 0 settled — 1/1 actions succeeded; state mutations applied between levels",
+    "status": "SUCCESS",
+    "rollback_action": "none",
+    "latency_ms": 20,
+    "cost": 0,
+    "rubric_category": "task_execution",
+    "data_lineage": {
+      "from": "Level_0",
+      "to": "Level_1",
+      "data_type": "LevelSettlement",
+      "key_change": "1/1 success"
+    },
+    "workplan_formulation": {
+      "status": "INITIALIZED",
+      "plan": "Antigravity pipeline — task_execution"
+    },
+    "task_execution": "DAGExecutor:M11_Level_0_Complete",
+    "tool_calls": [
+      "DAGExecutor"
+    ],
+    "constraint_evaluation": {
+      "amce_contract": null,
+      "result": "SUCCESS"
+    },
+    "failure_recovery": {
+      "rollback_triggered": false,
+      "strategy": "none"
+    }
+  },
+  {
+    "timestamp": "2026-05-19T23:54:39.467Z",
+    "step": "M11_Level_1_Start",
+    "tool_called": "DAGExecutor",
+    "reasoning": "Antigravity launching level 1 (1 actions in parallel via Promise.allSettled): ACT-002",
+    "status": "SUCCESS",
+    "rollback_action": "none",
+    "latency_ms": 0,
+    "cost": 0,
+    "rubric_category": "task_execution",
+    "data_lineage": {
+      "from": "M11_DAGExecutor",
+      "to": "Level_1",
+      "data_type": "LevelLaunch",
+      "key_change": "actions=1, concurrency=Promise.allSettled"
+    },
+    "workplan_formulation": {
+      "status": "INITIALIZED",
+      "plan": "Antigravity pipeline — task_execution"
+    },
+    "task_execution": "DAGExecutor:M11_Level_1_Start",
+    "tool_calls": [
+      "DAGExecutor"
+    ],
+    "constraint_evaluation": {
+      "amce_contract": null,
+      "result": "SUCCESS"
+    },
+    "failure_recovery": {
+      "rollback_triggered": false,
+      "strategy": "none"
+    }
+  },
+  {
+    "timestamp": "2026-05-19T23:54:39.492Z",
+    "step": "action_execute:DAGExecutor",
+    "tool_called": "DAGExecutor",
+    "reasoning": "Action ACT-002 (level 1): failed",
+    "status": "SUCCESS",
+    "rollback_action": "none",
+    "latency_ms": 24,
+    "cost": 0,
+    "rubric_category": "task_execution",
+    "workplan_formulation": {
+      "status": "INITIALIZED",
+      "plan": "Antigravity pipeline — task_execution"
+    },
+    "task_execution": "DAGExecutor:action_execute:DAGExecutor",
+    "tool_calls": [
+      "DAGExecutor"
+    ],
+    "constraint_evaluation": {
+      "amce_contract": null,
+      "result": "SUCCESS"
+    },
+    "failure_recovery": {
+      "rollback_triggered": false,
+      "strategy": "none"
+    }
+  },
+  {
+    "timestamp": "2026-05-19T23:54:39.493Z",
+    "step": "M11_Level_1_Complete",
+    "tool_called": "DAGExecutor",
+    "reasoning": "Level 1 settled — 0/1 actions succeeded; state mutations applied between levels",
+    "status": "SUCCESS",
+    "rollback_action": "none",
+    "latency_ms": 25,
+    "cost": 0,
+    "rubric_category": "task_execution",
+    "data_lineage": {
+      "from": "Level_1",
+      "to": "Level_2",
+      "data_type": "LevelSettlement",
+      "key_change": "0/1 success"
+    },
+    "workplan_formulation": {
+      "status": "INITIALIZED",
+      "plan": "Antigravity pipeline — task_execution"
+    },
+    "task_execution": "DAGExecutor:M11_Level_1_Complete",
+    "tool_calls": [
+      "DAGExecutor"
+    ],
+    "constraint_evaluation": {
+      "amce_contract": null,
+      "result": "SUCCESS"
+    },
+    "failure_recovery": {
+      "rollback_triggered": false,
+      "strategy": "none"
+    }
+  },
+  {
+    "timestamp": "2026-05-19T23:54:39.494Z",
+    "step": "M11_Level_2_Start",
+    "tool_called": "DAGExecutor",
+    "reasoning": "Antigravity launching level 2 (1 actions in parallel via Promise.allSettled): ACT-003",
+    "status": "SUCCESS",
+    "rollback_action": "none",
+    "latency_ms": 0,
+    "cost": 0,
+    "rubric_category": "task_execution",
+    "data_lineage": {
+      "from": "M11_DAGExecutor",
+      "to": "Level_2",
+      "data_type": "LevelLaunch",
+      "key_change": "actions=1, concurrency=Promise.allSettled"
+    },
+    "workplan_formulation": {
+      "status": "INITIALIZED",
+      "plan": "Antigravity pipeline — task_execution"
+    },
+    "task_execution": "DAGExecutor:M11_Level_2_Start",
+    "tool_calls": [
+      "DAGExecutor"
+    ],
+    "constraint_evaluation": {
+      "amce_contract": null,
+      "result": "SUCCESS"
+    },
+    "failure_recovery": {
+      "rollback_triggered": false,
+      "strategy": "none"
+    }
+  },
+  {
+    "timestamp": "2026-05-19T23:54:39.495Z",
+    "step": "action_execute:DAGExecutor",
+    "tool_called": "DAGExecutor",
+    "reasoning": "Action ACT-003 (level 2): skipped",
+    "status": "SUCCESS",
+    "rollback_action": "none",
+    "latency_ms": 0,
+    "cost": 0,
+    "rubric_category": "task_execution",
+    "workplan_formulation": {
+      "status": "INITIALIZED",
+      "plan": "Antigravity pipeline — task_execution"
+    },
+    "task_execution": "DAGExecutor:action_execute:DAGExecutor",
+    "tool_calls": [
+      "DAGExecutor"
+    ],
+    "constraint_evaluation": {
+      "amce_contract": null,
+      "result": "SUCCESS"
+    },
+    "failure_recovery": {
+      "rollback_triggered": false,
+      "strategy": "none"
+    }
+  },
+  {
+    "timestamp": "2026-05-19T23:54:39.495Z",
+    "step": "M11_Level_2_Complete",
+    "tool_called": "DAGExecutor",
+    "reasoning": "Level 2 settled — 0/1 actions succeeded; state mutations applied between levels",
+    "status": "SUCCESS",
+    "rollback_action": "none",
+    "latency_ms": 0,
+    "cost": 0,
+    "rubric_category": "task_execution",
+    "data_lineage": {
+      "from": "Level_2",
+      "to": "Level_3",
+      "data_type": "LevelSettlement",
+      "key_change": "0/1 success"
+    },
+    "workplan_formulation": {
+      "status": "INITIALIZED",
+      "plan": "Antigravity pipeline — task_execution"
+    },
+    "task_execution": "DAGExecutor:M11_Level_2_Complete",
+    "tool_calls": [
+      "DAGExecutor"
+    ],
+    "constraint_evaluation": {
+      "amce_contract": null,
+      "result": "SUCCESS"
+    },
+    "failure_recovery": {
+      "rollback_triggered": false,
+      "strategy": "none"
+    }
+  },
+  {
+    "timestamp": "2026-05-19T23:54:39.496Z",
+    "step": "M11_Level_3_Start",
+    "tool_called": "DAGExecutor",
+    "reasoning": "Antigravity launching level 3 (1 actions in parallel via Promise.allSettled): ACT-004",
+    "status": "SUCCESS",
+    "rollback_action": "none",
+    "latency_ms": 0,
+    "cost": 0,
+    "rubric_category": "task_execution",
+    "data_lineage": {
+      "from": "M11_DAGExecutor",
+      "to": "Level_3",
+      "data_type": "LevelLaunch",
+      "key_change": "actions=1, concurrency=Promise.allSettled"
+    },
+    "workplan_formulation": {
+      "status": "INITIALIZED",
+      "plan": "Antigravity pipeline — task_execution"
+    },
+    "task_execution": "DAGExecutor:M11_Level_3_Start",
+    "tool_calls": [
+      "DAGExecutor"
+    ],
+    "constraint_evaluation": {
+      "amce_contract": null,
+      "result": "SUCCESS"
+    },
+    "failure_recovery": {
+      "rollback_triggered": false,
+      "strategy": "none"
+    }
+  },
+  {
+    "timestamp": "2026-05-19T23:54:39.497Z",
+    "step": "action_execute:DAGExecutor",
+    "tool_called": "DAGExecutor",
+    "reasoning": "Action ACT-004 (level 3): skipped",
+    "status": "SUCCESS",
+    "rollback_action": "none",
+    "latency_ms": 0,
+    "cost": 0,
+    "rubric_category": "task_execution",
+    "workplan_formulation": {
+      "status": "INITIALIZED",
+      "plan": "Antigravity pipeline — task_execution"
+    },
+    "task_execution": "DAGExecutor:action_execute:DAGExecutor",
+    "tool_calls": [
+      "DAGExecutor"
+    ],
+    "constraint_evaluation": {
+      "amce_contract": null,
+      "result": "SUCCESS"
+    },
+    "failure_recovery": {
+      "rollback_triggered": false,
+      "strategy": "none"
+    }
+  },
+  {
+    "timestamp": "2026-05-19T23:54:39.498Z",
+    "step": "M11_Level_3_Complete",
+    "tool_called": "DAGExecutor",
+    "reasoning": "Level 3 settled — 0/1 actions succeeded; state mutations applied between levels",
+    "status": "SUCCESS",
+    "rollback_action": "none",
+    "latency_ms": 1,
+    "cost": 0,
+    "rubric_category": "task_execution",
+    "data_lineage": {
+      "from": "Level_3",
+      "to": "M12_FailureRecoveryEngine",
+      "data_type": "LevelSettlement",
+      "key_change": "0/1 success"
+    },
+    "workplan_formulation": {
+      "status": "INITIALIZED",
+      "plan": "Antigravity pipeline — task_execution"
+    },
+    "task_execution": "DAGExecutor:M11_Level_3_Complete",
+    "tool_calls": [
+      "DAGExecutor"
+    ],
+    "constraint_evaluation": {
+      "amce_contract": null,
+      "result": "SUCCESS"
+    },
+    "failure_recovery": {
+      "rollback_triggered": false,
+      "strategy": "none"
+    }
+  },
+  {
+    "timestamp": "2026-05-19T23:54:39.499Z",
+    "step": "decision:AntigravityOrchestrator",
+    "tool_called": "AntigravityOrchestrator",
+    "reasoning": "Phase E routing → M12 for failed action ACT-002. Antigravity contract requires ledger.refund() FIRST before retry/fallback.",
+    "status": "SUCCESS",
+    "rollback_action": "none",
+    "latency_ms": 0,
+    "cost": 0,
+    "rubric_category": "workplan_formulation",
+    "workplan_formulation": {
+      "status": "INITIALIZED",
+      "plan": "Antigravity pipeline — workplan_formulation"
+    },
+    "task_execution": "AntigravityOrchestrator:decision:AntigravityOrchestrator",
+    "tool_calls": [
+      "AntigravityOrchestrator"
+    ],
+    "constraint_evaluation": {
+      "amce_contract": null,
+      "result": "SUCCESS"
+    },
+    "failure_recovery": {
+      "rollback_triggered": false,
+      "strategy": "none"
+    }
+  },
+  {
+    "timestamp": "2026-05-19T23:54:39.501Z",
+    "step": "M12_LedgerRefund_ACT-002",
+    "tool_called": "SagaConstraintLedger",
+    "reasoning": "Refunded PKR 0 from reserved row LEDGER-TEST-T-0002 BEFORE any retry/fallback. Available now: PKR 50000.",
+    "status": "SUCCESS",
+    "rollback_action": "Escrowed funds released; retry/fallback may now re-reserve",
+    "latency_ms": 0,
+    "cost": 0,
+    "rubric_category": "failure_recovery",
+    "data_lineage": {
+      "from": "M12_FailureRecoveryEngine",
+      "to": "SagaConstraintLedger",
+      "data_type": "LedgerRefund",
+      "key_change": "available +PKR 0 → 50000"
+    },
+    "workplan_formulation": {
+      "status": "INITIALIZED",
+      "plan": "Antigravity pipeline — failure_recovery"
+    },
+    "task_execution": "SagaConstraintLedger:M12_LedgerRefund_ACT-002",
+    "tool_calls": [
+      "SagaConstraintLedger"
+    ],
+    "constraint_evaluation": {
+      "amce_contract": null,
+      "result": "SUCCESS"
+    },
+    "failure_recovery": {
+      "rollback_triggered": false,
+      "strategy": "none"
+    }
+  },
+  {
+    "timestamp": "2026-05-19T23:54:39.502Z",
+    "step": "M12_RecoveryPlanned_ACT-002",
+    "tool_called": "FailureRecoveryEngine",
+    "reasoning": "Strategy=retry, refund_invoked=true, refund_amount=PKR 0, recovery_cost=PKR 0",
+    "status": "SUCCESS",
+    "rollback_action": "Retry 2 attempts",
+    "latency_ms": 0,
+    "cost": 0,
+    "rubric_category": "failure_recovery",
+    "data_lineage": {
+      "from": "M12_FailureRecoveryEngine",
+      "to": "M11_DAGExecutor",
+      "data_type": "RecoveryPlan",
+      "key_change": "retry (refunded PKR 0, new cost PKR 0)"
+    },
+    "workplan_formulation": {
+      "status": "INITIALIZED",
+      "plan": "Antigravity pipeline — failure_recovery"
+    },
+    "task_execution": "FailureRecoveryEngine:M12_RecoveryPlanned_ACT-002",
+    "tool_calls": [
+      "FailureRecoveryEngine"
+    ],
+    "constraint_evaluation": {
+      "amce_contract": null,
+      "result": "SUCCESS"
+    },
+    "failure_recovery": {
+      "rollback_triggered": false,
+      "strategy": "none"
+    }
+  },
+  {
+    "timestamp": "2026-05-19T23:54:39.503Z",
+    "step": "recovery:FailureRecoveryEngine",
+    "tool_called": "FailureRecoveryEngine",
+    "reasoning": "Recovery for ACT-002: strategy=retry, refund_invoked=true, refund_amount_pkr=0, recovery_cost_pkr=0",
+    "status": "ROLLED_BACK",
+    "rollback_action": "Recovery for ACT-002: strategy=retry, refund_invoked=true, refund_amount_pkr=0, recovery_cost_pkr=0",
+    "latency_ms": 0,
+    "cost": 0,
+    "rubric_category": "failure_recovery",
+    "workplan_formulation": {
+      "status": "INITIALIZED",
+      "plan": "Antigravity pipeline — failure_recovery"
+    },
+    "task_execution": "FailureRecoveryEngine:recovery:FailureRecoveryEngine",
+    "tool_calls": [
+      "FailureRecoveryEngine"
+    ],
+    "constraint_evaluation": {
+      "amce_contract": null,
+      "result": "ROLLED_BACK"
+    },
+    "failure_recovery": {
+      "rollback_triggered": true,
+      "strategy": "Recovery for ACT-002: strategy=retry, refund_invoked=true, refund_amount_pkr=0, recovery_cost_pkr=0"
+    }
+  },
+  {
+    "timestamp": "2026-05-19T23:54:39.504Z",
+    "step": "decision:AntigravityOrchestrator",
+    "tool_called": "AntigravityOrchestrator",
+    "reasoning": "Phase F routing → M13 (Outcome Visualizer). Synthesizes state diff + timeline + residual risk + agentic-vs-heuristic baseline + cost/scalability.",
+    "status": "SUCCESS",
+    "rollback_action": "none",
+    "latency_ms": 0,
+    "cost": 0,
+    "rubric_category": "workplan_formulation",
+    "workplan_formulation": {
+      "status": "INITIALIZED",
+      "plan": "Antigravity pipeline — workplan_formulation"
+    },
+    "task_execution": "AntigravityOrchestrator:decision:AntigravityOrchestrator",
+    "tool_calls": [
+      "AntigravityOrchestrator"
+    ],
+    "constraint_evaluation": {
+      "amce_contract": null,
+      "result": "SUCCESS"
+    },
+    "failure_recovery": {
+      "rollback_triggered": false,
+      "strategy": "none"
+    }
+  },
+  {
+    "timestamp": "2026-05-19T23:54:39.513Z",
+    "step": "AMCE_M13_StructuralValidation",
+    "tool_called": "ZodValidator",
+    "reasoning": "M13 output passed Zod structural schema (ALERT_ONLY). residual_risk=elevated, verdict=agentic_wins, parallel_levels=4",
+    "status": "SUCCESS",
+    "rollback_action": "none",
+    "latency_ms": 7,
+    "cost": 0,
+    "rubric_category": "constraint_evaluation",
+    "data_lineage": {
+      "from": "M13_OutcomeVisualizer",
+      "to": "PipelineResult",
+      "data_type": "OutcomeVisualization",
+      "key_change": "residual_risk=elevated, success_rate=50.0%, cost=PKR 0"
+    },
+    "workplan_formulation": {
+      "status": "INITIALIZED",
+      "plan": "Antigravity pipeline — constraint_evaluation"
+    },
+    "task_execution": "ZodValidator:AMCE_M13_StructuralValidation",
+    "tool_calls": [
+      "ZodValidator"
+    ],
+    "constraint_evaluation": {
+      "amce_contract": null,
+      "result": "SUCCESS"
+    },
+    "failure_recovery": {
+      "rollback_triggered": false,
+      "strategy": "none"
+    }
+  }
+]

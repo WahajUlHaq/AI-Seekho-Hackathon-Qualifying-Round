@@ -455,11 +455,36 @@ export class PipelineOrchestrator {
                     },
                 });
             } else {
+                // V2 Phase 4 — Global Panic Handler. Any non-AMCE failure is
+                // funnelled through this branch so the auditor can distinguish
+                // an unrecoverable orchestrator exception from a base-model
+                // BLOCK halt. The file-logger uses synchronous appendFileSync,
+                // so every event written prior to this point is already on
+                // disk; the explicit PIPELINE_HALT marker below signals that
+                // the captured trace up to the point of failure has been
+                // safely flushed before exit.
                 traceCollector.log(pipelineId, {
                     pipeline_id: pipelineId,
                     event_type: "failure",
                     agent: "PipelineOrchestrator",
                     message: `Pipeline failed: ${err instanceof Error ? err.message : String(err)}`,
+                });
+                antigravityFileLogger.append({
+                    timestamp: new Date().toISOString(),
+                    step: "PIPELINE_HALT_PANIC",
+                    tool_called: "AntigravityOrchestrator",
+                    reasoning: `Global panic handler engaged for pipeline ${pipelineId}. Captured trace flushed to disk before graceful halt. Reason: ${err instanceof Error ? err.message : String(err)}`,
+                    status: "FAILED",
+                    rollback_action: "halt_pipeline_flush_trace",
+                    latency_ms: 0,
+                    cost: 0,
+                    rubric_category: "failure_recovery",
+                    data_lineage: {
+                        from: "PipelineOrchestrator",
+                        to: "AntigravityFileLogger",
+                        data_type: "PanicFlush",
+                        key_change: `pipeline_status=failed`,
+                    },
                 });
             }
             const trace = traceCollector.finalizePipeline(pipelineId);

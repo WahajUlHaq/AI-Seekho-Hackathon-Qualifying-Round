@@ -115,7 +115,15 @@ function deriveRubricFields(input: TraceEntryInput): {
     };
 }
 
-const DEFAULT_LOG_PATH = path.resolve(process.cwd(), "logs/antigravity_trace.log");
+/**
+ * Anchor the trace log on the backend root, NOT cwd. file-logger.ts lives at
+ * `backend/src/tracing/file-logger.ts`, so `<__dirname>/../..` is the backend
+ * root and the log lands at `backend/logs/antigravity_trace.log` regardless
+ * of which directory the runner was launched from. V2 Phase 4 mandates this
+ * exact path as the single authoritative trace sink.
+ */
+const BACKEND_ROOT = path.resolve(__dirname, "..", "..");
+const DEFAULT_LOG_PATH = path.resolve(BACKEND_ROOT, "logs", "antigravity_trace.log");
 
 export class AntigravityFileLogger {
     private logPath: string;
@@ -148,6 +156,21 @@ export class AntigravityFileLogger {
 
     getPath(): string {
         return this.logPath;
+    }
+
+    /**
+     * V2 Phase 4 — explicit truncate. Tests (test-24) and the trace-formatter
+     * harness need a clean log to produce a reproducible submission JSON
+     * array. Writes are already synchronous (`appendFileSync`) so the on-disk
+     * state is durable after each `append()`; truncate is therefore the only
+     * extra primitive Phase 4 needs.
+     */
+    truncate(): void {
+        const dir = path.dirname(this.logPath);
+        if (!fs.existsSync(dir)) {
+            fs.mkdirSync(dir, { recursive: true });
+        }
+        fs.writeFileSync(this.logPath, "", "utf-8");
     }
 }
 
