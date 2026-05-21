@@ -14,6 +14,7 @@ import {
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { LinearGradient } from "expo-linear-gradient";
+import { Feather } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
 import type { BottomTabNavigationProp } from "@react-navigation/bottom-tabs";
 
@@ -110,7 +111,7 @@ export function DashboardScreen({ operatorHandle }: Props): React.ReactElement {
         <SafeAreaView edges={["top"]} style={styles.safe}>
             <KeyboardAvoidingView
                 style={styles.root}
-                behavior={Platform.OS === "ios" ? "padding" : undefined}
+                behavior={Platform.OS === "ios" ? "height" : "padding"}
             >
                 <ScrollView
                     style={styles.scroll}
@@ -119,17 +120,12 @@ export function DashboardScreen({ operatorHandle }: Props): React.ReactElement {
                 >
                     {/* ── App header row ─────────────────────── */}
                     <View style={styles.appHeader}>
-                        <Pressable style={styles.headerIconBtn} hitSlop={8}>
-                            <Text style={styles.headerIconGlyph}>≡</Text>
-                        </Pressable>
+                        <View />
                         <View style={styles.headerLogoRow}>
                             <Text style={styles.headerLogoBolt}>⚡</Text>
                             <Text style={styles.headerLogo}>ChainFlow</Text>
                         </View>
                         <View style={styles.headerRight}>
-                            <Pressable style={styles.headerIconBtn} hitSlop={8}>
-                                <Text style={styles.headerIconGlyph}>🕐</Text>
-                            </Pressable>
                             <View style={styles.headerAvatar}>
                                 <Text style={styles.headerAvatarText}>{headerInitial}</Text>
                             </View>
@@ -202,7 +198,7 @@ export function DashboardScreen({ operatorHandle }: Props): React.ReactElement {
                     <View style={styles.tabBody}>
                         {tab === "FILE" ? (
                             <Pressable style={styles.dropZone} onPress={addFile}>
-                                <Text style={styles.dropArrow}>⬆</Text>
+                                <Feather name="upload-cloud" size={32} color={T.teal} style={{ marginBottom: 8 }} />
                                 <Text style={styles.dropTitle}>Pick a file</Text>
                                 <Text style={styles.dropSubtitle}>PDF / CSV / TXT / JSON</Text>
                             </Pressable>
@@ -277,38 +273,14 @@ export function DashboardScreen({ operatorHandle }: Props): React.ReactElement {
                         </>
                     ) : null}
 
-                    {/* ── Prompt input bar with gradient border ─ */}
-                    <View style={styles.promptWrap}>
-                        <GradientBorderCard
-                            colors={T.gradBlue}
-                            radius={28}
-                            thickness={1.5}
-                            innerStyle={styles.promptInner}
-                        >
-                            <View style={styles.promptRow}>
-                                <View style={styles.promptBadge}>
-                                    <Text style={styles.promptBadgeText}>
-                                        {demoMode ? "DEMO" : tab}
-                                    </Text>
-                                </View>
-                                <TextInput
-                                    style={styles.promptInput}
-                                    value={promptDraft}
-                                    onChangeText={setPromptDraft}
-                                    placeholder="Describe your workflow intent…"
-                                    placeholderTextColor={T.tx3V2}
-                                />
-                                <Pressable style={styles.promptIconBtn} hitSlop={6}>
-                                    <Text style={styles.promptIconGlyph}>🎙</Text>
-                                </Pressable>
-                                <Pressable style={styles.promptIconBtn} hitSlop={6}>
-                                    <Text style={styles.promptIconGlyph}>＋</Text>
-                                </Pressable>
-                            </View>
-                        </GradientBorderCard>
-                    </View>
+                    {/* ── Footer Status ─────────────────────── */}
+                    {/* <Text style={styles.statusItalic}>
+                        Awaiting active payload for full diagnostic ingestion…
+                    </Text> */}
+                </ScrollView>
 
-                    {/* ── Launch Pipeline CTA ────────────────── */}
+                {/* ── Bottom Launch CTA ──────────────────── */}
+                <View style={styles.bottomBar}>
                     <Pressable
                         onPress={launch}
                         disabled={launchDisabled}
@@ -327,11 +299,7 @@ export function DashboardScreen({ operatorHandle }: Props): React.ReactElement {
                             )}
                         </LinearGradient>
                     </Pressable>
-
-                    <Text style={styles.statusItalic}>
-                        Awaiting active payload for full diagnostic ingestion…
-                    </Text>
-                </ScrollView>
+                </View>
             </KeyboardAvoidingView>
         </SafeAreaView>
     );
@@ -744,15 +712,19 @@ const styles = StyleSheet.create({
         fontWeight: "800",
     },
 
-    // ── Prompt bar ──
-    promptWrap: {
-        marginTop: 18,
-        marginBottom: 14,
+    // ── Prompt / Chat Bottom Bar ──
+    bottomBar: {
+        paddingHorizontal: 16,
+        paddingTop: 8,
+        paddingBottom: Platform.OS === "ios" ? 8 : 16,
+        backgroundColor: T.bgBaseV2,
+        borderTopWidth: 1,
+        borderTopColor: T.bdDimV2,
     },
     promptInner: {
         backgroundColor: T.bgSurfaceV2,
         borderRadius: 26.5,
-        paddingHorizontal: 10,
+        paddingHorizontal: 6,
         paddingVertical: 6,
     },
     promptRow: {
@@ -767,6 +739,7 @@ const styles = StyleSheet.create({
         borderRadius: T.rFull,
         paddingHorizontal: 10,
         paddingVertical: 4,
+        marginLeft: 4,
     },
     promptBadgeText: {
         color: T.teal,
@@ -777,20 +750,38 @@ const styles = StyleSheet.create({
     promptInput: {
         flex: 1,
         color: T.tx1V2,
-        fontSize: 13,
-        paddingVertical: 6,
+        fontSize: 14,
+        paddingVertical: 8,
         paddingHorizontal: 4,
         minHeight: 38,
+        maxHeight: 120, // Prevent infinite growth
     },
-    promptIconBtn: {
-        width: 32,
-        height: 32,
-        borderRadius: 16,
+    submitBtn: {
+        width: 36,
+        height: 36,
+        borderRadius: 18,
+        backgroundColor: T.teal,
         alignItems: "center",
         justifyContent: "center",
+        marginRight: 2,
     },
-    promptIconGlyph: {
-        fontSize: 14,
+    submitBtnDisabled: {
+        opacity: 0.5,
+        backgroundColor: T.tx3V2,
+    },
+    submitBtnGlyph: {
+        fontSize: 16,
+        color: "#fff",
+        fontWeight: "900",
+        transform: [{ translateY: -1 }], // Small centering tweak
+    },
+
+    statusItalic: {
+        color: T.tx3V2,
+        fontStyle: "italic",
+        fontSize: 11,
+        textAlign: "center",
+        marginTop: 14,
     },
 
     // ── Launch CTA ──
@@ -812,13 +803,5 @@ const styles = StyleSheet.create({
         fontSize: 16,
         fontWeight: "800",
         letterSpacing: 0.4,
-    },
-
-    statusItalic: {
-        color: T.tx3V2,
-        fontStyle: "italic",
-        fontSize: 11,
-        textAlign: "center",
-        marginTop: 14,
     },
 });

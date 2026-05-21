@@ -3,10 +3,12 @@ import { Alert, Pressable, ScrollView, StyleSheet, Text, View } from "react-nati
 import { SafeAreaView } from "react-native-safe-area-context";
 
 import { usePipelineContext } from "@/context/PipelineContext";
+import { clearOperatorHandle } from "@/services/IdentityService";
 import { T } from "@/lib/theme";
 
 interface Props {
     operatorHandle: string;
+    onSignOut?: () => void;
 }
 
 interface SettingsRow {
@@ -16,7 +18,7 @@ interface SettingsRow {
     onPress: () => void;
 }
 
-export function ProfileScreen({ operatorHandle }: Props): React.ReactElement {
+export function ProfileScreen({ operatorHandle, onSignOut }: Props): React.ReactElement {
     const pipeline = usePipelineContext();
 
     const stats = useMemo(() => {
@@ -36,10 +38,10 @@ export function ProfileScreen({ operatorHandle }: Props): React.ReactElement {
         Alert.alert(label, "This setting will be available in a future build.");
 
     const rows: SettingsRow[] = [
-        { label: "Notification Preferences", icon: "🔔", onPress: comingSoon("Notifications") },
-        { label: "Security & Biometrics", icon: "🛡", onPress: comingSoon("Security") },
-        { label: "API Configuration", icon: "⚙", onPress: comingSoon("API") },
-        { label: "Export Data", icon: "↓", onPress: comingSoon("Export") },
+        // { label: "Notification Preferences", icon: "🔔", onPress: comingSoon("Notifications") },
+        // { label: "Security & Biometrics", icon: "🛡", onPress: comingSoon("Security") },
+        // { label: "API Configuration", icon: "⚙", onPress: comingSoon("API") },
+        // { label: "Export Data", icon: "↓", onPress: comingSoon("Export") },
         {
             label: "Sign Out",
             icon: "⎋",
@@ -47,13 +49,17 @@ export function ProfileScreen({ operatorHandle }: Props): React.ReactElement {
             onPress: () => {
                 Alert.alert(
                     "Sign out?",
-                    "This clears the active pipeline. Operator credentials remain provisioned.",
+                    "You will be returned to the operator provisioning screen.",
                     [
                         { text: "Cancel", style: "cancel" },
                         {
                             text: "Sign Out",
                             style: "destructive",
-                            onPress: () => pipeline.reset(),
+                            onPress: async () => {
+                                pipeline.reset();
+                                await clearOperatorHandle();
+                                onSignOut?.();
+                            },
                         },
                     ],
                 );

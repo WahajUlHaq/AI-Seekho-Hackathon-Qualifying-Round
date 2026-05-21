@@ -4,6 +4,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { LinearGradient } from "expo-linear-gradient";
 import { useNavigation } from "@react-navigation/native";
 import type { BottomTabNavigationProp } from "@react-navigation/bottom-tabs";
+import { Feather } from "@expo/vector-icons";
 
 import { usePipelineContext } from "@/context/PipelineContext";
 import { PillBadge } from "@/components/PillBadge";
@@ -127,7 +128,7 @@ function RunResults({
                 )}
 
                 {/* ── Advanced insights teaser ──── */}
-                <GradientBorderCard
+                {/* <GradientBorderCard
                     colors={T.gradBlue}
                     radius={T.rLg}
                     thickness={1}
@@ -143,7 +144,7 @@ function RunResults({
                         </View>
                         <Text style={styles.insightsArrow}>→</Text>
                     </View>
-                </GradientBorderCard>
+                </GradientBorderCard> */}
 
                 {/* ── CTAs ──── */}
                 <Pressable onPress={onStartNew} style={styles.launchOuter}>
@@ -157,14 +158,13 @@ function RunResults({
                     </LinearGradient>
                 </Pressable>
 
-                <Pressable
+                {/* <Pressable
                     style={styles.outlineBtn}
                     onPress={() => {
-                        /* future: artifact download */
                     }}
                 >
                     <Text style={styles.outlineBtnText}>↓ Download All Artifacts</Text>
-                </Pressable>
+                </Pressable> */}
             </ScrollView>
         </SafeAreaView>
     );
@@ -237,7 +237,7 @@ function RunCanceled({
                 {/* ── Canceled hero card ──── */}
                 <View style={styles.canceledCard}>
                     <View style={styles.canceledCircle}>
-                        <Text style={styles.canceledX}>✕</Text>
+                        <Feather name="x" size={26} color={T.crimson} />
                     </View>
                     <Text style={styles.canceledTitle}>Run Canceled</Text>
                     <Text style={styles.canceledBody}>
@@ -252,21 +252,38 @@ function RunCanceled({
                             end={{ x: 1, y: 0 }}
                             style={styles.retryInner}
                         >
-                            <Text style={styles.retryText}>↺ Retry Execution</Text>
+                            <View style={{ flexDirection: "row", alignItems: "center", gap: 6 }}>
+                                <Feather name="refresh-cw" size={14} color="#fff" />
+                                <Text style={styles.retryText}>Retry Execution</Text>
+                            </View>
                         </LinearGradient>
                     </Pressable>
 
                     <Pressable
-                        style={styles.outlineBtnInline}
                         onPress={onRetry}
+                        style={{ alignSelf: "stretch", width: "100%", marginTop: 10, borderRadius: 14, overflow: "hidden" }}
                     >
-                        <Text style={styles.outlineBtnText}>✎ Edit Pipeline Input</Text>
+                        <LinearGradient
+                            colors={["#171f30ff", "#232e42"]}
+                            start={{ x: 0, y: 0 }}
+                            end={{ x: 1, y: 0 }}
+                            style={styles.retryInner}
+                        >
+                            <View style={{ flexDirection: "row", alignItems: "center", gap: 6 }}>
+                                <Feather name="edit-2" size={14} color="#fff" />
+                                <Text style={styles.retryText}>Edit Pipeline Input</Text>
+                            </View>
+                        </LinearGradient>
                     </Pressable>
 
                     <Pressable onPress={onGoToAudit} style={styles.canceledAuditLink}>
-                        <Text style={styles.canceledAuditLinkText}>
-                            🔍 View audit ledger for this run →
-                        </Text>
+                        <View style={{ flexDirection: "row", alignItems: "center", gap: 4 }}>
+                            <Feather name="search" size={12} color={T.blue} />
+                            <Text style={styles.canceledAuditLinkText}>
+                                View audit ledger for this run
+                            </Text>
+                            <Feather name="arrow-right" size={12} color={T.blue} />
+                        </View>
                     </Pressable>
                 </View>
 
@@ -310,7 +327,7 @@ function RunCanceled({
                         </Text>
                     </View>
                     <Pressable onPress={onGoToAudit} style={styles.auditTeaserBtn}>
-                        <Text style={styles.auditTeaserBtnText}>Go to Audit →</Text>
+                        <Text style={styles.auditTeaserBtnText}>Go to Audit <Feather name="arrow-right" size={12} color={T.blue} /></Text>
                     </Pressable>
                 </View>
             </ScrollView>

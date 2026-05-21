@@ -140,7 +140,7 @@ function ExecutionTabIcon({ color }: { color: string }): React.ReactElement {
 
 // ── Tabs component (inside Provider so it can read pipeline state) ──
 
-function Tabs({ operatorHandle }: { operatorHandle: string }): React.ReactElement {
+function Tabs({ operatorHandle, onSignOut }: { operatorHandle: string; onSignOut: () => void }): React.ReactElement {
     const pipeline = usePipelineContext();
     const navigationRef = useNavigationContainerRef<RootTabParamList>();
     const lastNavStatus = useRef<string | null>(null);
@@ -224,7 +224,7 @@ function Tabs({ operatorHandle }: { operatorHandle: string }): React.ReactElemen
                         tabBarIcon: ({ color }) => <ProfileIcon color={color} />,
                     }}
                 >
-                    {() => <ProfileScreen operatorHandle={operatorHandle} />}
+                    {() => <ProfileScreen operatorHandle={operatorHandle} onSignOut={onSignOut} />}
                 </Tab.Screen>
             </Tab.Navigator>
         </NavigationContainer>
@@ -303,7 +303,7 @@ export default function App(): React.ReactElement {
         <SafeAreaProvider>
             <StatusBar style="light" />
             <PipelineProvider>
-                <Tabs operatorHandle={boot.operatorHandle} />
+                <Tabs operatorHandle={boot.operatorHandle} onSignOut={() => setBoot({ phase: "provisioning" })} />
             </PipelineProvider>
         </SafeAreaProvider>
     );
