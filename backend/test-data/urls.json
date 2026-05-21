@@ -1,0 +1,20 @@
+[
+  {
+    "url": "https://freightwatch.io/alerts/route-suspension-2026",
+    "label": "Industry freight alert portal",
+    "expected_tier": "MEDIUM",
+    "mock_content": "<html><body><h1>Route Suspension Alert</h1><p>NorthRoute Carrier has suspended operations on the WH-NORTH to WH-SOUTH corridor. Estimated duration: 48 hours. Affected shipments should be rerouted via WH-EAST. Item ITM-A1 stock at WH-NORTH is reported at 420 units pending verification.</p></body></html>"
+  },
+  {
+    "url": "https://gov.example/logistics/disruption-notice-2026-Q2",
+    "label": "Government logistics regulatory portal",
+    "expected_tier": "HIGH",
+    "mock_content": "<html><body><h1>Official Logistics Disruption Notice</h1><p>This notice confirms infrastructure maintenance affecting the KM-47 freight corridor. Expected resolution: 72 hours from 2026-05-14T09:00Z. All carriers are required to maintain service logs and submit rerouting plans within 24 hours.</p></body></html>"
+  },
+  {
+    "url": "https://blogspot.com/supply-chain-watch/northroute-suspension-may2026",
+    "label": "Industry blogger post",
+    "expected_tier": "LOW",
+    "mock_content": "<html><body><h1>NorthRoute Down Again?</h1><p>Sources tell me NorthRoute Carrier is suspended again on their main WH corridor. I'm hearing the delay could be anywhere from 2 days to a week. Personally I think ITM-A1 inventory is way overstated - more like 300 units not the 380 they claim. Take this with a grain of salt.</p></body></html>"
+  }
+]

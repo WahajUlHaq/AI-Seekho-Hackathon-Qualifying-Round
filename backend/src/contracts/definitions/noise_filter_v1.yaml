@@ -1,0 +1,51 @@
+name: noise_filter_v1
+version: "1.0"
+module: NoiseFilterAgent
+description: "Output contract for the noise filter and deduplication agent"
+fields:
+  filter_id:
+    type: string
+    required: true
+    regex: "^FLT-[A-Z0-9]{8}$"
+  filtered_at:
+    type: string
+    required: true
+  input_count:
+    type: number
+    required: true
+    min: 0
+  output_count:
+    type: number
+    required: true
+    min: 0
+  removed_count:
+    type: number
+    required: true
+    min: 0
+  sources:
+    type: array
+    required: true
+    items:
+      type: object
+      properties:
+        source_id:
+          type: string
+          required: true
+        source_type:
+          type: string
+          required: true
+          enum: [pdf, url, csv, txt, json, realtime_feed]
+        content:
+          type: string
+          required: true
+        credibility_tier:
+          type: string
+          required: true
+          enum: [HIGH, MEDIUM, LOW, UNVERIFIED]
+        ingested_at:
+          type: string
+          required: true
+semantic_checks:
+  - "output_count must equal the length of the sources array"
+  - "removed_count must equal input_count minus output_count"
+  - "output_count must be less than or equal to input_count"

@@ -1,0 +1,28 @@
+name: impact_analysis_v1
+version: "1.0"
+module: ImpactScorerAgent
+description: "Module 8 contract — 0-100 Impact Magnitude Score derived from weighted Financial (40%), Operational (35%), Reputational (25%) component buckets."
+fields:
+  impact_analysis_id:
+    type: string
+    required: true
+    regex: "^IMP-[A-Z0-9]{8}$"
+  analyzed_at:
+    type: string
+    required: true
+  componentScores:
+    type: object
+    required: true
+  impactMagnitudeScore:
+    type: number
+    required: true
+    min: 0
+    max: 100
+  reasoning:
+    type: string
+    required: true
+semantic_checks:
+  - "componentScores must contain exactly three numeric keys: financial, operational, reputational, each in the inclusive range 0..100"
+  - "impactMagnitudeScore must equal round(componentScores.financial * 0.40 + componentScores.operational * 0.35 + componentScores.reputational * 0.25) within a tolerance of 1"
+  - "impactMagnitudeScore must be in the inclusive range 0..100"
+  - "reasoning must reference at least one input from the Phase 2 insights (trend, risk, opportunity, or conflict)"

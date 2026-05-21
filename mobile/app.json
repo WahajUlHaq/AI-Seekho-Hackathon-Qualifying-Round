@@ -1,0 +1,53 @@
+{
+  "expo": {
+    "name": "Pipeline Control",
+    "slug": "pipeline-control",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "userInterfaceStyle": "dark",
+    "newArchEnabled": true,
+    "splash": {
+      "image": "./assets/splash-icon.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#0b0b0f"
+    },
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "com.codewitharham.pipelinecontrol",
+      "infoPlist": {
+        "NSFaceIDUsageDescription": "Sign HITL approvals for the agentic pipeline.",
+        "NSAppTransportSecurity": {
+          "NSAllowsLocalNetworking": true
+        }
+      }
+    },
+    "android": {
+      "package": "com.codewitharham.pipelinecontrol",
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/adaptive-icon.png",
+        "backgroundColor": "#0b0b0f"
+      },
+      "edgeToEdgeEnabled": true,
+      "predictiveBackGestureEnabled": false,
+      "permissions": ["USE_BIOMETRIC", "USE_FINGERPRINT"]
+    },
+    "web": {
+      "favicon": "./assets/favicon.png"
+    },
+    "plugins": [
+      [
+        "expo-secure-store",
+        {
+          "faceIDPermission": "Authorize HITL approvals using Face ID."
+        }
+      ],
+      [
+        "expo-local-authentication",
+        {
+          "faceIDPermission": "Authorize HITL approvals using Face ID."
+        }
+      ]
+    ]
+  }
+}

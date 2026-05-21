@@ -1,0 +1,34 @@
+name: workflow_audit_v1
+version: "1.0"
+module: WorkflowAuditAgent
+description: "Module 14 contract — consolidated compliance receipt with mock SHA-256 verification hash."
+fields:
+  pipelineId:
+    type: string
+    required: true
+  audit_id:
+    type: string
+    required: true
+    regex: "^AUD-[A-Z0-9]{8}$"
+  generated_at:
+    type: string
+    required: true
+  finalized_status:
+    type: string
+    required: true
+    enum: [APPROVED_PASSED, APPROVED_PARTIAL, APPROVED_FAILED, REJECTED]
+  signature_block:
+    type: object
+    required: true
+  verification_hash:
+    type: string
+    required: true
+    regex: "^[a-f0-9]{64}$"
+  event_summary:
+    type: object
+    required: true
+semantic_checks:
+  - "verification_hash must be a valid SHA-256 hex digest (64 lowercase hex chars)"
+  - "signature_block must contain approver (string), pipeline_id (string), and signed_at (ISO timestamp) keys"
+  - "event_summary must contain numeric counters for at least: agent_start, agent_complete, action_start, action_complete, contract_gate"
+  - "finalized_status must reflect upstream M11.overall_status (SUCCESS to APPROVED_PASSED, PARTIAL_SUCCESS to APPROVED_PARTIAL, FAILED to APPROVED_FAILED)"

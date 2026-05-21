@@ -1,0 +1,43 @@
+name: multi_source_ingestion_v1
+version: "1.0"
+module: MultiSourceIngestionAgent
+description: "Output contract for the multi-source ingestion agent"
+fields:
+  ingestion_id:
+    type: string
+    required: true
+    regex: "^ING-[A-Z0-9]{8}$"
+  timestamp:
+    type: string
+    required: true
+  sources_processed:
+    type: number
+    required: true
+    min: 1
+    max: 20
+  sources:
+    type: array
+    required: true
+    items:
+      type: object
+      properties:
+        source_id:
+          type: string
+          required: true
+        source_type:
+          type: string
+          required: true
+          enum: [pdf, url, csv, txt, json, realtime_feed]
+        content:
+          type: string
+          required: true
+        credibility_tier:
+          type: string
+          enum: [HIGH, MEDIUM, LOW, UNVERIFIED]
+        ingested_at:
+          type: string
+          required: true
+semantic_checks:
+  - "Each source must have non-empty content"
+  - "ingestion_id must follow ING-XXXXXXXX pattern with 8 uppercase alphanumeric chars"
+  - "sources_processed must equal the length of the sources array"

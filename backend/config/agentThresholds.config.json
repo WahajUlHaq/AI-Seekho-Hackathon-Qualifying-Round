@@ -1,0 +1,47 @@
+{
+  "credibilityScorer": {
+    "maxAgeHours": 168,
+    "recencyMaxScore": 40,
+    "authorityMaxScore": 30,
+    "qualityMaxScore": 30,
+    "authorityDefaultScore": 15,
+    "qualityPromptMaxChars": 500,
+    "tierThresholds": {
+      "high": 70,
+      "medium": 45,
+      "low": 20
+    }
+  },
+  "noiseFilter": {
+    "cosineSimilarityThreshold": 0.85,
+    "spamBatchSize": 10
+  },
+  "contradictionDetector": {
+    "numericDiscrepancyPercent": 20,
+    "numericCriticalPercent": 50,
+    "temporalDiffHours": 24,
+    "confidenceThreshold": 0.75
+  },
+  "conflictResolution": {
+    "credibilityDiffThreshold": 30,
+    "temporalDiffHours": 24,
+    "weightedAverageMaxDiff": 10
+  },
+  "insightExtraction": {
+    "chunkSizeTokens": 500,
+    "chunkOverlapTokens": 100,
+    "topK": 5,
+    "embeddingBatchSize": 20
+  },
+  "temporalAnalysis": {
+    "slopeThreshold": 0.1,
+    "driftStdDevThreshold": 2.0,
+    "spikeZScore": 2.0,
+    "anomalyZScore": 3.0,
+    "minDataPoints": 3
+  },
+  "ingestion": {
+    "feedDelayMs": 50,
+    "maxContentLengthBytes": 5242880
+  }
+}

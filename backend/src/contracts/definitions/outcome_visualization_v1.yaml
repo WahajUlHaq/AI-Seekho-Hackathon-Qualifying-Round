@@ -1,0 +1,32 @@
+name: outcome_visualization_v1
+version: "1.0"
+module: OutcomeVisualizerAgent
+description: "Module 13 contract — quantitative before/after deltas and qualitative impact projection."
+fields:
+  pipelineId:
+    type: string
+    required: true
+  total_cost:
+    type: number
+    required: true
+    min: 0
+  projected_risk_reduction:
+    type: number
+    required: true
+    min: 0
+    max: 100
+  simulated_latency_saved:
+    type: number
+    required: true
+  before_state_summary:
+    type: string
+    required: true
+  after_state_summary:
+    type: string
+    required: true
+  qualitative_diff:
+    type: string
+    required: true
+semantic_checks:
+  - "projected_risk_reduction must be in the inclusive range 0..100"
+  - "qualitative_diff must reference at least one ACT- action_id from the execution chain"

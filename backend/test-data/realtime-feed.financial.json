@@ -1,0 +1,190 @@
+[
+  {
+    "id": "EVT-FIN-001",
+    "timestamp": "2026-05-14T06:00:00Z",
+    "source": "FEED-REALTIME-01",
+    "event_type": "remittance_advice",
+    "payload": {
+      "entity": "SystemsX Tech Private Limited",
+      "bank_log_id": "HBL-IRV-2026-8871A",
+      "currency": "USD",
+      "amount_inward": 248750.00,
+      "amount_credited_pkr": 69648750.00,
+      "exchange_rate": 279.95,
+      "advice_status": "received",
+      "regulator": "SBP",
+      "confidence": "high"
+    }
+  },
+  {
+    "id": "EVT-FIN-002",
+    "timestamp": "2026-05-14T06:05:00Z",
+    "source": "FEED-REALTIME-01",
+    "event_type": "retention_variance",
+    "payload": {
+      "entity": "SystemsX Tech Private Limited",
+      "bank_log_id": "HBL-IRV-2026-8871A",
+      "retention_required_pkr": 6964875.00,
+      "retention_observed_pkr": 5223656.25,
+      "variance_delta_pkr": -1741218.75,
+      "variance_pct": -25.0,
+      "regulatory_file": "Annexure-R",
+      "flag": "below_threshold"
+    }
+  },
+  {
+    "id": "EVT-FIN-003",
+    "timestamp": "2026-05-14T06:10:00Z",
+    "source": "FEED-REALTIME-01",
+    "event_type": "pseb_registration",
+    "payload": {
+      "entity": "SystemsX Tech Private Limited",
+      "pseb_registration_id": "PSEB-IT-2024-04812",
+      "designation_code": "ITES-EXP-A",
+      "valid_until": "2027-06-30",
+      "annual_export_pkr": 412500000.00,
+      "annual_export_usd": 1473214.00,
+      "renewal_status": "active",
+      "regulator": "PSEB"
+    }
+  },
+  {
+    "id": "EVT-FIN-004",
+    "timestamp": "2026-05-14T06:15:00Z",
+    "source": "FEED-REALTIME-01",
+    "event_type": "compliance_alert",
+    "payload": {
+      "entity": "SystemsX Tech Private Limited",
+      "bank_log_id": "HBL-IRV-2026-8871A",
+      "regulatory_file": "Annexure-R",
+      "rule_reference": "SBP FE Manual Chapter 8, Para 12(iii)",
+      "violation_type": "retention_shortfall",
+      "severity": "HIGH",
+      "deadline_to_cure": "2026-05-28T23:59:59Z"
+    }
+  },
+  {
+    "id": "EVT-FIN-005",
+    "timestamp": "2026-05-14T06:20:00Z",
+    "source": "FEED-REALTIME-01",
+    "event_type": "transaction_log",
+    "payload": {
+      "entity": "SystemsX Tech Private Limited",
+      "bank_log_id": "HBL-IRV-2026-8871A",
+      "instrument": "swift_credit",
+      "originator": "Acme Holdings GmbH",
+      "originator_country": "DE",
+      "purpose_code": "P0802 (computer services)",
+      "swift_reference": "MT103-202605140600-XL9821",
+      "value_date": "2026-05-13"
+    }
+  },
+  {
+    "id": "EVT-FIN-006",
+    "timestamp": "2026-05-14T06:30:00Z",
+    "source": "FEED-REALTIME-01",
+    "event_type": "remittance_advice",
+    "payload": {
+      "entity": "Nasrullah Textiles (Pvt) Ltd",
+      "bank_log_id": "MCB-IRV-2026-5510B",
+      "currency": "USD",
+      "amount_inward": 87320.00,
+      "amount_credited_pkr": 24443854.00,
+      "exchange_rate": 279.95,
+      "advice_status": "received",
+      "regulator": "SBP",
+      "confidence": "medium"
+    }
+  },
+  {
+    "id": "EVT-FIN-007",
+    "timestamp": "2026-05-14T06:45:00Z",
+    "source": "FEED-REALTIME-01",
+    "event_type": "foreign_currency_account",
+    "payload": {
+      "entity": "SystemsX Tech Private Limited",
+      "fca_account_no": "HBL-FCA-0231-994",
+      "currency": "USD",
+      "opening_balance": 412580.40,
+      "month_to_date_credit": 248750.00,
+      "month_to_date_debit": 0.00,
+      "closing_balance": 661330.40
+    }
+  },
+  {
+    "id": "EVT-FIN-008",
+    "timestamp": "2026-05-14T07:00:00Z",
+    "source": "FEED-REALTIME-01",
+    "event_type": "retention_variance",
+    "payload": {
+      "entity": "Nasrullah Textiles (Pvt) Ltd",
+      "bank_log_id": "MCB-IRV-2026-5510B",
+      "retention_required_pkr": 2444385.40,
+      "retention_observed_pkr": 2444385.40,
+      "variance_delta_pkr": 0.00,
+      "variance_pct": 0.0,
+      "regulatory_file": "Annexure-R",
+      "flag": "compliant"
+    }
+  },
+  {
+    "id": "EVT-FIN-009",
+    "timestamp": "2026-05-14T07:15:00Z",
+    "source": "FEED-REALTIME-01",
+    "event_type": "pseb_registration",
+    "payload": {
+      "entity": "Nasrullah Textiles (Pvt) Ltd",
+      "pseb_registration_id": "PSEB-MFG-2023-01155",
+      "designation_code": "MFG-EXP-C",
+      "valid_until": "2026-12-31",
+      "annual_export_pkr": 138900000.00,
+      "annual_export_usd": 496160.00,
+      "renewal_status": "due_for_review",
+      "regulator": "PSEB"
+    }
+  },
+  {
+    "id": "EVT-FIN-010",
+    "timestamp": "2026-05-14T07:30:00Z",
+    "source": "FEED-REALTIME-01",
+    "event_type": "audit_trail",
+    "payload": {
+      "entity": "SystemsX Tech Private Limited",
+      "bank_log_id": "HBL-IRV-2026-8871A",
+      "auditor": "Pakistan Audit Office, Regulatory Affairs Wing",
+      "report_reference": "PAO-RAW-2026-Q2-0341",
+      "finding": "Retention deficit of PKR 1,741,218.75 against Annexure-R schedule on inward USD 248,750.00.",
+      "severity": "HIGH",
+      "recommended_action": "Top-up retention within 14 business days and file Annexure-R supplementary affidavit."
+    }
+  },
+  {
+    "id": "EVT-FIN-011",
+    "timestamp": "2026-05-14T08:00:00Z",
+    "source": "FEED-REALTIME-01",
+    "event_type": "fx_rate_snapshot",
+    "payload": {
+      "regulator": "SBP",
+      "pair": "USD/PKR",
+      "interbank_rate": 279.95,
+      "open_market_rate": 281.20,
+      "spread_pct": 0.4465,
+      "snapshot_window": "2026-05-14T07:55:00Z/08:00:00Z"
+    }
+  },
+  {
+    "id": "EVT-FIN-012",
+    "timestamp": "2026-05-14T08:30:00Z",
+    "source": "FEED-REALTIME-01",
+    "event_type": "compliance_alert",
+    "payload": {
+      "entity": "Nasrullah Textiles (Pvt) Ltd",
+      "bank_log_id": "MCB-IRV-2026-5510B",
+      "regulatory_file": "Annexure-R",
+      "rule_reference": "PSEB Circular 2024-06, Section 4",
+      "violation_type": "registration_renewal_due",
+      "severity": "MEDIUM",
+      "deadline_to_cure": "2026-09-30T23:59:59Z"
+    }
+  }
+]

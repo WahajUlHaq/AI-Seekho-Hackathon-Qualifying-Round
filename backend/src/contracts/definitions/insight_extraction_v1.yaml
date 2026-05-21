@@ -1,0 +1,36 @@
+name: insight_extraction_v1
+version: "1.0"
+module: InsightExtractionAgent
+description: "Output contract for the RAG-powered insight extraction agent"
+fields:
+  extraction_id:
+    type: string
+    required: true
+    regex: "^INS-[A-Z0-9]{8}$"
+  extracted_at:
+    type: string
+    required: true
+  chunks_indexed:
+    type: number
+    required: true
+    min: 0
+  sources_used:
+    type: number
+    required: true
+    min: 0
+  trends:
+    type: array
+    required: true
+  risks:
+    type: array
+    required: true
+  opportunities:
+    type: array
+    required: true
+  persistentConflicts:
+    type: array
+    required: true
+semantic_checks:
+  - "trends, risks, and opportunities must each have at least one entry when sources_used > 0"
+  - "Each trend must have title and description fields"
+  - "Each risk must have title, description, and severity fields"

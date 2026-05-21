@@ -1,0 +1,30 @@
+{
+  "permissions": {
+    "allow": [
+      "PowerShell(Get-ChildItem -Path \"D:\\\\Google Ai Seekho 2026\\\\Autonomous Content-to-Action Agent\" -Recurse -Depth 3 -File | Where-Object { $_.Extension -match '\\\\.\\(json|ts|js|py|env|toml|yaml|yml|txt|lock|config\\)$' } | Select-Object -ExpandProperty FullName)",
+      "PowerShell(Get-ChildItem -Path \"D:\\\\Google Ai Seekho 2026\\\\Autonomous Content-to-Action Agent\" -Recurse -Depth 2 -File | Where-Object { $_.Name -match '^\\(package\\\\.json|tsconfig\\\\.json|\\\\.env|requirements\\\\.txt|Dockerfile|docker-compose\\\\.yml|\\\\.eslintrc|\\\\.prettierrc|vite\\\\.config|next\\\\.config|tailwind\\\\.config\\)' } | Select-Object -ExpandProperty FullName)",
+      "PowerShell(Get-ChildItem -Path \"D:\\\\Google Ai Seekho 2026\\\\Autonomous Content-to-Action Agent\" -Recurse -Depth 3 -File | Where-Object { $_.Name -match '^package\\\\.json$' -and $_.FullName -notmatch 'node_modules' } | Select-Object -ExpandProperty FullName)",
+      "PowerShell(Get-ChildItem -Path \"D:\\\\Google Ai Seekho 2026\\\\Autonomous Content-to-Action Agent\\\\backend\\\\src\" -Recurse -File | Where-Object { $_.FullName -notmatch 'node_modules' } | Select-Object -ExpandProperty FullName)",
+      "PowerShell(Get-ChildItem \"D:\\\\Google Ai Seekho 2026\\\\Autonomous Content-to-Action Agent\\\\backend\\\\node_modules\" -Directory | Where-Object { $_.Name -match \"^\\(express|ts-node|js-yaml|zod|uuid|cors|nodemon|@types\\)\" } | Select-Object Name)",
+      "PowerShell(Get-ChildItem \"D:\\\\Google Ai Seekho 2026\\\\Autonomous Content-to-Action Agent\\\\backend\\\\node_modules\" -Directory | Select-Object Name | Where-Object { $_.Name -in @\\(\"express\",\"ts-node\",\"js-yaml\",\"zod\",\"uuid\",\"cors\",\"nodemon\",\"yaml\",\"@types\"\\) } | Sort-Object Name)",
+      "Bash(grep -E \"/\\(express|ts-node|nodemon|zod|js-yaml|yaml|uuid|cors|@types\\)$\")",
+      "Bash(xargs grep -l '\"name\": \"express\"')",
+      "Bash(xargs -I{} sh -c 'echo \"=== {} ===\"; head -3 \"{}\"')",
+      "Bash(xargs head -5)",
+      "Bash(curl -s -X POST http://localhost:8000/api/pipeline/run -H 'Content-Type: application/json' -d '{\"sources\":[{\"type\":\"test\"}]}')",
+      "Bash(python3 -m json.tool)",
+      "Bash(curl -s http://localhost:8000/api/validations)",
+      "WebSearch",
+      "Bash(npm install *)",
+      "Bash(ls backend/src/docs)",
+      "Bash(ls backend/openapi*)",
+      "Bash(ls backend/src/docs/contracts/)",
+      "Bash(npx --yes create-expo-app@latest . --template blank-typescript --no-install)",
+      "WebFetch(domain:docs.expo.dev)",
+      "Bash(npx expo *)",
+      "Bash(Get-ChildItem -Path \"D:\\\\Google Ai Seekho 2026\\\\Autonomous Content-to-Action Agent\\\\mobile\\\\src\" -Recurse -Filter \"*.ts*\")",
+      "Bash(Select-Object -ExpandProperty FullName)",
+      "Bash(Select-Object -First 30)"
+    ]
+  }
+}

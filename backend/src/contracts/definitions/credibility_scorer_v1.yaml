@@ -1,0 +1,46 @@
+name: credibility_scorer_v1
+version: "1.0"
+module: CredibilityScorerAgent
+description: "Output contract for the credibility scoring agent"
+fields:
+  scorer_id:
+    type: string
+    required: true
+    regex: "^SCR-[A-Z0-9]{8}$"
+  scored_at:
+    type: string
+    required: true
+  sources_scored:
+    type: number
+    required: true
+    min: 1
+  sources:
+    type: array
+    required: true
+    items:
+      type: object
+      properties:
+        source_id:
+          type: string
+          required: true
+        source_type:
+          type: string
+          required: true
+          enum: [pdf, url, csv, txt, json, realtime_feed]
+        content:
+          type: string
+          required: true
+        ingested_at:
+          type: string
+          required: true
+        credibility_tier:
+          type: string
+          required: true
+          enum: [HIGH, MEDIUM, LOW, UNVERIFIED]
+        credibility_score:
+          type: object
+          required: true
+semantic_checks:
+  - "sources_scored must equal the length of the sources array"
+  - "Each source must have a credibility_score with recency, authority, quality, and total fields"
+  - "total credibility score must equal recency + authority + quality for each source"

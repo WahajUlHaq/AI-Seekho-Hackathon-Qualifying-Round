@@ -1,0 +1,51 @@
+name: action_chain_v1
+version: "1.0"
+module: ExecutionSimulatorAgent
+description: "Module 11 contract — unified execution result for the HITL-approved, topologically-sorted action chain."
+fields:
+  pipelineId:
+    type: string
+    required: true
+  overall_status:
+    type: string
+    required: true
+    enum: [SUCCESS, PARTIAL_SUCCESS, FAILED]
+  approved_by:
+    type: string
+    required: false
+  approval_timestamp:
+    type: string
+    required: true
+  total_execution_ms:
+    type: number
+    required: true
+    min: 0
+  execution_results:
+    type: array
+    required: true
+    items:
+      type: object
+      properties:
+        action_id:
+          type: string
+          required: true
+          regex: "^ACT-[A-Z0-9]{6}$"
+        status:
+          type: string
+          required: true
+          enum: [SUCCESS, FAILED, SKIPPED]
+        latency_ms:
+          type: number
+          required: true
+          min: 0
+        error_message:
+          type: string
+          required: false
+        output_summary:
+          type: string
+          required: false
+semantic_checks:
+  - "execution_results length must equal the number of actions submitted to the simulator"
+  - "overall_status must be SUCCESS only if every execution_results entry has status=SUCCESS"
+  - "overall_status must be FAILED only if no execution_results entry has status=SUCCESS"
+  - "execution_results must reference unique action_ids (no duplicates)"
