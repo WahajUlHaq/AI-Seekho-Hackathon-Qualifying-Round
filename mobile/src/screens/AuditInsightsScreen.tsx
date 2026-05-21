@@ -99,21 +99,6 @@ export function AuditInsightsScreen(): React.ReactElement {
                     </Text>
                 </View>
 
-                {/* ── Filter row ──── */}
-                <View style={styles.filterRow}>
-                    <Pressable style={styles.filterBtn}>
-                        <Text style={styles.filterBtnText}>▼ Filters</Text>
-                    </Pressable>
-                    <Pressable style={styles.filterBtn}>
-                        <Text style={styles.filterBtnText}>⏰ Last 24h</Text>
-                    </Pressable>
-                    <Pressable style={[styles.filterBtn, styles.filterBtnAccent]}>
-                        <Text style={[styles.filterBtnText, styles.filterBtnTextAccent]}>
-                            ↑ Export JSON
-                        </Text>
-                    </Pressable>
-                </View>
-
                 {/* ── Finalization distribution ──── */}
                 <Text style={styles.sectionEyebrow}>FINALIZATION DISTRIBUTION</Text>
                 <View style={styles.distributionRow}>
@@ -156,7 +141,7 @@ export function AuditInsightsScreen(): React.ReactElement {
                     <LineChart
                         data={timelineData}
                         width={SCREEN_W - 36}
-                        height={140}
+                        height={200}
                         bezier
                         withInnerLines={false}
                         withOuterLines={false}
@@ -167,7 +152,7 @@ export function AuditInsightsScreen(): React.ReactElement {
                 </View>
 
                 {/* ── Ingestion breakdown ──── */}
-                <Text style={styles.sectionEyebrow}>INGESTION BREAKDOWN</Text>
+                {/* <Text style={styles.sectionEyebrow}>INGESTION BREAKDOWN</Text>
                 <View style={styles.breakdownRow}>
                     <BreakdownCard
                         icon="📄"
@@ -183,7 +168,7 @@ export function AuditInsightsScreen(): React.ReactElement {
                         sub="Processed links"
                         accent={T.blue}
                     />
-                </View>
+                </View> */}
 
                 {/* ── Ledger receipts ──── */}
                 <View style={styles.sectionRowFlex}>
@@ -211,7 +196,7 @@ export function AuditInsightsScreen(): React.ReactElement {
                     <BarChart
                         data={confidenceData}
                         width={SCREEN_W - 36}
-                        height={140}
+                        height={200}
                         yAxisLabel=""
                         yAxisSuffix=""
                         chartConfig={chartConfig("24,200,100")}
@@ -253,32 +238,7 @@ export function AuditInsightsScreen(): React.ReactElement {
                     ))
                 )}
 
-                {/* ── Export artifacts ──── */}
-                <Text style={styles.sectionEyebrow}>EXPORT ARTIFACTS</Text>
-                <View style={styles.exportCard}>
-                    <View style={styles.exportIconBox}>
-                        <Text style={styles.exportIcon}>🛡</Text>
-                    </View>
-                    <View style={{ flex: 1 }}>
-                        <Text style={styles.exportName}>Audit_Report.pdf</Text>
-                        <Text style={styles.exportMeta}>Signed PDF · ledger snapshot</Text>
-                    </View>
-                    <Pressable style={styles.exportBtn}>
-                        <Text style={styles.exportBtnText}>↓</Text>
-                    </Pressable>
-                </View>
-                <View style={styles.exportCard}>
-                    <View style={styles.exportIconBox}>
-                        <Text style={styles.exportIcon}>📁</Text>
-                    </View>
-                    <View style={{ flex: 1 }}>
-                        <Text style={styles.exportName}>Ledger_Raw_Dump.json</Text>
-                        <Text style={styles.exportMeta}>Raw hash ledger</Text>
-                    </View>
-                    <Pressable style={styles.exportBtn}>
-                        <Text style={styles.exportBtnText}>↓</Text>
-                    </Pressable>
-                </View>
+
             </ScrollView>
         </SafeAreaView>
     );

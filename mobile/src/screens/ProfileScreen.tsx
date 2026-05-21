@@ -36,10 +36,10 @@ export function ProfileScreen({ operatorHandle }: Props): React.ReactElement {
         Alert.alert(label, "This setting will be available in a future build.");
 
     const rows: SettingsRow[] = [
-        { label: "Notification Preferences", icon: "🔔", onPress: comingSoon("Notifications") },
-        { label: "Security & Biometrics", icon: "🛡", onPress: comingSoon("Security") },
-        { label: "API Configuration", icon: "⚙", onPress: comingSoon("API") },
-        { label: "Export Data", icon: "↓", onPress: comingSoon("Export") },
+        // { label: "Notification Preferences", icon: "🔔", onPress: comingSoon("Notifications") },
+        // { label: "Security & Biometrics", icon: "🛡", onPress: comingSoon("Security") },
+        // { label: "API Configuration", icon: "⚙", onPress: comingSoon("API") },
+        // { label: "Export Data", icon: "↓", onPress: comingSoon("Export") },
         {
             label: "Sign Out",
             icon: "⎋",

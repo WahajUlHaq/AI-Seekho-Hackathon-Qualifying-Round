@@ -138,39 +138,6 @@ export function ExecutionScreen({ operatorHandle }: Props): React.ReactElement {
                 <ThinkingCard event={thinkingEvent} onExpand={() => setLogOpen(true)} />
             ) : null}
 
-            {/* ── Inject instruction bar ──────────────── */}
-            <View style={styles.injectBar}>
-                <Pressable style={styles.injectIconBtn} hitSlop={6}>
-                    <Text style={styles.injectIcon}>🎙</Text>
-                </Pressable>
-                <TextInput
-                    style={styles.injectInput}
-                    value={injectDraft}
-                    onChangeText={setInjectDraft}
-                    placeholder="Inject instruction…"
-                    placeholderTextColor={T.tx3V2}
-                />
-                <Pressable
-                    style={styles.injectSendOuter}
-                    onPress={() => {
-                        Alert.alert(
-                            "Inject instruction",
-                            "Backend endpoint not yet available. Note recorded locally only.",
-                        );
-                        setInjectDraft("");
-                    }}
-                >
-                    <LinearGradient
-                        colors={[T.teal, "#0095a8"] as readonly [string, string]}
-                        start={{ x: 0, y: 0 }}
-                        end={{ x: 1, y: 1 }}
-                        style={styles.injectSendInner}
-                    >
-                        <Text style={styles.injectSendGlyph}>↑</Text>
-                    </LinearGradient>
-                </Pressable>
-            </View>
-
             {/* ── Log drill-down modal ────────────────── */}
             <LogModal
                 visible={logOpen}
