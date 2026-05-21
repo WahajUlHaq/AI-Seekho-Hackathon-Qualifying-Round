@@ -202,12 +202,12 @@ function ResultCard({
 
             <View style={styles.resultFooter}>
                 <View style={styles.resultFooterIcons}>
-                    <View style={styles.resultIconChip}>
+                    {/* <View style={styles.resultIconChip}>
                         <Text style={styles.resultIconChipText}>↓</Text>
                     </View>
                     <View style={styles.resultIconChip}>
                         <Text style={styles.resultIconChipText}>↗</Text>
-                    </View>
+                    </View> */}
                 </View>
                 <Text style={styles.resultLatency}>{result.latency_ms} ms</Text>
             </View>
